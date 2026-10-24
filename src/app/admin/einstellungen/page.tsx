@@ -71,8 +71,11 @@ export default function Einstellungen() {
                   const f = x.target.files?.[0];
                   if (!f) return;
                   const r = await hochladen(f);
-                  if (r.id) setP({ ...p, foto_id: r.id });
-                  else zeige(r);
+                  if (!r.id) return zeige(r);
+                  // sofort speichern – sonst ist das Foto nur in der Vorschau
+                  const neu = { ...p, foto_id: r.id };
+                  setP(neu);
+                  zeige(await anfrage('/api/admin/profil', 'PUT', neu), 'Foto gespeichert.');
                 }}
               />
             </div>
@@ -152,9 +155,20 @@ export default function Einstellungen() {
                 const f = x.target.files?.[0];
                 if (!f) return;
                 const r = await hochladen(f);
-                if (r.id) setE({ ...e, theme: { ...th, logoDateiId: r.id } });
+                if (!r.id) return zeige(r);
+                await speichern({ theme: { ...th, logoDateiId: r.id } });
               }}
             />
+            <span className="mt-2 flex flex-wrap items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={th.logoDateiId ? `/api/datei/${th.logoDateiId}` : '/logo-aveyo.png'} alt="Aktuelles Logo" className="h-10 w-auto rounded border border-slate-200 bg-white p-1" />
+              {th.logoDateiId && (
+                <button type="button" className="a-btn2" onClick={() => speichern({ theme: { ...th, logoDateiId: 0 } })}>
+                  Standard-Logo verwenden
+                </button>
+              )}
+            </span>
+            <span className="mt-1 block text-xs text-slate-500">Am besten ein eng zugeschnittenes PNG mit transparentem Hintergrund.</span>
           </Feld>
           <button className="a-btn" onClick={() => speichern({ theme: th })}>
             Branding speichern
