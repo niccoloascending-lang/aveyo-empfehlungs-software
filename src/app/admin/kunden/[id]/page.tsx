@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { MessageCircle, Mail, RefreshCw, Ban, Trash2, ExternalLink } from 'lucide-react';
 import Shell from '@/components/admin/Shell';
 import { anfrage, useDaten, datum } from '@/components/admin/api';
-import { Feld, KopierKnopf, Meldung, Themen } from '@/components/admin/ui';
+import { AnredeFelder, Feld, KopierKnopf, Meldung, Themen } from '@/components/admin/ui';
 
 const ART: Record<string, string> = { nachricht: 'Persönliche Danke-Nachricht', spende: 'Spende im Namen des Empfehlers', erlebnis: 'Gemeinsames Erlebnis', doppelt: 'Doppeltes Geschenk' };
 const KANAL: Record<string, string> = { whatsapp: 'WhatsApp', signal: 'Signal', telegram: 'Telegram', email: 'E-Mail', kopieren: 'Kopiert', nativ: 'Andere App', qr: 'QR-Code' };
@@ -200,6 +200,7 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
         <form onSubmit={speichern} className="a-karte h-fit space-y-3">
           <h2 className="font-semibold">Stammdaten</h2>
           <div className="grid gap-3 sm:grid-cols-2">
+            <AnredeFelder anrede={f.anrede ?? ''} ansprache={f.ansprache ?? ''} onChange={(v) => setF({ ...f, ...v })} />
             <Feld label="Vorname">
               <input className="a-input" value={f.vorname ?? ''} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
             </Feld>

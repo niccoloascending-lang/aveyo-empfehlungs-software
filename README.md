@@ -189,9 +189,9 @@ Header: `X-Geschenk-Zeit` (Unix-Sekunden) und `X-Geschenk-Signatur: sha256=<HMAC
 
 **REST-API** (API-Key in den Einstellungen erzeugen, `Authorization: Bearer gk_…`):
 - `GET /api/v1/anfragen?seit=2026-01-01T00:00:00Z` – bestätigte Anfragen (gleiches Format wie oben)
-- `POST /api/v1/kunden` `{ vorname, nachname, email, handy?, themen?, extern_id? }` – legt an oder aktualisiert (über `extern_id`, sonst E-Mail) und gibt den Magic-Link zurück. Es wird nichts verschickt.
+- `POST /api/v1/kunden` `{ vorname, nachname, email, handy?, themen?, extern_id?, anrede? (Herr/Frau), ansprache? (du/sie) }` – legt an oder aktualisiert (über `extern_id`, sonst E-Mail) und gibt den Magic-Link zurück. Es wird nichts verschickt.
 
-**CSV-Import:** Admin → Kunden → CSV-Import (Spalten `Vorname;Nachname;E-Mail;Handy;Themen;Kundennummer`), mit Probelauf und Fehlerliste je Zeile.
+**CSV-Import:** Admin → Kunden → CSV-Import (Spalten `Anrede;Vorname;Nachname;E-Mail;Handy;Themen;Kundennummer;Ansprache`; Anrede = Herr/Frau, Ansprache = Du/Sie, beides optional), mit Probelauf und Fehlerliste je Zeile.
 
 ## Recht & Datenschutz – wie es umgesetzt ist
 

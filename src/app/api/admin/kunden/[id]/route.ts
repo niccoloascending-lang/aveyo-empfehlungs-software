@@ -3,7 +3,8 @@ import { one, all, run, protokolliere } from '@/lib/db';
 import { linkFuer, kundeLoeschen, type Kunde } from '@/lib/kunden';
 import { wirkungVon } from '@/lib/empfehler';
 import { istEmail, sauber, telefon, themenLesen } from '@/lib/validierung';
-import { t, einstellungen } from '@/lib/einstellungen';
+import { t, einstellungen, ansprache } from '@/lib/einstellungen';
+import { anredeName, istAnredeform, istAnsprache } from '@/lib/texte';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +28,9 @@ export const GET = admin((_req, b, ctx) => {
   return json({
     kunde: k,
     link,
-    einladung: link ? t('einladung.text', { vorname: k.vorname, link }) : '',
-    einladungBetreff: t('einladung.betreff'),
-    dankeVorlage: t('danke.nachricht', { vorname: k.vorname, berater }),
+    einladung: link ? t('einladung.text', { vorname: k.vorname, anrede_name: anredeName(k, ansprache(k)), link }, ansprache(k)) : '',
+    einladungBetreff: t('einladung.betreff', {}, ansprache(k)),
+    dankeVorlage: t('danke.nachricht', { vorname: k.vorname, anrede_name: anredeName(k, ansprache(k)), berater }, ansprache(k)),
     wirkung: wirkungVon(k, null),
     teilungen,
     dankeschoens,
@@ -46,8 +47,11 @@ export const PUT = admin(async (req, b, ctx) => {
   if (!vorname) return fehler('Vorname fehlt.');
   if (email && !istEmail(email)) return fehler('E-Mail ungültig.');
   if (handy === null) return fehler('Handynummer ungültig.');
+  if (!istAnredeform(d.anrede ?? '') || !istAnsprache(d.ansprache ?? '')) return fehler('Anrede/Ansprache ungültig.');
   run(
-    "UPDATE kunden SET vorname = ?, nachname = ?, email = ?, handy = ?, themen = ?, notiz = ?, geaendert = datetime('now') WHERE id = ?",
+    "UPDATE kunden SET anrede = ?, ansprache = ?, vorname = ?, nachname = ?, email = ?, handy = ?, themen = ?, notiz = ?, geaendert = datetime('now') WHERE id = ?",
+    d.anrede ?? '',
+    d.ansprache ?? '',
     vorname,
     sauber(d.nachname, 80),
     email || null,

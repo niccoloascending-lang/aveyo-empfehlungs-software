@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { TEXTE, fuelle, rohtext, text, textPaket, rechtlichePruefliste, bloecke } from '../src/lib/texte.ts';
+import { TEXTE, fuelle, rohtext, text, textPaket, rechtlichePruefliste, bloecke, anredeName } from '../src/lib/texte.ts';
 
 test('Platzhalter: bekannte ersetzt, unbekannte leer (nichts erfinden)', () => {
   assert.equal(fuelle('Hallo {vorname}, {unbekannt}!', { vorname: 'Lisa' }), 'Hallo Lisa, !');
@@ -46,4 +46,14 @@ test('Einfacher Textsatz', () => {
   assert.deepEqual(b.map((x) => x.typ), ['h1', 'p', 'h2', 'ul', 'p']);
   assert.deepEqual(b[3].punkte, ['a', 'b']);
   assert.equal(b[1].text, 'Absatz eins\nZeile zwei');
+});
+
+test('Anrede: Du = Vorname, Sie = Herr/Frau Nachname, sonst neutral voller Name', () => {
+  assert.equal(anredeName({ vorname: 'Lisa', nachname: 'Muster', anrede: 'frau' }, 'du'), 'Lisa');
+  assert.equal(anredeName({ vorname: 'Lisa', nachname: 'Muster', anrede: 'frau' }, 'sie'), 'Frau Muster');
+  assert.equal(anredeName({ vorname: 'Max', nachname: 'Muster', anrede: 'herr' }, 'sie'), 'Herr Muster');
+  assert.equal(anredeName({ vorname: 'Kim', nachname: 'Muster', anrede: '' }, 'sie'), 'Kim Muster');
+  assert.equal(anredeName({ vorname: 'Kim', nachname: '', anrede: 'herr' }, 'sie'), 'Kim');
+  assert.equal(text('kunde.titel', 'sie', {}, { vorname: 'Max', anrede_name: 'Herr Muster' }), 'Hallo Herr Muster!');
+  assert.equal(text('kunde.titel', 'du', {}, { vorname: 'Max', anrede_name: 'Herr Muster' }), 'Hallo Max!');
 });

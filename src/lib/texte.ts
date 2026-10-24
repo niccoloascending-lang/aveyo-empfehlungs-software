@@ -18,7 +18,7 @@ export type TextDef = {
 
 export const TEXTE = {
   // ---------- Empfehler: Mein Geschenke-Bereich ----------
-  'kunde.titel': { bereich: 'Empfehler', beschreibung: 'Überschrift', du: 'Hallo {vorname}!' },
+  'kunde.titel': { bereich: 'Empfehler', beschreibung: 'Überschrift ({anrede_name} = „Herr Muster“ bzw. Vor- und Nachname)', du: 'Hallo {vorname}!', sie: 'Hallo {anrede_name}!' },
   'kunde.begruessung': {
     bereich: 'Empfehler',
     beschreibung: 'Persönliche Begrüßung vom Berater',
@@ -339,7 +339,7 @@ export const TEXTE = {
     bereich: 'Einladung',
     beschreibung: 'Nachricht an den Kunden (vom Berater selbst verschickt)',
     du: 'Hey {vorname}, du hast gesagt, du bist zufrieden mit uns. Hier kannst du deinen Freunden ein Geschenk von uns machen: {link}',
-    sie: 'Hallo {vorname}, Sie hatten gesagt, Sie sind zufrieden mit uns. Hier können Sie Ihren Freunden ein Geschenk von uns machen: {link}',
+    sie: 'Hallo {anrede_name}, Sie hatten gesagt, Sie sind zufrieden mit uns. Hier können Sie Ihren Freunden ein Geschenk von uns machen: {link}',
     lang: true,
   },
   'einladung.betreff': { bereich: 'Einladung', beschreibung: 'Betreff, falls per Mail', du: 'Ein Geschenk für deine Freunde', sie: 'Ein Geschenk für Ihre Freunde' },
@@ -349,7 +349,7 @@ export const TEXTE = {
     bereich: 'Dankeschön',
     beschreibung: 'Vorlage persönliche Danke-Nachricht (Versand manuell)',
     du: 'Hallo {vorname},\n\nich wollte einfach Danke sagen. Dass du an uns gedacht hast, freut mich wirklich.\n\nViele Grüße\n{berater}',
-    sie: 'Hallo {vorname},\n\nich wollte einfach Danke sagen. Dass Sie an uns gedacht haben, freut mich wirklich.\n\nViele Grüße\n{berater}',
+    sie: 'Hallo {anrede_name},\n\nich wollte einfach Danke sagen. Dass Sie an uns gedacht haben, freut mich wirklich.\n\nViele Grüße\n{berater}',
     lang: true,
   },
   'belohnung.spende.titel': { bereich: 'Dankeschön', beschreibung: 'Spende: Titel', du: 'Wir spenden in deinem Namen', sie: 'Wir spenden in Ihrem Namen', rechtlich: true },
@@ -416,6 +416,22 @@ export function fuelle(vorlage: string, vars: Record<string, string | number | n
     const v = vars[k];
     return v == null ? '' : String(v);
   });
+}
+
+export type Anredeform = 'herr' | 'frau' | '';
+export const istAnredeform = (x: unknown): x is Anredeform => x === 'herr' || x === 'frau' || x === '';
+export const istAnsprache = (x: unknown): x is Anrede | '' => x === 'du' || x === 'sie' || x === '';
+
+/**
+ * Name für die Begrüßung. Du: Vorname. Sie: „Herr Muster“ / „Frau Muster“, ohne Angabe oder ohne Nachname
+ * neutral mit vollem Namen („Lisa Beispiel“). Das Geschlecht wird nie aus dem Vornamen geraten.
+ */
+export function anredeName(k: { vorname: string; nachname?: string | null; anrede?: string | null }, form: Anrede): string {
+  const vor = (k.vorname ?? '').trim();
+  const nach = (k.nachname ?? '').trim();
+  if (form === 'du') return vor;
+  if (nach && (k.anrede === 'herr' || k.anrede === 'frau')) return `${k.anrede === 'herr' ? 'Herr' : 'Frau'} ${nach}`;
+  return `${vor} ${nach}`.trim();
 }
 
 /** Text nach Anrede holen: Admin-Überschreibung > Standard. Sie-Form fällt auf Du-Form zurück, wenn es keine gibt. */

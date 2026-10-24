@@ -1,6 +1,7 @@
 import { admin, json, fehler, body } from '@/lib/admin';
 import { all, one, insertRow, protokolliere } from '@/lib/db';
-import { einstellungen, t } from '@/lib/einstellungen';
+import { einstellungen, t, ansprache } from '@/lib/einstellungen';
+import { anredeName } from '@/lib/texte';
 import { mehrzeilig } from '@/lib/validierung';
 
 export const dynamic = 'force-dynamic';
@@ -30,9 +31,9 @@ export const POST = admin(async (req, b) => {
   const art = ['nachricht', 'spende', 'erlebnis', 'doppelt'].includes(d.art) ? (d.art as keyof typeof e.belohnungen) : null;
   if (!art) return fehler('Unbekannte Art.');
   if (!e.belohnungen[art]) return fehler('Diese Belohnungsart ist in den Einstellungen ausgeschaltet.');
-  const k = one<{ id: number; vorname: string }>('SELECT id, vorname FROM kunden WHERE id = ?', Number(d.kundeId));
+  const k = one<{ id: number; vorname: string; nachname: string; anrede: string; ansprache: string }>('SELECT id, vorname, nachname, anrede, ansprache FROM kunden WHERE id = ?', Number(d.kundeId));
   if (!k) return fehler('Kunde nicht gefunden.', 404);
-  const text = mehrzeilig(d.text, 5000) || t('danke.nachricht', { vorname: k.vorname, berater: b.name });
+  const text = mehrzeilig(d.text, 5000) || t('danke.nachricht', { vorname: k.vorname, anrede_name: anredeName(k, ansprache(k)), berater: b.name }, ansprache(k));
   const id = insertRow('dankeschoens', { kunde_id: k.id, art, text });
   protokolliere(b.id, 'dankeschoen', `${art}:${k.id}`);
   return json({ ok: true, id });

@@ -73,3 +73,25 @@ export function Themen({ wert, onChange }: { wert: string; onChange: (v: string)
     </div>
   );
 }
+
+/** Anrede (Herr/Frau/keine Angabe, bewusst gewählt – nie aus dem Vornamen geraten) und Du/Sie je Kunde. */
+export function AnredeFelder({ anrede, ansprache, onChange }: { anrede: string; ansprache: string; onChange: (v: { anrede: string; ansprache: string }) => void }) {
+  return (
+    <>
+      <Feld label="Anrede" hinweis="Für die Sie-Form: „Hallo Herr Muster“. Ohne Angabe: „Hallo Lisa Muster“.">
+        <select className="a-input" value={anrede} onChange={(e) => onChange({ anrede: e.target.value, ansprache })}>
+          <option value="">keine Angabe</option>
+          <option value="frau">Frau</option>
+          <option value="herr">Herr</option>
+        </select>
+      </Feld>
+      <Feld label="Ansprache">
+        <select className="a-input" value={ansprache} onChange={(e) => onChange({ anrede, ansprache: e.target.value })}>
+          <option value="">wie in den Einstellungen</option>
+          <option value="du">Du</option>
+          <option value="sie">Sie</option>
+        </select>
+      </Feld>
+    </>
+  );
+}

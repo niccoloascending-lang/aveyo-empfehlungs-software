@@ -213,9 +213,12 @@ for (const g of GESCHENKE) {
 
 if (!one('SELECT 1 FROM kunden LIMIT 1')) {
   kundeAnlegen({ vorname: 'Lisa', nachname: 'Beispiel', email: 'lisa@example.org', handy: '+49 170 0000001', themen: 'pkv,vorsorge', berater_id: adrian, extern_id: 'DEMO-1' });
-  kundeAnlegen({ vorname: 'Jonas', nachname: 'Muster', email: 'jonas@example.org', themen: 'vorsorge,vermoegen', berater_id: adrian, extern_id: 'DEMO-2' });
+  kundeAnlegen({ anrede: 'herr', ansprache: 'sie', vorname: 'Jonas', nachname: 'Muster', email: 'jonas@example.org', themen: 'vorsorge,vermoegen', berater_id: adrian, extern_id: 'DEMO-2' });
   kundeAnlegen({ vorname: 'Mia', nachname: 'Test', email: 'mia@example.org', themen: 'immobilien', berater_id: adrian, extern_id: 'DEMO-3' });
 }
+
+// Ältere Test-Datenbanken: Jonas zeigt die Sie-Form
+run("UPDATE kunden SET anrede = 'herr', ansprache = 'sie' WHERE extern_id = 'DEMO-2' AND anrede = '' AND ansprache = ''");
 
 console.log('\nBeispieldaten bereit.\n');
 console.log(`Admin:   ${process.env.GESCHENK_BASE_URL || 'http://localhost:3200'}/admin`);

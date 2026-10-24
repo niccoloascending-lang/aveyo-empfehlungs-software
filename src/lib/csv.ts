@@ -2,6 +2,16 @@
 // UTF-8 mit/ohne BOM. Rein → testbar.
 import { istEmail, sauber, telefon, themenLesen } from './validierung.ts';
 
+/** „Herr“/„Frau“ aus der CSV, alles andere = keine Angabe. */
+export function anredeLesen(s: string): '' | 'herr' | 'frau' {
+  const w = s.trim().toLowerCase();
+  return w === 'herr' || w === 'hr.' || w === 'hr' ? 'herr' : w === 'frau' || w === 'fr.' || w === 'fr' ? 'frau' : '';
+}
+export function anspracheLesen(s: string): '' | 'du' | 'sie' {
+  const w = s.trim().toLowerCase();
+  return w === 'du' ? 'du' : w === 'sie' ? 'sie' : '';
+}
+
 export function parseCsv(text: string): string[][] {
   const t = text.replace(/^﻿/, '');
   const ersteZeile = t.split(/\r?\n/, 1)[0] ?? '';
@@ -42,9 +52,11 @@ const SPALTEN: Record<string, string[]> = {
   handy: ['handy', 'mobil', 'telefon', 'phone', 'mobile', 'tel'],
   themen: ['themen', 'thema', 'interessen', 'sparten'],
   extern_id: ['id', 'crm_id', 'kunden_id', 'kundennummer', 'extern_id'],
+  anrede: ['anrede', 'salutation'],
+  ansprache: ['ansprache', 'du/sie', 'duzen'],
 };
 
-export type CsvKunde = { vorname: string; nachname: string; email: string; handy: string; themen: string; extern_id: string };
+export type CsvKunde = { vorname: string; nachname: string; anrede: '' | 'herr' | 'frau'; ansprache: '' | 'du' | 'sie'; email: string; handy: string; themen: string; extern_id: string };
 export type CsvErgebnis = { kunden: CsvKunde[]; fehler: { zeile: number; grund: string }[]; spalten: Record<string, number> };
 
 export function kundenAusCsv(text: string): CsvErgebnis {
@@ -75,6 +87,8 @@ export function kundenAusCsv(text: string): CsvErgebnis {
     kunden.push({
       vorname,
       nachname: sauber(get('nachname'), 80),
+      anrede: anredeLesen(get('anrede')),
+      ansprache: anspracheLesen(get('ansprache')),
       email,
       handy,
       themen: themenLesen(get('themen')).join(','),

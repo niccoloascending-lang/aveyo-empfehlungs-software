@@ -75,14 +75,17 @@ export function textOverrides(): Overrides {
 }
 
 /** Texte für eine Seite (nach Anrede, mit Admin-Überschreibungen). */
-export function texte(praefixe: string[] = []) {
-  const e = einstellungen();
-  return textPaket(e.anrede, textOverrides(), praefixe);
+/** Texte für eine Seite. `ansprache`: Du/Sie für einen bestimmten Kunden, sonst die allgemeine Einstellung. */
+export function texte(praefixe: string[] = [], ansprache?: Anrede | '' | null) {
+  return textPaket(ansprache || einstellungen().anrede, textOverrides(), praefixe);
 }
 
-export function t(key: string, vars: Record<string, string | number | null | undefined> = {}) {
-  return textRein(key, einstellungen().anrede, textOverrides(), vars);
+export function t(key: string, vars: Record<string, string | number | null | undefined> = {}, ansprache?: Anrede | '' | null) {
+  return textRein(key, ansprache || einstellungen().anrede, textOverrides(), vars);
 }
+
+/** Du/Sie für einen Kunden: eigene Angabe, sonst allgemeine Einstellung. */
+export const ansprache = (k: { ansprache?: string | null }): Anrede => (k.ansprache === 'du' || k.ansprache === 'sie' ? k.ansprache : einstellungen().anrede);
 
 export const basisUrl = () => (process.env.GESCHENK_BASE_URL || 'http://localhost:3200').replace(/\/+$/, '');
 

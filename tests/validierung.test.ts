@@ -45,10 +45,10 @@ test('CSV: Semikolon, Anführungszeichen, BOM', () => {
 });
 
 test('CSV-Kundenimport mit Fehlern je Zeile', () => {
-  const csv = 'Vorname;Nachname;E-Mail;Handy;Themen;Kundennummer\nLisa;Muster;LISA@example.org;+49 171 111;PKV, Vorsorge;K-1\n;Ohne;x@example.org;;;\nMax;M;kaputt;;;\nEva;E;lisa@example.org;;;\nTom;T;tom@example.org;abc;;';
+  const csv = 'Anrede;Vorname;Nachname;E-Mail;Handy;Themen;Kundennummer;Ansprache\nFrau;Lisa;Muster;LISA@example.org;+49 171 111;PKV, Vorsorge;K-1;Sie\n;;Ohne;x@example.org;;;;\n;Max;M;kaputt;;;;\n;Eva;E;lisa@example.org;;;;\n;Tom;T;tom@example.org;abc;;;';
   const r = kundenAusCsv(csv);
   assert.equal(r.kunden.length, 1);
-  assert.deepEqual(r.kunden[0], { vorname: 'Lisa', nachname: 'Muster', email: 'lisa@example.org', handy: '+49 171 111', themen: 'pkv,vorsorge', extern_id: 'K-1' });
+  assert.deepEqual(r.kunden[0], { vorname: 'Lisa', nachname: 'Muster', anrede: 'frau', ansprache: 'sie', email: 'lisa@example.org', handy: '+49 171 111', themen: 'pkv,vorsorge', extern_id: 'K-1' });
   assert.deepEqual(r.fehler.map((f) => f.zeile), [3, 4, 5, 6]);
   assert.equal(kundenAusCsv('Name;Telefon\nA;1').fehler[0].zeile, 1);
 });

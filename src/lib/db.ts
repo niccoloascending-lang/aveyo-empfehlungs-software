@@ -219,7 +219,9 @@ export function initSchema(d: DatabaseSync) {
   addColumnIfMissing(d, 'berater', 'kalender_id', 'TEXT'); // Google-Kalender-ID (meist die E-Mail-Adresse)
   addColumnIfMissing(d, 'anfragen', 'berater_id', 'INTEGER'); // zuständiger Berater (Kalender)
   addColumnIfMissing(d, 'anfragen', 'google_event_id', 'TEXT');
-  addColumnIfMissing(d, 'geschenke', 'akkusativ', 'TEXT'); // Geschenk im Satz: „Lisa schenkt dir <akkusativ>“
+  addColumnIfMissing(d, 'geschenke', 'akkusativ', 'TEXT');
+  addColumnIfMissing(d, 'kunden', 'anrede', "TEXT NOT NULL DEFAULT ''"); // herr | frau | '' (vom Berater gewählt, nie geraten)
+  addColumnIfMissing(d, 'kunden', 'ansprache', "TEXT NOT NULL DEFAULT ''"); // du | sie | '' (= allgemeine Einstellung) // Geschenk im Satz: „Lisa schenkt dir <akkusativ>“
 }
 
 export type Row = Record<string, any>;

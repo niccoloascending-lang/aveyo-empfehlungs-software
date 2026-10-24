@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Plus, Upload } from 'lucide-react';
 import Shell from '@/components/admin/Shell';
 import { anfrage, useDaten } from '@/components/admin/api';
-import { Feld, Meldung, Themen, THEMEN_LABEL } from '@/components/admin/ui';
+import { AnredeFelder, Feld, Meldung, Themen, THEMEN_LABEL } from '@/components/admin/ui';
 
 type K = { id: number; vorname: string; nachname: string; email: string | null; themen: string; geteilt: number; eingeloest: number; link_aktiv: number; zuletzt_gesehen: string | null };
 
@@ -15,7 +15,7 @@ export default function Kunden() {
   const { daten, laden } = useDaten<K[]>(`/api/admin/kunden?q=${encodeURIComponent(suche)}`);
   const [neu, setNeu] = useState(false);
   const [csv, setCsv] = useState(false);
-  const [f, setF] = useState({ vorname: '', nachname: '', email: '', handy: '', themen: '' });
+  const [f, setF] = useState({ anrede: '', ansprache: '', vorname: '', nachname: '', email: '', handy: '', themen: '' });
   const [fehler, setFehler] = useState('');
 
   const anlegen = async (e: React.FormEvent) => {
@@ -41,6 +41,7 @@ export default function Kunden() {
     >
       {neu && (
         <form onSubmit={anlegen} className="a-karte mb-6 grid gap-3 sm:grid-cols-2">
+          <AnredeFelder anrede={f.anrede} ansprache={f.ansprache} onChange={(v) => setF({ ...f, ...v })} />
           <Feld label="Vorname *">
             <input className="a-input" required value={f.vorname} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
           </Feld>
@@ -119,7 +120,7 @@ function CsvImport({ fertig }: { fertig: () => void }) {
   return (
     <div className="a-karte mb-6 space-y-3">
       <p className="text-sm text-slate-600">
-        CSV mit Kopfzeile, Trennzeichen „;“ oder „,“. Spalten: <code>Vorname</code>, <code>Nachname</code>, <code>E-Mail</code>, optional <code>Handy</code>, <code>Themen</code>,{' '}
+        CSV mit Kopfzeile, Trennzeichen „;“ oder „,“. Spalten: <code>Vorname</code>, <code>Nachname</code>, <code>E-Mail</code>, optional <code>Anrede</code> (Herr/Frau), <code>Ansprache</code> (Du/Sie), <code>Handy</code>, <code>Themen</code>,{' '}
         <code>Kundennummer</code> (ID aus dem CRM). Vorhandene Kunden (gleiche Kundennummer oder E-Mail) werden aktualisiert. Es wird nichts verschickt.
       </p>
       <input type="file" accept=".csv,text/csv" onChange={(e) => datei(e.target.files?.[0])} />

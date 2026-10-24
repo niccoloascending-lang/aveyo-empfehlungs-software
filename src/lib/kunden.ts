@@ -16,6 +16,8 @@ export type Kunde = {
   id: number;
   vorname: string;
   nachname: string;
+  anrede: string;
+  ansprache: string;
   email: string | null;
   handy: string | null;
   themen: string;
@@ -28,12 +30,14 @@ export type Kunde = {
   erstellt: string;
 };
 
-export type KundeNeu = { vorname: string; nachname?: string; email?: string | null; handy?: string | null; themen?: string; berater_id?: number | null; extern_id?: string | null; notiz?: string | null };
+export type KundeNeu = { vorname: string; nachname?: string; anrede?: string; ansprache?: string; email?: string | null; handy?: string | null; themen?: string; berater_id?: number | null; extern_id?: string | null; notiz?: string | null };
 
 export function kundeAnlegen(k: KundeNeu): number {
   const id = insertRow('kunden', {
     vorname: k.vorname,
     nachname: k.nachname ?? '',
+    anrede: k.anrede ?? '',
+    ansprache: k.ansprache ?? '',
     email: k.email || null,
     handy: k.handy || null,
     themen: themenLesen(k.themen ?? '').join(','),
@@ -85,7 +89,7 @@ export function kundeAusToken(token: unknown): Kunde | null {
 export function kundenListe(suche = ''): (Kunde & { geteilt: number; eingeloest: number; link_aktiv: number })[] {
   const q = `%${suche.trim()}%`;
   return all(
-    `SELECT k.id, k.vorname, k.nachname, k.email, k.handy, k.themen, k.berater_id, k.extern_id, k.token_erstellt, k.token_widerrufen,
+    `SELECT k.id, k.vorname, k.nachname, k.anrede, k.ansprache, k.email, k.handy, k.themen, k.berater_id, k.extern_id, k.token_erstellt, k.token_widerrufen,
             k.zuletzt_gesehen, k.erstellt,
             (SELECT COUNT(*) FROM teilungen t WHERE t.kunde_id = k.id AND t.geteilt_am IS NOT NULL) geteilt,
             (SELECT COUNT(*) FROM ereignisse e JOIN teilungen t ON t.id = e.teilung_id
@@ -119,9 +123,11 @@ export function kundeImportieren(k: KundeNeu & { email: string }, beraterId: num
     one<{ id: number }>('SELECT id FROM kunden WHERE lower(email) = lower(?)', k.email);
   if (vorhanden) {
     run(
-      "UPDATE kunden SET vorname = ?, nachname = ?, email = ?, handy = COALESCE(NULLIF(?, ''), handy), themen = CASE WHEN ? = '' THEN themen ELSE ? END, extern_id = COALESCE(NULLIF(?, ''), extern_id), geaendert = datetime('now') WHERE id = ?",
+      "UPDATE kunden SET vorname = ?, nachname = ?, anrede = COALESCE(NULLIF(?, ''), anrede), ansprache = COALESCE(NULLIF(?, ''), ansprache), email = ?, handy = COALESCE(NULLIF(?, ''), handy), themen = CASE WHEN ? = '' THEN themen ELSE ? END, extern_id = COALESCE(NULLIF(?, ''), extern_id), geaendert = datetime('now') WHERE id = ?",
       k.vorname,
       k.nachname ?? '',
+      k.anrede ?? '',
+      k.ansprache ?? '',
       k.email,
       k.handy ?? '',
       themenLesen(k.themen ?? '').join(','),

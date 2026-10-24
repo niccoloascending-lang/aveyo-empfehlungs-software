@@ -1,6 +1,7 @@
 // Daten für „Mein Geschenke-Bereich“ des Empfehlers.
 import { all, run } from './db.ts';
-import { einstellungen, texte } from './einstellungen.ts';
+import { einstellungen, texte, ansprache } from './einstellungen.ts';
+import { anredeName } from './texte.ts';
 import { aktiveGeschenke, beraterFuerKunde, teilungenVonKunde } from './teilungen.ts';
 import { berechneWirkung, type Einwilligung } from './einwilligung.ts';
 import { geschenkeFuer } from './validierung.ts';
@@ -33,9 +34,11 @@ export function empfehlerDaten(kunde: Kunde) {
     'SELECT id, art, spende_zweck, status FROM dankeschoens WHERE kunde_id = ? ORDER BY id DESC',
     kunde.id,
   ).filter((d) => d.art !== 'nachricht' && e.belohnungen[d.art as keyof typeof e.belohnungen]);
-  const t = texte(['kunde.', 'freund.einwilligung', 'belohnung.']);
+  const form = ansprache(kunde);
+  const t = texte(['kunde.', 'freund.einwilligung', 'belohnung.'], form);
   return {
     vorname: kunde.vorname,
+    anredeName: anredeName(kunde, form),
     berater: b ? { name: b.name, foto_id: b.foto_id, video_url: b.video_url } : null,
     geschenke: geschenkeFuer(aktiveGeschenke(), kunde.themen, 4).map((g) => ({ id: g.id, titel: g.titel, satz: imSatz(g), kurz: g.kurz, icon: g.icon, typ: g.typ, bild_id: g.bild_id })),
     t,

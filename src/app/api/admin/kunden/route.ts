@@ -2,6 +2,7 @@ import { admin, json, fehler, body } from '@/lib/admin';
 import { kundenListe, kundeAnlegen } from '@/lib/kunden';
 import { istEmail, sauber, telefon, themenLesen } from '@/lib/validierung';
 import { protokolliere } from '@/lib/db';
+import { istAnredeform, istAnsprache } from '@/lib/texte';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,8 @@ export const POST = admin(async (req, b) => {
   if (!vorname) return fehler('Vorname fehlt.');
   if (email && !istEmail(email)) return fehler('E-Mail ungültig.');
   if (handy === null) return fehler('Handynummer ungültig.');
-  const id = kundeAnlegen({ vorname, nachname: sauber(d.nachname, 80), email: email || null, handy: handy || null, themen: themenLesen(d.themen).join(','), berater_id: b.id });
+  if (!istAnredeform(d.anrede ?? '') || !istAnsprache(d.ansprache ?? '')) return fehler('Anrede/Ansprache ungültig.');
+  const id = kundeAnlegen({ anrede: d.anrede ?? '', ansprache: d.ansprache ?? '', vorname, nachname: sauber(d.nachname, 80), email: email || null, handy: handy || null, themen: themenLesen(d.themen).join(','), berater_id: b.id });
   protokolliere(b.id, 'kunde_angelegt', String(id));
   return json({ ok: true, id });
 });

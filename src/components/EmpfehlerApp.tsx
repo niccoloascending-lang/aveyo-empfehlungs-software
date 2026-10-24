@@ -122,7 +122,7 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
       <section className="anim-hoch mt-6 flex items-start gap-4">
         {daten.berater && <Avatar name={daten.berater.name} fotoId={daten.berater.foto_id} groesse={60} />}
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">{fuelle(t['kunde.titel'], { vorname: daten.vorname })}</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">{fuelle(t['kunde.titel'], { vorname: daten.vorname, anrede_name: daten.anredeName })}</h1>
           <p className="mt-1 leading-relaxed text-tinte/80">{t['kunde.begruessung']}</p>
           {daten.berater && <p className="mt-1 text-sm font-medium text-marke-dunkel">– {daten.berater.name}</p>}
           {daten.berater?.video_url && (
