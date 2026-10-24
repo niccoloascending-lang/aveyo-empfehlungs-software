@@ -131,8 +131,8 @@ export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenU
             <h2 id="berater-titel" className="text-xl font-bold">
               {t['freund.berater.titel']}
             </h2>
-            <div className="mt-3 flex items-start gap-4">
-              <Avatar name={berater.name} fotoId={berater.foto_id} groesse={72} />
+            <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-start">
+              <Avatar name={berater.name} fotoId={berater.foto_id} groesse={180} breit />
               <div>
                 <p className="text-lg font-semibold">{berater.name}</p>
                 {berater.vorstellung && <p className="mt-1 whitespace-pre-line leading-relaxed text-tinte/80">{berater.vorstellung}</p>}

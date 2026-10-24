@@ -98,7 +98,7 @@ export function kundenListe(suche = ''): (Kunde & { geteilt: number; eingeloest:
             (SELECT COUNT(*) FROM ereignisse e JOIN teilungen t ON t.id = e.teilung_id
                WHERE t.kunde_id = k.id AND e.typ IN ('download','rechner','termin_bestaetigt','auswertung_bestaetigt','download_mail_bestaetigt')) eingeloest,
             CASE WHEN k.token_hash IS NOT NULL AND k.token_widerrufen IS NULL THEN 1 ELSE 0 END link_aktiv,
-            (SELECT name FROM berater WHERE id = k.berater_id) berater
+            (SELECT name || ' (' || email || ')' FROM berater WHERE id = k.berater_id) berater
        FROM kunden k
       WHERE (? = '%%' OR k.vorname LIKE ? OR k.nachname LIKE ? OR k.email LIKE ?)
       ORDER BY k.erstellt DESC, k.id DESC`,

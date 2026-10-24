@@ -361,8 +361,23 @@ export default function Einstellungen() {
         <Abschnitt titel="Berater-Zugänge">
           <ul className="text-sm">
             {(berater.daten ?? []).map((b) => (
-              <li key={b.id}>
-                {b.name} · {b.email} · {b.totp_aktiv ? '2FA aktiv' : '2FA noch nicht eingerichtet'}
+              <li key={b.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 py-1.5">
+                <span>
+                  {b.name} · {b.email} · {b.kunden} Kunden · {b.totp_aktiv ? '2FA aktiv' : '2FA noch nicht eingerichtet'}
+                  {b.ich ? <strong> (du)</strong> : null}
+                </span>
+                {!b.ich && (
+                  <button
+                    className="a-btn2 text-red-700"
+                    onClick={async () => {
+                      if (!confirm(`Zugang ${b.email} entfernen? Seine ${b.kunden} Kunden werden dir zugeordnet.`)) return;
+                      zeige(await anfrage(`/api/admin/berater?id=${b.id}`, 'DELETE'), 'Zugang entfernt, Kunden übernommen.');
+                      berater.laden();
+                    }}
+                  >
+                    Entfernen
+                  </button>
+                )}
               </li>
             ))}
           </ul>
