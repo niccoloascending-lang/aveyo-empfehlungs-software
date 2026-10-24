@@ -24,7 +24,7 @@ export default function Login() {
     const j = await r.json().catch(() => ({}));
     setLaeuft(false);
     if (!r.ok) return setFehler(j.error ?? 'Anmeldung fehlgeschlagen');
-    router.push(j.weiter === '2fa' ? '/admin/2fa' : '/admin');
+    window.location.assign(j.weiter === '2fa' ? '/admin/2fa' : '/admin'); // volle Seite: Cookie sicher übernommen
   };
 
   return (

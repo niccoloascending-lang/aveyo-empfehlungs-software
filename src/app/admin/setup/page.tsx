@@ -1,10 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Feld, Meldung } from '@/components/admin/ui';
 
 export default function Setup() {
-  const router = useRouter();
   const [d, setD] = useState({ name: '', email: '', passwort: '' });
   const [fehler, setFehler] = useState('');
   const senden = async (e: React.FormEvent) => {
@@ -12,7 +10,7 @@ export default function Setup() {
     const r = await fetch('/api/admin/auth/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) return setFehler(j.error ?? 'Fehler');
-    router.push(j.weiter === '2fa' ? '/admin/2fa' : '/admin');
+    window.location.assign(j.weiter === '2fa' ? '/admin/2fa' : '/admin'); // volle Seite: Cookie sicher übernommen
   };
   return (
     <main className="grid min-h-screen place-items-center bg-slate-50 p-4">

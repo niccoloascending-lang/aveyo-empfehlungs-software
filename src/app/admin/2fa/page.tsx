@@ -23,7 +23,7 @@ export default function ZweiFaktor() {
     const r = await fetch('/api/admin/auth/2fa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) return setFehler(j.error ?? 'Fehler');
-    router.push('/admin');
+    window.location.assign('/admin');
   };
 
   return (
