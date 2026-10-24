@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --marke: 180 83 42;
+  --marke-dunkel: 122 52 23;
+  --marke-hell: 248 230 218;
+  --akzent: 224 164 88;
+  --papier: 255 251 246;
+  --tinte: 42 33 28;
+  --schrift: system-ui;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body { @apply bg-papier text-tinte antialiased; }
+
+@layer components {
+  .karte { @apply rounded-3xl bg-white shadow-karte; }
+  .knopf {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 text-base font-semibold transition
+      focus:outline-none focus-visible:ring-4 focus-visible:ring-marke/30 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .knopf-haupt { @apply knopf bg-marke text-white hover:bg-marke-dunkel active:scale-[.98]; }
+  .knopf-zweit { @apply knopf border border-tinte/15 bg-white text-tinte hover:bg-marke-hell/60 active:scale-[.98]; }
+  .knopf-klein { @apply inline-flex min-h-[36px] items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition focus:outline-none focus-visible:ring-4 focus-visible:ring-marke/30; }
+  .eingabe {
+    @apply block w-full rounded-2xl border border-tinte/20 bg-white px-4 py-3 text-base text-tinte placeholder:text-tinte/55
+      focus:border-marke focus:outline-none focus:ring-4 focus:ring-marke/20;
+  }
+  .beschriftung { @apply mb-1.5 block text-sm font-medium text-tinte/80; }
+  .chip { @apply inline-flex min-h-[40px] items-center rounded-full border border-tinte/15 bg-white px-4 text-sm transition hover:border-marke; }
+  .chip-an { @apply border-marke bg-marke-hell text-marke-dunkel; }
+  .leise { @apply text-tinte/70; }
+
+  /* Admin: nüchterner, kompakt */
+  .a-karte { @apply rounded-2xl border border-slate-200 bg-white p-4 shadow-sm; }
+  .a-input { @apply block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-marke focus:outline-none focus:ring-2 focus:ring-marke/20; }
+  .a-label { @apply mb-1 block text-xs font-medium uppercase tracking-wide text-slate-600; }
+  .a-btn { @apply inline-flex min-h-[38px] items-center gap-1.5 rounded-lg bg-marke px-3 text-sm font-semibold text-white hover:bg-marke-dunkel disabled:opacity-50; }
+  .a-btn2 { @apply inline-flex min-h-[38px] items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-sm font-medium text-slate-800 hover:bg-slate-50 disabled:opacity-50; }
+  .a-tab { @apply w-full text-left text-sm; }
+  .a-tab th { @apply border-b border-slate-200 px-2 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600; }
+  .a-tab td { @apply border-b border-slate-100 px-2 py-2 align-top; }
+}
+
+/* Geschenk auspacken: Deckel hebt sich, Inhalt erscheint */
+@keyframes deckel { 0% { transform: translateY(0) rotate(0); } 60% { transform: translateY(-26px) rotate(-8deg); } 100% { transform: translateY(-18px) rotate(-6deg); } }
+@keyframes hoch { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes funke { 0% { opacity: 0; transform: translate(0,0) scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1); } }
+@keyframes pop { 0% { transform: scale(.85); opacity: 0; } 60% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); } }
+.anim-deckel { animation: deckel .9s cubic-bezier(.2,.8,.2,1) .25s both; transform-origin: 30% 100%; }
+.anim-hoch { animation: hoch .6s ease-out both; }
+.anim-pop { animation: pop .45s ease-out both; }
+.funke { position: absolute; width: 8px; height: 8px; border-radius: 9999px; animation: funke .9s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-deckel, .anim-hoch, .anim-pop, .funke { animation: none !important; }
+  .funke { display: none; }
+}
