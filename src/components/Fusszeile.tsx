@@ -20,9 +20,9 @@ export default function Fusszeile() {
             {t['footer.datenschutz.seite']}
           </Link>
         )}
-        <Link className="underline-offset-4 hover:underline" href="/info/erstinformation">
+        <a className="underline-offset-4 hover:underline" href={e.erstinformationUrl || '/info/erstinformation'}>
           {t['footer.erstinformation']}
-        </Link>
+        </a>
       </nav>
       {e.registerNr && <p className="mt-3">{fuelle(t['footer.register'], { nr: e.registerNr })}</p>}
       <p className="mt-3">© {new Date().getFullYear()} {e.theme.firmenname}</p>

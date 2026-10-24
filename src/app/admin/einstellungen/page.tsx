@@ -270,13 +270,16 @@ export default function Einstellungen() {
           <Feld label="Datenschutzerklärung (Link)" hinweis="Zusätzlich verlinkt jede Seite „Datenschutz bei dieser Seite“ (Texte → Rechtliches) mit den App-spezifischen Punkten.">
             <input className="a-input" value={e.datenschutzUrl} onChange={(x) => setE({ ...e, datenschutzUrl: x.target.value })} />
           </Feld>
+          <Feld label="Erstinformation § 15 VersVermV (Link, leer = eigene Seite)">
+            <input className="a-input" value={e.erstinformationUrl} onChange={(x) => setE({ ...e, erstinformationUrl: x.target.value })} />
+          </Feld>
           <Feld label="Link zu echten Bewertungen (optional)" hinweis="Nur echte, öffentlich verlinkbare Bewertungen (z. B. Google, ProvenExpert). Leer = nicht anzeigen.">
             <input className="a-input" value={e.bewertungenUrl} onChange={(x) => setE({ ...e, bewertungenUrl: x.target.value })} />
           </Feld>
           <Feld label="Benachrichtigung bei neuen Anfragen an (E-Mail)" hinweis="Die Mail enthält keine Namen, nur einen Link in den Admin.">
             <input className="a-input" type="email" value={e.adminMail} onChange={(x) => setE({ ...e, adminMail: x.target.value })} />
           </Feld>
-          <button className="a-btn" onClick={() => speichern({ registerNr: e.registerNr, impressumUrl: e.impressumUrl, datenschutzUrl: e.datenschutzUrl, bewertungenUrl: e.bewertungenUrl, adminMail: e.adminMail })}>
+          <button className="a-btn" onClick={() => speichern({ registerNr: e.registerNr, impressumUrl: e.impressumUrl, datenschutzUrl: e.datenschutzUrl, erstinformationUrl: e.erstinformationUrl, bewertungenUrl: e.bewertungenUrl, adminMail: e.adminMail })}>
             Speichern
           </button>
         </Abschnitt>

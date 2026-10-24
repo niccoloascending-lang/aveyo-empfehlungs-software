@@ -14,6 +14,7 @@ export default function Info({ params }: { params: { seite: string } }) {
   if (!key) notFound();
   const e = einstellungen();
   if (params.seite === 'impressum' && e.impressumUrl) redirect(e.impressumUrl);
+  if (params.seite === 'erstinformation' && e.erstinformationUrl) redirect(e.erstinformationUrl);
   return (
     <div className="min-h-screen">
       <Kopf />

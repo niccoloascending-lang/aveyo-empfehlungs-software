@@ -69,7 +69,7 @@ export const PUT = admin(async (req, b) => {
     if (u === null) return fehler('Bewertungs-Link ist keine gültige Adresse.');
     setzeEinstellung('bewertungenUrl', u);
   }
-  for (const k of ['impressumUrl', 'datenschutzUrl'] as const) {
+  for (const k of ['impressumUrl', 'datenschutzUrl', 'erstinformationUrl'] as const) {
     if (d[k] === undefined) continue;
     const u = url(d[k]);
     if (u === null) return fehler('Link zu Impressum/Datenschutz ist keine gültige Adresse.');

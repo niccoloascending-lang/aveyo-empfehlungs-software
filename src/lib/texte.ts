@@ -299,7 +299,7 @@ export const TEXTE = {
     lang: true,
   },
   'mail.termin.ort.online': { bereich: 'E-Mails', beschreibung: 'Details Online-Termin', du: 'Den Link zum Videogespräch schicken wir dir kurz vorher.', sie: 'Den Link zum Videogespräch schicken wir Ihnen kurz vorher.' },
-  'mail.termin.ort.hamburg': { bereich: 'E-Mails', beschreibung: 'Details Vor-Ort-Termin', du: 'Adresse: [BITTE AUSFÜLLEN: Büroadresse Hamburg]' },
+  'mail.termin.ort.hamburg': { bereich: 'E-Mails', beschreibung: 'Details Vor-Ort-Termin', du: 'Adresse: AVEYO GmbH, Hartwicusstraße 3, 22087 Hamburg' },
   'mail.doi.download.betreff': { bereich: 'E-Mails', beschreibung: 'Bestätigung Download: Betreff', du: 'Kurz bestätigen, dann kommt dein Geschenk', sie: 'Kurz bestätigen, dann kommt Ihr Geschenk' },
   'mail.doi.download.text': {
     bereich: 'E-Mails',
@@ -360,7 +360,7 @@ export const TEXTE = {
     sie: 'Als Dankeschön spenden wir einen Betrag an einen Zweck, den Sie aussuchen.',
     rechtlich: true,
   },
-  'belohnung.spende.zwecke': { bereich: 'Dankeschön', beschreibung: 'Spendenzwecke (mit | trennen)', du: 'Einen Baum in Deutschland pflanzen|S.O.S Kinderhilfe|Ärzte ohne Grenzen', rechtlich: true },
+  'belohnung.spende.zwecke': { bereich: 'Dankeschön', beschreibung: 'Spendenzwecke (mit | trennen)', du: 'Einen Baum in Deutschland pflanzen|SOS-Kinderdorf e.V.|Ärzte ohne Grenzen', rechtlich: true },
   'belohnung.erlebnis.titel': { bereich: 'Dankeschön', beschreibung: 'Erlebnis: Titel', du: 'Kaffee mit {berater}?', rechtlich: true },
   'belohnung.erlebnis.text': {
     bereich: 'Dankeschön',
@@ -386,8 +386,8 @@ export const TEXTE = {
   'footer.register': { bereich: 'Rechtliches', beschreibung: 'Registerangabe in der Fußzeile', du: 'Vermittlerregister: {nr}' },
   'seite.impressum': {
     bereich: 'Rechtliches',
-    beschreibung: 'Seite Impressum',
-    du: '# Impressum\n\nAVEYO GmbH\n[BITTE AUSFÜLLEN: Anschrift]\n20xxx Hamburg\n\nVertreten durch: [BITTE AUSFÜLLEN]\nHandelsregister: [BITTE AUSFÜLLEN]\n\nKontakt: [BITTE AUSFÜLLEN]\n\n## Angaben zur Vermittlertätigkeit\nVersicherungsmakler mit Erlaubnis nach § 34d Abs. 1 GewO, Finanzanlagenvermittler nach § 34f Abs. 1 GewO.\nRegistrierungsnummern: [BITTE AUSFÜLLEN]\nZuständige Stelle: [BITTE AUSFÜLLEN]',
+    beschreibung: 'Seite Impressum (nur genutzt, wenn in den Einstellungen kein Link gesetzt ist)',
+    du: '# Impressum\n\nAVEYO GmbH\nHartwicusstraße 3\n22087 Hamburg\n\nVertreten durch: Timo-Maximilian Konrad und Adrian Nerhoff\nHandelsregister: HRB 196519, Amtsgericht Hamburg\n\nTelefon: 040 65055720\nE-Mail: kontakt@aveyo.de\n\nVollständiges Impressum: https://www.aveyo.de/impressum',
     lang: true,
     rechtlich: true,
   },
@@ -400,8 +400,8 @@ export const TEXTE = {
   },
   'seite.erstinformation': {
     bereich: 'Rechtliches',
-    beschreibung: 'Seite Erstinformation / Statusangaben',
-    du: '# Erstinformation\n\nStatusangaben nach § 15 VersVermV und § 12 FinVermV.\n\n[BITTE AUSFÜLLEN: vollständige Erstinformation, Registrierungsnummern, Beteiligungen, Schlichtungsstellen]',
+    beschreibung: 'Seite Erstinformation (nur genutzt, wenn in den Einstellungen kein Link gesetzt ist)',
+    du: '# Erstinformation\n\nGemäß § 15 VersVermV. Vollständige Fassung: https://www.aveyo.de/erstinformationen\n\n## Name und Anschrift\nAVEYO GmbH, Hartwicusstraße 3, 22087 Hamburg\nVertreten durch Timo-Maximilian Konrad und Adrian Nerhoff\nTelefon 040 65055720, kontakt@aveyo.de\n\n## Vermittlerregister (www.vermittlerregister.info)\n- Adrian Nerhoff: D-KHWD-FFLB9-02 (§ 34d GewO), D-F-131-NTTI-65 (§ 34f GewO)\n- Timo Konrad: D-EAJS-AFQPN-81 (§ 34d GewO)\n\n## Zuständige Behörde\nHandelskammer Hamburg, Adolphsplatz 1, 20457 Hamburg\n\n## Schlichtungsstellen\n- Versicherungsombudsmann e.V., Postfach 08 06 32, 10006 Berlin, https://www.versicherungsombudsmann.de\n- Ombudsmann für die Private Kranken- und Pflegeversicherung, Postfach 06 02 22, 10052 Berlin, https://www.pkv-ombudsmann.de',
     lang: true,
     rechtlich: true,
   },

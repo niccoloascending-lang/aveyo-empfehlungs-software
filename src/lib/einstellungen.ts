@@ -18,6 +18,7 @@ export type Einstellungen = {
   registerNr: string;
   impressumUrl: string; // externe Seiten (aveyo.de); leer = eigene Seite unter /info/…
   datenschutzUrl: string;
+  erstinformationUrl: string;
   bewertungenUrl: string; // nur echte, verlinkbare Bewertungen
   adminMail: string; // Benachrichtigung bei neuen bestätigten Anfragen (ohne Namen)
   webhookUrl: string;
@@ -36,9 +37,11 @@ export const STANDARD: Einstellungen = {
   // Standard: Danke-Nachricht + Spende (von AVEYO gewünscht). Erlebnis/Doppeltes Geschenk aus. Nie Geld an den Empfehler
   // (Provisionsabgabeverbot, Tippgeber-Abgrenzung).
   belohnungen: { nachricht: true, spende: true, erlebnis: false, doppelt: false },
-  registerNr: '',
+  // Quelle: https://www.aveyo.de/erstinformationen (Stand Oktober 2026)
+  registerNr: 'Adrian Nerhoff D-KHWD-FFLB9-02 (§ 34d GewO), D-F-131-NTTI-65 (§ 34f GewO) · Timo Konrad D-EAJS-AFQPN-81 (§ 34d GewO)',
   impressumUrl: 'https://www.aveyo.de/impressum',
   datenschutzUrl: 'https://www.aveyo.de/datenschutz',
+  erstinformationUrl: 'https://www.aveyo.de/erstinformationen',
   bewertungenUrl: '',
   adminMail: '',
   webhookUrl: '',

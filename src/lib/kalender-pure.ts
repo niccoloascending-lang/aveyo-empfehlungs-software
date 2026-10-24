@@ -35,6 +35,8 @@ export function belegtAusAntwort(antwort: any, kalenderId: string): { start: str
   return (Array.isArray(k.busy) ? k.busy : []).filter((b: any) => typeof b?.start === 'string' && typeof b?.end === 'string');
 }
 
+export const BUERO = 'AVEYO GmbH, Hartwicusstraße 3, 22087 Hamburg';
+
 export type TerminEintrag = {
   start: string; // UTC-ISO
   dauerMin: number;
@@ -66,7 +68,7 @@ export function eventDaten(t: TerminEintrag) {
       .join('\n'),
     start: { dateTime: t.start, timeZone: 'Europe/Berlin' },
     end: { dateTime: ende, timeZone: 'Europe/Berlin' },
-    location: t.ort === 'hamburg' ? 'AVEYO Büro Hamburg' : 'Online (Video)',
+    location: t.ort === 'hamburg' ? BUERO : 'Online (Video)',
     reminders: { useDefault: true },
   };
 }

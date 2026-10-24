@@ -55,16 +55,17 @@ npm run dev         # http://localhost:3200
 
 - **Kalender:** Abgleich mit Google-Kalender → umgesetzt (siehe „Google-Kalender einrichten“).
 - **Mail:** Google Workspace, Absender `kontakt@aveyo.de` → siehe „E-Mail einrichten“.
-- **Spendenzwecke:** Einen Baum in Deutschland pflanzen · S.O.S Kinderhilfe · Ärzte ohne Grenzen (Texte → Dankeschön). Spende ist als Dankeschön-Art eingeschaltet.
+- **Spende** ist als Dankeschön-Art eingeschaltet (Texte → Dankeschön).
 - **Impressum / Datenschutz:** verlinkt auf https://www.aveyo.de/impressum und https://www.aveyo.de/datenschutz (Einstellungen). Zusätzlich gibt es
   „Datenschutz bei dieser Seite“ mit den App-spezifischen Punkten (Double-Opt-in, Löschfristen, Kalender) – gehört juristisch geprüft bzw. in die Hauptdatenschutzerklärung übernommen.
 - **Domain:** Vorschlag `geschenk.aveyo.de` (siehe unten).
 
+- **Erstinformation, Registernummern, Büroadresse:** aus https://www.aveyo.de/erstinformationen übernommen (Fußzeile, Bestätigungsmail für Vor-Ort-Termine, Kalendereintrag).
+  Erstinformation in der Fußzeile verlinkt auf aveyo.de. Ändern sich Nummern oder Adresse: Einstellungen bzw. Texte im Admin.
+- **Spendenzwecke:** Einen Baum in Deutschland pflanzen · SOS-Kinderdorf e.V. · Ärzte ohne Grenzen.
+
 ### Noch offen
-1. Erstinformation nach § 15 VersVermV: eigene Seite auf aveyo.de verlinken oder Text hier einpflegen (aktuell Platzhalter).
-2. Adresse für Vor-Ort-Termine in Hamburg (Text `mail.termin.ort.hamburg`).
-3. Vermittlerregister-Nummer für die Fußzeile (Einstellungen).
-4. Welche Organisation genau mit „S.O.S Kinderhilfe“ gemeint ist (z. B. SOS-Kinderdorf e.V.) – der Text ist im Admin änderbar.
+1. „Datenschutz bei dieser Seite“: Hosting-Anbieter eintragen, sobald der Server steht (Platzhalter), und juristisch prüfen lassen.
 
 ## Server: Hetzner oder Büro?
 
@@ -207,7 +208,7 @@ Header: `X-Geschenk-Zeit` (Unix-Sekunden) und `X-Geschenk-Signatur: sha256=<HMAC
 
 ## Rechtlich zu prüfende Texte
 
-Im Admin unter „Texte“ mit ⚖️ markiert. Platzhalter `[BITTE AUSFÜLLEN]` in Impressum, Datenschutz und Erstinformation müssen vor dem Livegang ersetzt werden.
+Im Admin unter „Texte“ mit ⚖️ markiert. Offener Platzhalter: Hosting-Anbieter in „Datenschutz bei dieser Seite“ (sobald der Server steht).
 
 | Schlüssel | Bereich | Inhalt |
 |---|---|---|
