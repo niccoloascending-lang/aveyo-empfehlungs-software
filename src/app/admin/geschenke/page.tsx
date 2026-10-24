@@ -106,9 +106,6 @@ export default function Geschenke() {
             <Feld label="Ablauf (3 Schritte, je Zeile einer)">
               <textarea className="a-input" rows={3} value={g.ablauf} onChange={(e) => setG({ ...g, ablauf: e.target.value })} />
             </Feld>
-            <Feld label="„Wer fällt dir ein?“ – Denkanstöße für den Empfehler (je Zeile einer)" hinweis="z. B. „gerade Vater oder Mutter geworden ist“. Hilft dem Kunden, an eine konkrete Person zu denken.">
-              <textarea className="a-input" rows={3} value={g.anlaesse ?? ''} onChange={(e) => setG({ ...g, anlaesse: e.target.value })} />
-            </Feld>
             <div className="grid gap-3 sm:grid-cols-3">
               <Feld label="Typ">
                 <select className="a-input" value={g.typ} onChange={(e) => setG({ ...g, typ: e.target.value as G['typ'] })}>

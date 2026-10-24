@@ -60,7 +60,7 @@ function eindeutigerCode(): string {
 }
 
 /** Neue Teilung für einen Kunden: Variante der Nachrichtenvorlage wird hier (A/B) gewählt. */
-export function teilungAnlegen(kunde: { id: number; vorname: string }, geschenkId: number, ton: Ton, zitat: unknown) {
+export function teilungAnlegen(kunde: { id: number; vorname: string }, geschenkId: number, ton: Ton, zitat: unknown, anlassId: number | null = null) {
   const vorlage = waehleVariante(aktiveVorlagen(), ton, Math.random());
   const code = eindeutigerCode();
   const id = insertRow('teilungen', {
@@ -70,16 +70,18 @@ export function teilungAnlegen(kunde: { id: number; vorname: string }, geschenkI
     zitat: saeubereZitat(zitat) || null,
     von_name: kunde.vorname,
     vorlage_id: vorlage?.id ?? null,
+    anlass_id: anlassId,
   });
   return { id, code, vorlage };
 }
 
 /** Zitat oder Ton nachträglich ändern (vor dem Teilen). Nur eigene, noch nicht geteilte Teilungen. */
-export function teilungAendern(kundeId: number, code: string, d: { zitat?: unknown; ton?: Ton }) {
+export function teilungAendern(kundeId: number, code: string, d: { zitat?: unknown; ton?: Ton; anlassId?: number | null }) {
   const t = one<Teilung>('SELECT * FROM teilungen WHERE code = ? AND kunde_id = ?', code, kundeId);
   if (!t) return null;
   let vorlage: Vorlage | null | undefined;
   if (d.zitat !== undefined) run('UPDATE teilungen SET zitat = ? WHERE id = ?', saeubereZitat(d.zitat) || null, t.id);
+  if (d.anlassId !== undefined && !t.geteilt_am) run('UPDATE teilungen SET anlass_id = ? WHERE id = ?', d.anlassId, t.id);
   if (d.ton) {
     vorlage = waehleVariante(aktiveVorlagen(), d.ton, Math.random());
     run('UPDATE teilungen SET vorlage_id = ? WHERE id = ?', vorlage?.id ?? null, t.id);

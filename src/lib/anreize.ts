@@ -57,6 +57,36 @@ export function baumReihe(anzahl: number, max = 12): { symbole: number; mehr: nu
   return { symbole: Math.min(n, max), mehr: Math.max(0, n - max) };
 }
 
+export type Anlass = { id: number; text: string; icon: string; geschenke: string; themen: string; reihenfolge: number; aktiv: number };
+
+const liste = (s: string) =>
+  (s ?? '')
+    .split(/[,;\s]+/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+
+/**
+ * Anlässe für einen Kunden: zuerst die zu seinen Themen passenden, dann die allgemeinen (ohne Themen), je nach Reihenfolge.
+ * Anlässe mit Themen, die der Kunde nicht hat, entfallen. Nur Anlässe mit mindestens einem aktiven Geschenk.
+ */
+export function anlaesseFuer<A extends Anlass>(alle: A[], kundenThemen: string, aktiveGeschenkIds: number[], max = 6): (A & { geschenkIds: number[] })[] {
+  const k = new Set(liste(kundenThemen));
+  const aktiv = new Set(aktiveGeschenkIds);
+  return alle
+    .filter((a) => a.aktiv)
+    .map((a) => ({ ...a, geschenkIds: liste(a.geschenke).map(Number).filter((id) => aktiv.has(id)) }))
+    .filter((a) => a.geschenkIds.length > 0)
+    .map((a) => {
+      const th = liste(a.themen);
+      const rang = !th.length ? 1 : th.some((t) => k.has(t)) ? 0 : -1;
+      return { a, rang };
+    })
+    .filter((x) => x.rang >= 0)
+    .sort((x, y) => x.rang - y.rang || x.a.reihenfolge - y.a.reihenfolge || x.a.id - y.a.id)
+    .slice(0, max)
+    .map((x) => x.a);
+}
+
 /** Denkanstöße eines Geschenks („Wer fällt dir ein?“), eine Zeile je Anlass. */
 export const anlaesseLesen = (s: string | null | undefined) =>
   (s ?? '')

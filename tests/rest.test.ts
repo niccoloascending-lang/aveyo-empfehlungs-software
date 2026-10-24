@@ -21,7 +21,7 @@ test('Rentenlücken-Rechner', () => {
 
 test('Kennzahlen und Conversion je Geschenk/Vorlage/Kanal', () => {
   const t = [
-    { id: 1, kunde_id: 1, geschenk_id: 1, vorlage_id: 1, geteilt_am: 'x', kanal: 'whatsapp' },
+    { id: 1, kunde_id: 1, geschenk_id: 1, vorlage_id: 1, geteilt_am: 'x', kanal: 'whatsapp', anlass_id: 7 },
     { id: 2, kunde_id: 1, geschenk_id: 1, vorlage_id: 2, geteilt_am: 'x', kanal: 'whatsapp' },
     { id: 3, kunde_id: 2, geschenk_id: 2, vorlage_id: 1, geteilt_am: 'x', kanal: 'kopieren' },
     { id: 4, kunde_id: 3, geschenk_id: 2, vorlage_id: 1, geteilt_am: null, kanal: null },
@@ -34,7 +34,7 @@ test('Kennzahlen und Conversion je Geschenk/Vorlage/Kanal', () => {
     { teilung_id: 3, typ: 'download' },
   ];
   const a = [{ teilung_id: 1, typ: 'termin', status: 'kunde', bestaetigt: 'x' }];
-  const k = kennzahlen(5, t, e, a, new Map([[1, 'PKV-Check'], [2, 'Checkliste']]), new Map([[1, 'locker A'], [2, 'locker B']]));
+  const k = kennzahlen(5, t, e, a, new Map([[1, 'PKV-Check'], [2, 'Checkliste']]), new Map([[1, 'locker A'], [2, 'locker B']]), new Map([[7, 'gerade umgezogen ist']]));
   assert.equal(k.kundenGeteilt, 2);
   assert.equal(k.geteilt, 3);
   assert.equal(k.geoeffnet, 2);
@@ -46,6 +46,7 @@ test('Kennzahlen und Conversion je Geschenk/Vorlage/Kanal', () => {
   assert.equal(k.proGeschenk[0].name, 'Checkliste'); // 2/1 = 200 %
   assert.equal(k.proVorlage.find((z) => z.name === 'locker B')!.quote, 0);
   assert.equal(k.proKanal.find((z) => z.id === 'whatsapp')!.geteilt, 2);
+  assert.deepEqual(k.proAnlass.map((z) => [z.name, z.geteilt, z.termine]), [['gerade umgezogen ist', 1, 1]]);
   assert.equal(quote(1, 3), 33.3);
   assert.equal(quote(1, 0), 0);
 });

@@ -26,13 +26,17 @@ export const TEXTE = {
     sie: 'Schön, dass Sie mit uns zufrieden sind. Hier können Sie Freunden etwas schenken, das ihnen wirklich etwas bringt. Ganz ohne Verkaufsgespräch.',
     lang: true,
   },
-  'kunde.schritt1': { bereich: 'Empfehler', beschreibung: 'Schritt 1 Überschrift', du: 'Was möchtest du verschenken?', sie: 'Was möchten Sie verschenken?' },
+  'kunde.schritt1': { bereich: 'Empfehler', beschreibung: 'Schritt 1 Überschrift', du: 'Wem möchtest du etwas schenken?', sie: 'Wem möchten Sie etwas schenken?' },
   'kunde.schritt1.hinweis': {
     bereich: 'Empfehler',
     beschreibung: 'Schritt 1 Hinweis',
-    du: 'Such dir aus, was zu deinem Freundeskreis passt.',
-    sie: 'Suchen Sie aus, was zu Ihrem Freundeskreis passt.',
+    du: 'Denk an eine Person. Ein Tipp genügt, das passende Geschenk suchen wir aus.',
+    sie: 'Denken Sie an eine Person. Ein Tipp genügt, das passende Geschenk suchen wir aus.',
   },
+  'kunde.anlass.praefix': { bereich: 'Empfehler', beschreibung: 'Vor den Anlass-Kacheln', du: 'Jemandem, der …' },
+  'kunde.anlass.selbst': { bereich: 'Empfehler', beschreibung: 'Kachel: Geschenk selbst wählen', du: 'Ich weiß schon, was ich verschenken will', sie: 'Ich weiß schon, was ich verschenken möchte' },
+  'kunde.anlass.passt': { bereich: 'Empfehler', beschreibung: 'Über dem vorgeschlagenen Geschenk', du: 'Das passt:' },
+  'kunde.anlass.andere': { bereich: 'Empfehler', beschreibung: 'Vor den alternativen Geschenken', du: 'Oder lieber:' },
   'kunde.schritt2': { bereich: 'Empfehler', beschreibung: 'Schritt 2 Überschrift', du: 'Ein Satz von dir?', sie: 'Ein Satz von Ihnen?' },
   'kunde.schritt2.hinweis': {
     bereich: 'Empfehler',
@@ -93,7 +97,6 @@ export const TEXTE = {
     du: 'Alle {gesamt} Geschenke sind verschenkt. Danke dir! Fällt dir noch jemand ein? Sag {berater} kurz Bescheid, dann gibt es neue.',
     sie: 'Alle {gesamt} Geschenke sind verschenkt. Vielen Dank! Fällt Ihnen noch jemand ein? Sagen Sie {berater} kurz Bescheid, dann gibt es neue.',
   },
-  'kunde.anlaesse.titel': { bereich: 'Empfehler', beschreibung: 'Überschrift Denkanstöße', du: 'Wem könnte das helfen? Denk zum Beispiel an jemanden, der …', sie: 'Wem könnte das helfen? Denken Sie zum Beispiel an jemanden, der …' },
   'kunde.zitat.erfolg': { bereich: 'Empfehler', beschreibung: 'Hinweis am persönlichen Satz-Vorschlag', du: 'Dein Erfolg', sie: 'Ihr Erfolg' },
   'kunde.sozial': {
     bereich: 'Empfehler',

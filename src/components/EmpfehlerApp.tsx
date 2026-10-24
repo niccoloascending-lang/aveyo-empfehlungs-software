@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Eye, QrCode, X, ShieldCheck, PlayCircle, Heart, Users, Lightbulb } from 'lucide-react';
+import { Eye, QrCode, X, ShieldCheck, PlayCircle, Heart, Users } from 'lucide-react';
 import { baumReihe } from '@/lib/anreize';
 import { baueNachricht, TOENE, type Kanal, type Ton } from '@/lib/teilen';
 import { fuelle } from '@/lib/texte';
@@ -22,7 +22,11 @@ const FUNKEN = Array.from({ length: 14 }, (_, i) => {
 
 export default function EmpfehlerApp({ token, daten }: { token: string; daten: EmpfehlerDaten }) {
   const { t, geschenke, wirkung } = daten;
-  const [geschenkId, setGeschenkId] = useState<number | null>(geschenke[0]?.id ?? null);
+  // Erst die Person („Jemandem, der …“), dann das passende Geschenk. Ohne gepflegte Anlässe: direkt die Karten.
+  const [anlass, setAnlass] = useState<number | 'selbst' | null>(daten.anlaesse.length ? null : 'selbst');
+  const [geschenkId, setGeschenkId] = useState<number | null>(daten.anlaesse.length ? null : (daten.karten[0] ?? null));
+  const anlassId = typeof anlass === 'number' ? anlass : null;
+  const passendRef = useRef<HTMLDivElement>(null);
   const [zitat, setZitat] = useState('');
   const [ton, setTon] = useState<Ton>('locker');
   const [teilung, setTeilung] = useState<Teilung | null>(null);
@@ -54,11 +58,12 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
     const vorhanden = cache.current.get(geschenkId);
     if (vorhanden) {
       setTeilung(vorhanden);
+      api(`/api/k/${token}/teilung`, 'PATCH', { code: vorhanden.code, anlassId }); // Anlass für die Auswertung nachziehen
       return;
     }
     let ab = false;
     setTeilung(null);
-    api(`/api/k/${token}/teilung`, 'POST', { geschenkId, ton, zitat }).then((r) => {
+    api(`/api/k/${token}/teilung`, 'POST', { geschenkId, ton, zitat, anlassId }).then((r) => {
       if (ab || !r.ok) return;
       const neu = { code: r.code, link: r.link, vorlage: r.vorlage };
       cache.current.set(geschenkId, neu);
@@ -68,7 +73,15 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
       ab = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geschenkId, token]);
+  }, [geschenkId, anlassId, token]);
+
+  const anlassWaehlen = (a: number | 'selbst') => {
+    setAnlass(a);
+    setGeteilt(false);
+    if (a === 'selbst') setGeschenkId((g) => (g && daten.karten.includes(g) ? g : (daten.karten[0] ?? null)));
+    else setGeschenkId(daten.anlaesse.find((x) => x.id === a)?.geschenkIds[0] ?? null);
+    setTimeout(() => passendRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  };
 
   // Text neu aufbauen, wenn Link/Geschenk wechselt (eigene Änderungen gehen dabei bewusst verloren)
   useEffect(() => {
@@ -165,50 +178,105 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
             </h2>
             <p className="mt-1 text-sm text-tinte/70">{t['kunde.schritt1.hinweis']}</p>
             {gesamt != null && rest != null && <Kontingent gesamt={gesamt} rest={rest} t={t} berater={daten.berater?.name ?? ''} />}
-            <div role="radiogroup" aria-labelledby="s1" className="mt-3 grid gap-3 sm:grid-cols-2">
-              {geschenke.map((g) => {
-                const an = g.id === geschenkId;
-                return (
+
+            {daten.anlaesse.length > 0 && (
+              <>
+                <p className="mt-4 text-sm font-semibold text-tinte/80">{t['kunde.anlass.praefix']}</p>
+                <div role="radiogroup" aria-labelledby="s1" className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {daten.anlaesse.map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={anlass === a.id}
+                      onClick={() => anlassWaehlen(a.id)}
+                      className={`flex min-h-[56px] items-center gap-3 rounded-2xl border bg-white px-4 py-3 text-left font-medium shadow-sm transition focus:outline-none focus-visible:ring-4 focus-visible:ring-marke/30 ${
+                        anlass === a.id ? 'border-marke ring-2 ring-marke' : 'border-tinte/10 hover:border-marke/50'
+                      }`}
+                    >
+                      <span aria-hidden className="text-2xl">
+                        {a.icon}
+                      </span>
+                      <span className="leading-snug">{a.text}</span>
+                    </button>
+                  ))}
                   <button
-                    key={g.id}
                     type="button"
                     role="radio"
-                    aria-checked={an}
-                    onClick={() => {
-                      setGeschenkId(g.id);
-                      setGeteilt(false);
-                    }}
-                    className={`karte flex items-start gap-3 p-4 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-marke/30 ${
-                      an ? 'ring-2 ring-marke' : 'opacity-90 hover:opacity-100'
+                    aria-checked={anlass === 'selbst'}
+                    onClick={() => anlassWaehlen('selbst')}
+                    className={`flex min-h-[56px] items-center gap-3 rounded-2xl border border-dashed px-4 py-3 text-left font-medium transition focus:outline-none focus-visible:ring-4 focus-visible:ring-marke/30 sm:col-span-2 ${
+                      anlass === 'selbst' ? 'border-marke bg-white ring-2 ring-marke' : 'border-tinte/25 text-tinte/80 hover:border-marke/50'
                     }`}
                   >
-                    <span aria-hidden className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl ${an ? 'bg-marke-hell' : 'bg-papier'}`}>
-                      {g.icon || '🎁'}
+                    <span aria-hidden className="text-2xl">
+                      ➡️
                     </span>
-                    <span>
-                      <span className="block font-bold leading-snug">{g.titel}</span>
-                      {g.kurz && <span className="mt-0.5 block text-sm leading-snug text-tinte/70">{g.kurz}</span>}
-                    </span>
+                    <span className="leading-snug">{t['kunde.anlass.selbst']}</span>
                   </button>
-                );
-              })}
-            </div>
-            {geschenk && geschenk.anlaesse.length > 0 && (
-              <div className="anim-hoch mt-4 rounded-2xl border border-akzent/40 bg-white/60 p-4" key={geschenk.id}>
-                <p className="flex items-start gap-2 text-sm font-semibold">
-                  <Lightbulb size={18} className="mt-0.5 shrink-0 text-akzent" aria-hidden /> {t['kunde.anlaesse.titel']}
-                </p>
-                <ul className="mt-2 space-y-1.5 pl-7 text-sm text-tinte/80">
-                  {geschenk.anlaesse.map((a) => (
-                    <li key={a} className="list-disc">
-                      {a}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                </div>
+              </>
             )}
+
+            <div ref={passendRef} className="scroll-mt-4">
+              {typeof anlass === 'number' && geschenk && (
+                <div className="anim-hoch mt-5" key={anlass}>
+                  <p className="text-sm font-semibold text-tinte/80">{t['kunde.anlass.passt']}</p>
+                  <GeschenkKarte g={geschenk} an />
+                  {(() => {
+                    const andere = (daten.anlaesse.find((x) => x.id === anlass)?.geschenkIds ?? []).filter((id) => id !== geschenkId);
+                    if (!andere.length) return null;
+                    return (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="text-sm text-tinte/70">{t['kunde.anlass.andere']}</span>
+                        {andere.map((id) => {
+                          const g = geschenke.find((x) => x.id === id);
+                          return g ? (
+                            <button
+                              key={id}
+                              type="button"
+                              className="chip"
+                              onClick={() => {
+                                setGeschenkId(id);
+                                setGeteilt(false);
+                              }}
+                            >
+                              <span aria-hidden className="mr-1.5">
+                                {g.icon}
+                              </span>
+                              {g.titel}
+                            </button>
+                          ) : null;
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {anlass === 'selbst' && (
+                <div role="radiogroup" aria-label={t['kunde.anlass.selbst']} className="anim-hoch mt-5 grid gap-3 sm:grid-cols-2">
+                  {daten.karten
+                    .map((id) => geschenke.find((g) => g.id === id))
+                    .filter((g): g is (typeof geschenke)[number] => !!g)
+                    .map((g) => (
+                      <GeschenkKarte
+                        key={g.id}
+                        g={g}
+                        an={g.id === geschenkId}
+                        onClick={() => {
+                          setGeschenkId(g.id);
+                          setGeteilt(false);
+                        }}
+                      />
+                    ))}
+                </div>
+              )}
+            </div>
           </section>
 
+          {geschenk && (
+          <>
           {/* 2. Eigener Satz */}
           <section className="mt-8" aria-labelledby="s2">
             <h2 id="s2" className="text-lg font-bold">
@@ -342,6 +410,8 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
               )}
             </div>
           </section>
+          </>
+          )}
         </>
       )}
 
@@ -480,5 +550,29 @@ function Baeume({ eigene, gesamt, t }: { eigene: number; gesamt: number; t: Reco
       )}
       {gesamt > 0 && <p className="mt-3 text-xs font-medium text-tinte/70">{fuelle(t['kunde.baeume.gesamt'], { anzahl: gesamt })}</p>}
     </section>
+  );
+}
+
+type GeschenkKurz = EmpfehlerDaten['geschenke'][number];
+
+function GeschenkKarte({ g, an, onClick }: { g: GeschenkKurz; an: boolean; onClick?: () => void }) {
+  const inhalt = (
+    <>
+      <span aria-hidden className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-2xl ${an ? 'bg-marke-hell' : 'bg-papier'}`}>
+        {g.icon || '🎁'}
+      </span>
+      <span>
+        <span className="block font-bold leading-snug">{g.titel}</span>
+        {g.kurz && <span className="mt-0.5 block text-sm leading-snug text-tinte/70">{g.kurz}</span>}
+      </span>
+    </>
+  );
+  const klasse = `karte flex w-full items-start gap-3 p-4 text-left transition ${an ? 'ring-2 ring-marke' : 'opacity-90 hover:opacity-100'}`;
+  return onClick ? (
+    <button type="button" role="radio" aria-checked={an} onClick={onClick} className={`${klasse} focus:outline-none focus-visible:ring-4 focus-visible:ring-marke/30`}>
+      {inhalt}
+    </button>
+  ) : (
+    <div className={`${klasse} mt-2`}>{inhalt}</div>
   );
 }

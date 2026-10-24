@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { kontingent, erinnerungen, sozialeZahl, baumReihe, anlaesseLesen, type ErinnerKunde } from '../src/lib/anreize.ts';
+import { kontingent, erinnerungen, sozialeZahl, baumReihe, anlaesseLesen, anlaesseFuer, type ErinnerKunde, type Anlass } from '../src/lib/anreize.ts';
 
 const jetzt = new Date('2026-10-24T12:00:00Z');
 
@@ -38,4 +38,15 @@ test('Soziale Zahl, Baumreihe, Anlässe', () => {
   assert.deepEqual(baumReihe(20, 12), { symbole: 12, mehr: 8 });
   assert.deepEqual(anlaesseLesen('a\n\n b \n'), ['a', 'b']);
   assert.deepEqual(anlaesseLesen(null), []);
+});
+
+test('Anlässe: passende Themen zuerst, fremde Themen weg, nur mit aktiven Geschenken, max. 6', () => {
+  const a = (id: number, themen: string, geschenke: string, reihenfolge = id, aktiv = 1): Anlass => ({ id, text: `A${id}`, icon: '', geschenke, themen, reihenfolge, aktiv });
+  const alle = [a(1, '', '1,2'), a(2, '', '3'), a(3, 'pkv', '4,5'), a(4, 'immobilien', '6'), a(5, '', '99'), a(6, '', '1', 6, 0)];
+  const aktiv = [1, 2, 3, 4, 5, 6];
+  assert.deepEqual(anlaesseFuer(alle, 'pkv,vorsorge', aktiv).map((x) => x.id), [3, 1, 2]);
+  assert.deepEqual(anlaesseFuer(alle, 'immobilien', aktiv).map((x) => x.id), [4, 1, 2]);
+  assert.deepEqual(anlaesseFuer(alle, '', aktiv).map((x) => x.id), [1, 2]);
+  assert.deepEqual(anlaesseFuer(alle, 'pkv', [2, 5]).map((x) => [x.id, x.geschenkIds]), [[3, [5]], [1, [2]]]);
+  assert.equal(anlaesseFuer(Array.from({ length: 9 }, (_, i) => a(i + 1, '', '1')), '', [1]).length, 6);
 });

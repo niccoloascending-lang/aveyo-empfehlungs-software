@@ -40,7 +40,7 @@ Bewusst ohne Geldprämien, Punkte oder Ranglisten – das hat bei Tellscale den 
 | Anstoß | Wo | Einstellbar |
 |---|---|---|
 | **Geschenk statt Prämie**, Versprechen „Niemand ruft dich an“ | Freund-Seite, Empfehler-Bereich | Texte |
-| **„Wer fällt dir ein?“** – Denkanstöße je Geschenk (konkrete Anlässe statt „empfiehl uns“) | unter den Geschenk-Karten | Geschenke → Denkanstöße |
+| **Erst die Person, dann das Geschenk:** „Wem möchtest du etwas schenken? Jemandem, der … gerade umgezogen ist / ein Kind bekommen hat / …“ – ein Tipp wählt das passende Geschenk, Alternativen darunter, „Ich weiß schon, was ich verschenken will“ führt zur Kartenauswahl | Schritt 1 im Empfehler-Bereich | Admin → Anlässe (je Anlass bis zu 3 Geschenke, Themen, Reihenfolge); Auswertung je Anlass in der Übersicht |
 | **Kontingent** „Du hast 3 Geschenke zu vergeben“, danach „Noch 2 von 3“ (rollierend 12 Monate) | Empfehler-Bereich | Einstellungen; je Kunde „+3 freischalten“ |
 | **Persönlicher Erfolgs-Satz** („Ich spare jetzt 840 € im Jahr“) als erster Vorschlag – nur echte Zahlen | Schritt 2 | Kunde → Erfolg als Satz-Vorschlag |
 | **Im Termin teilen**: großer QR-Code zum Kunden-Link, der Kunde scannt und teilt sofort | Admin → Kunde | – |

@@ -72,10 +72,15 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   const p = await ctx.newPage();
   const start = Date.now();
   await p.goto(links.Lisa);
+  // Erst die Person: „Wem möchtest du etwas schenken? Jemandem, der …“ – ein Tipp wählt das passende Geschenk
+  await p.getByText('Wem möchtest du etwas schenken?').waitFor();
+  assert.equal(await p.locator('textarea').count(), 0, 'Nachricht erst nach der Wahl');
+  await p.getByRole('radio', { name: /gerade umgezogen ist/ }).click();
+  await p.getByText('Das passt:').waitFor();
   await p.waitForSelector('textarea:not([disabled])');
   await p.getByText('Du hast 3 Geschenke für Freunde zu vergeben.').waitFor();
   await p.getByText('Schon 36 Kunden haben ein Geschenk an Freunde weitergegeben.').waitFor();
-  await p.getByText('Wem könnte das helfen?', { exact: false }).waitFor();
+  await p.getByRole('button', { name: /Checkliste: Die wichtigsten Versicherungen/ }).waitFor(); // Alternative
   await p.getByRole('button', { name: /Ich spare jetzt 840 € im Jahr/ }).waitFor(); // persönlicher Erfolgs-Satz
   await p.getByRole('button', { name: 'Ehrlich und ohne Druck' }).click();
   await p.waitForTimeout(600);
@@ -133,6 +138,7 @@ test('Flow 2b: Download ohne Termin und ohne Daten, danach Weitergeben', async (
   const ctx = await handy();
   const p = await ctx.newPage();
   await p.goto(links.Jonas);
+  await p.getByRole('radio', { name: /Ich weiß schon/ }).click();
   await p.getByRole('radio', { name: /Checkliste/ }).click();
   await p.waitForSelector('textarea:not([disabled])');
   await p.waitForTimeout(400);

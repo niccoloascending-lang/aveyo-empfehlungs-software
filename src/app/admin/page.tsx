@@ -20,6 +20,7 @@ type Dash = {
   proGeschenk: Zeile[];
   proVorlage: Zeile[];
   proKanal: Zeile[];
+  proAnlass: Zeile[];
 };
 
 const KANAL: Record<string, string> = { whatsapp: 'WhatsApp', signal: 'Signal', telegram: 'Telegram', email: 'E-Mail', kopieren: 'Kopiert', nativ: 'Andere App', qr: 'QR-Code', weitergabe: 'Weitergabe durch Freund' };
@@ -118,6 +119,7 @@ export default function Dashboard() {
       {d && (
         <div className="mt-6 space-y-6">
           <Tabelle titel="Welches Geschenk funktioniert am besten?" zeilen={d.proGeschenk} />
+          <Tabelle titel="Welcher Anlass bringt am meisten? (Jemandem, der …)" zeilen={d.proAnlass} />
           <Tabelle titel="Nachrichtenvorlagen (A/B-Test)" zeilen={d.proVorlage} />
           <Tabelle titel="Kanäle" zeilen={d.proKanal} name={(z) => KANAL[String(z.id)] ?? String(z.id)} />
           <p className="text-xs text-slate-500">

@@ -1,6 +1,6 @@
 // Dashboard-Kennzahlen und Conversion je Geschenk / Nachrichtenvorlage. Rein → testbar.
 
-export type StatTeilung = { id: number; kunde_id: number | null; geschenk_id: number; vorlage_id: number | null; geteilt_am: string | null; kanal: string | null };
+export type StatTeilung = { id: number; kunde_id: number | null; geschenk_id: number; vorlage_id: number | null; geteilt_am: string | null; kanal: string | null; anlass_id?: number | null };
 export type StatEreignis = { teilung_id: number | null; typ: string };
 export type StatAnfrage = { teilung_id: number | null; typ: string; status: string; bestaetigt: string | null };
 
@@ -17,6 +17,7 @@ export type Kennzahlen = {
   proGeschenk: Zeile[];
   proVorlage: Zeile[];
   proKanal: Zeile[];
+  proAnlass: Zeile[];
 };
 
 const EINLOESUNG = new Set(['download', 'rechner', 'termin_bestaetigt', 'auswertung_bestaetigt', 'download_mail_bestaetigt']);
@@ -31,6 +32,7 @@ export function kennzahlen(
   anfragen: StatAnfrage[],
   geschenkNamen: Map<number, string>,
   vorlagenNamen: Map<number, string>,
+  anlassNamen: Map<number, string> = new Map(),
 ): Kennzahlen {
   const geteilte = teilungen.filter((t) => t.geteilt_am);
   const byT = new Map(teilungen.map((t) => [t.id, t]));
@@ -72,5 +74,6 @@ export function kennzahlen(
     proGeschenk: gruppe((t) => t.geschenk_id, (k) => geschenkNamen.get(Number(k)) ?? `Geschenk ${k}`),
     proVorlage: gruppe((t) => t.vorlage_id, (k) => vorlagenNamen.get(Number(k)) ?? `Vorlage ${k}`),
     proKanal: gruppe((t) => t.kanal, (k) => String(k)),
+    proAnlass: gruppe((t) => t.anlass_id ?? null, (k) => anlassNamen.get(Number(k)) ?? `Anlass ${k}`),
   };
 }

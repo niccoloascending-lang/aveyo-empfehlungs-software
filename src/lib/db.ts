@@ -215,13 +215,28 @@ export function initSchema(d: DatabaseSync) {
     );
   `);
 
+  // Anlässe: „Wem möchtest du etwas schenken? Jemandem, der …“ → passende Geschenke
+  d.exec(`
+    CREATE TABLE IF NOT EXISTS anlaesse (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      text        TEXT NOT NULL,              -- „gerade umgezogen ist“
+      icon        TEXT NOT NULL DEFAULT '✨',
+      geschenke   TEXT NOT NULL DEFAULT '',   -- Geschenk-IDs, erste = Vorschlag, Rest = Alternativen
+      themen      TEXT NOT NULL DEFAULT '',   -- leer = für alle Kunden
+      reihenfolge INTEGER NOT NULL DEFAULT 0,
+      aktiv       INTEGER NOT NULL DEFAULT 1,
+      erstellt    TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
   // Ergänzungen (abwärtskompatibel)
   addColumnIfMissing(d, 'berater', 'kalender_id', 'TEXT'); // Google-Kalender-ID (meist die E-Mail-Adresse)
   addColumnIfMissing(d, 'anfragen', 'berater_id', 'INTEGER'); // zuständiger Berater (Kalender)
   addColumnIfMissing(d, 'anfragen', 'google_event_id', 'TEXT');
   addColumnIfMissing(d, 'geschenke', 'akkusativ', 'TEXT');
   addColumnIfMissing(d, 'kunden', 'anrede', "TEXT NOT NULL DEFAULT ''"); // herr | frau | '' (vom Berater gewählt, nie geraten)
-  addColumnIfMissing(d, 'geschenke', 'anlaesse', 'TEXT'); // „Wer fällt dir ein?“ – je Zeile ein Anlass
+  addColumnIfMissing(d, 'geschenke', 'anlaesse', 'TEXT'); // (früher: Denkanstöße je Geschenk; ersetzt durch Tabelle anlaesse)
+  addColumnIfMissing(d, 'teilungen', 'anlass_id', 'INTEGER'); // anonym: über welchen Anlass verschenkt wurde (Auswertung) // „Wer fällt dir ein?“ – je Zeile ein Anlass
   addColumnIfMissing(d, 'kunden', 'zitat_vorschlag', 'TEXT'); // echter Erfolg, vom Berater eingetragen („Ich spare jetzt 840 € im Jahr“)
   addColumnIfMissing(d, 'kunden', 'kontingent_extra', 'INTEGER NOT NULL DEFAULT 0');
   addColumnIfMissing(d, 'kunden', 'erinnert_am', 'TEXT');

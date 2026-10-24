@@ -222,6 +222,25 @@ for (const g of GESCHENKE) {
   }
 }
 
+// ---------- Anlässe: „Wem möchtest du etwas schenken? Jemandem, der …“ ----------
+if (!one('SELECT 1 FROM anlaesse LIMIT 1')) {
+  const id = (titel: string) => one<{ id: number }>('SELECT id FROM geschenke WHERE titel = ?', titel)?.id;
+  const ANLAESSE: [string, string, string[], string][] = [
+    ['🩺', 'über seine PKV-Beiträge stöhnt', ['Kostenloser PKV-Beitragscheck', 'Checkliste: 7 Fehler beim Wechsel in die PKV'], 'pkv'],
+    ['🏢', 'über eine Wohnung als Geldanlage nachdenkt', ['Erstgespräch Kapitalanlage-Immobilie'], 'immobilien,vermoegen'],
+    ['🏠', 'gerade umgezogen ist oder mit jemandem zusammenzieht', ['Kostenloser Versicherungs-Check-up', 'Checkliste: Die wichtigsten Versicherungen'], ''],
+    ['👶', 'ein Kind bekommen hat oder heiratet', ['Kostenloser Versicherungs-Check-up', 'Ist dein Einkommen abgesichert?'], ''],
+    ['💼', 'sich selbstständig gemacht hat', ['Ist dein Einkommen abgesichert?', 'Kostenloser Versicherungs-Check-up', 'Checkliste: 7 Fehler beim Wechsel in die PKV'], ''],
+    ['🧓', 'endlich an die Rente denken will', ['Zweitmeinung zu deiner Altersvorsorge', 'Rentenlücken-Rechner'], ''],
+    ['🎓', 'gerade ins Berufsleben startet', ['Checkliste: Die wichtigsten Versicherungen', 'Rentenlücken-Rechner'], ''],
+    ['🤔', 'lange nicht auf seine Versicherungen geschaut hat', ['Kostenloser Versicherungs-Check-up', 'Checkliste: Die wichtigsten Versicherungen'], ''],
+  ];
+  ANLAESSE.forEach(([icon, text, titel, themen], i) => {
+    const geschenke = titel.map(id).filter(Boolean).join(',');
+    if (geschenke) insertRow('anlaesse', { icon, text, geschenke, themen, reihenfolge: i + 1 });
+  });
+}
+
 if (!one('SELECT 1 FROM kunden LIMIT 1')) {
   kundeAnlegen({ vorname: 'Lisa', nachname: 'Beispiel', email: 'lisa@example.org', handy: '+49 170 0000001', themen: 'pkv,vorsorge', berater_id: adrian, extern_id: 'DEMO-1' });
   kundeAnlegen({ anrede: 'herr', ansprache: 'sie', vorname: 'Jonas', nachname: 'Muster', email: 'jonas@example.org', themen: 'vorsorge,vermoegen', berater_id: adrian, extern_id: 'DEMO-2' });

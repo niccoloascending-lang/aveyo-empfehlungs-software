@@ -1,6 +1,6 @@
 // Daten für „Mein Geschenke-Bereich“ des Empfehlers.
 import { all, one, run } from './db.ts';
-import { kontingent, sozialeZahl, anlaesseLesen } from './anreize.ts';
+import { kontingent, sozialeZahl, anlaesseFuer, type Anlass } from './anreize.ts';
 import { einstellungen, texte, ansprache } from './einstellungen.ts';
 import { anredeName } from './texte.ts';
 import { aktiveGeschenke, beraterFuerKunde, teilungenVonKunde } from './teilungen.ts';
@@ -37,6 +37,21 @@ const EINLOESUNG = "('download','rechner','termin_bestaetigt','auswertung_bestae
 /** Alle Einlösungen (= gepflanzte Bäume) über alle Kunden. */
 export const baeumeGesamt = () => one<{ n: number }>(`SELECT COUNT(*) n FROM ereignisse WHERE typ IN ${EINLOESUNG}`)!.n;
 
+/** Anlässe („Jemandem, der …“) und Geschenke für den Kunden. `karten` = Auswahl für „Ich weiß schon, was ich verschenken will“. */
+function geschenkAuswahl(kunde: Kunde) {
+  const aktive = aktiveGeschenke();
+  const karten = geschenkeFuer(aktive, kunde.themen, 4);
+  const anlaesse = anlaesseFuer(all<Anlass>('SELECT * FROM anlaesse'), kunde.themen, aktive.map((g) => g.id));
+  const noetig = new Set([...karten.map((g) => g.id), ...anlaesse.flatMap((a) => a.geschenkIds)]);
+  return {
+    geschenke: aktive
+      .filter((g) => noetig.has(g.id))
+      .map((g) => ({ id: g.id, titel: g.titel, satz: imSatz(g), kurz: g.kurz, icon: g.icon, typ: g.typ, bild_id: g.bild_id })),
+    karten: karten.map((g) => g.id),
+    anlaesse: anlaesse.map((a) => ({ id: a.id, text: a.text, icon: a.icon, geschenkIds: a.geschenkIds })),
+  };
+}
+
 export function empfehlerDaten(kunde: Kunde) {
   const e = einstellungen();
   const wirkung = wirkungVon(kunde, kunde.zuletzt_gesehen);
@@ -52,16 +67,7 @@ export function empfehlerDaten(kunde: Kunde) {
     vorname: kunde.vorname,
     anredeName: anredeName(kunde, form),
     berater: b ? { name: b.name, foto_id: b.foto_id, video_url: b.video_url } : null,
-    geschenke: geschenkeFuer(aktiveGeschenke(), kunde.themen, 4).map((g) => ({
-      id: g.id,
-      titel: g.titel,
-      satz: imSatz(g),
-      kurz: g.kurz,
-      icon: g.icon,
-      typ: g.typ,
-      bild_id: g.bild_id,
-      anlaesse: anlaesseLesen(g.anlaesse),
-    })),
+    ...geschenkAuswahl(kunde),
     zitatVorschlag: (kunde.zitat_vorschlag ?? '').trim(),
     kontingent: kontingentVon(kunde),
     sozial: e.sozialAnzeigen
