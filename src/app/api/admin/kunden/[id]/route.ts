@@ -1,6 +1,8 @@
 import { admin, json, fehler, body, idParam } from '@/lib/admin';
 import { one, all, run, protokolliere } from '@/lib/db';
 import { linkFuer, kundeLoeschen, type Kunde } from '@/lib/kunden';
+import { saeubereZitat } from '@/lib/teilen';
+import { kontingentVon } from '@/lib/empfehler';
 import { wirkungVon } from '@/lib/empfehler';
 import { istEmail, sauber, telefon, themenLesen } from '@/lib/validierung';
 import { t, einstellungen, ansprache } from '@/lib/einstellungen';
@@ -32,6 +34,12 @@ export const GET = admin((_req, b, ctx) => {
     einladungBetreff: t('einladung.betreff', {}, ansprache(k)),
     dankeVorlage: t('danke.nachricht', { vorname: k.vorname, anrede_name: anredeName(k, ansprache(k)), berater }, ansprache(k)),
     wirkung: wirkungVon(k, null),
+    kontingent: kontingentVon(k),
+    terminQr: {
+      titel: t('termin.qr.titel', { vorname: k.vorname, anrede_name: anredeName(k, ansprache(k)) }, ansprache(k)),
+      text: t('termin.qr.text', {}, ansprache(k)),
+    },
+    erinnerung: link ? t('erinnerung.text', { vorname: k.vorname, anrede_name: anredeName(k, ansprache(k)), link }, ansprache(k)) : '',
     teilungen,
     dankeschoens,
     belohnungen: e.belohnungen,
@@ -51,6 +59,7 @@ export const PUT = admin(async (req, b, ctx) => {
   const beraterId = Number(d.berater_id);
   if (d.berater_id != null && !one('SELECT 1 FROM berater WHERE id = ?', beraterId)) return fehler('Berater unbekannt.');
   if (d.berater_id != null) run('UPDATE kunden SET berater_id = ? WHERE id = ?', beraterId, id);
+  if (d.zitat_vorschlag !== undefined) run('UPDATE kunden SET zitat_vorschlag = ? WHERE id = ?', saeubereZitat(d.zitat_vorschlag) || null, id);
   run(
     "UPDATE kunden SET anrede = ?, ansprache = ?, vorname = ?, nachname = ?, email = ?, handy = ?, themen = ?, notiz = ?, geaendert = datetime('now') WHERE id = ?",
     d.anrede ?? '',

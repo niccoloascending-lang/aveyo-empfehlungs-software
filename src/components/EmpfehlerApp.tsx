@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Eye, QrCode, X, ShieldCheck, PlayCircle, Heart } from 'lucide-react';
+import { Eye, QrCode, X, ShieldCheck, PlayCircle, Heart, Users, Lightbulb } from 'lucide-react';
+import { baumReihe } from '@/lib/anreize';
 import { baueNachricht, TOENE, type Kanal, type Ton } from '@/lib/teilen';
 import { fuelle } from '@/lib/texte';
 import type { EmpfehlerDaten } from '@/lib/empfehler';
@@ -31,6 +32,10 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
   const [qr, setQr] = useState(false);
   const [geteilt, setGeteilt] = useState(false);
   const [moment, setMoment] = useState(wirkung.neuSeit > 0);
+  // Kontingent: „Du hast 3 Geschenke zu vergeben“ – zählt jeden neuen Link einmal, erneutes Teilen desselben Links nicht
+  const [rest, setRest] = useState<number | null>(daten.kontingent.rest);
+  const geteilteCodes = useRef(new Set<string>());
+  const gesamt = daten.kontingent.gesamt;
   const cache = useRef(new Map<number, Teilung>());
   const zitatTimer = useRef<ReturnType<typeof setTimeout>>();
 
@@ -98,8 +103,17 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
     if (teilung) await api(`/api/k/${token}/teilung`, 'PATCH', { code: teilung.code, zitat });
   };
 
+  const verbrauchen = (code: string) => {
+    if (geteilteCodes.current.has(code)) return;
+    geteilteCodes.current.add(code);
+    setRest((r) => (r == null ? r : Math.max(0, r - 1)));
+  };
+  // Aufgebraucht? Ein schon geteilter Link darf weiter geteilt werden.
+  const gesperrt = rest === 0 && !!teilung && !geteilteCodes.current.has(teilung.code);
+
   const melden = (kanal: Kanal) => {
     if (!teilung) return;
+    verbrauchen(teilung.code);
     clearTimeout(zitatTimer.current);
     api(`/api/k/${token}/teilung`, 'PATCH', { code: teilung.code, zitat });
     const body = JSON.stringify({ code: teilung.code, kanal, bearbeitet });
@@ -133,6 +147,12 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
         </div>
       </section>
 
+      {daten.sozial != null && (
+        <p className="mt-5 flex items-center gap-2 rounded-2xl bg-white/70 px-4 py-3 text-sm font-medium text-tinte/80 shadow-karte">
+          <Users size={18} className="shrink-0 text-akzent" aria-hidden /> {fuelle(t['kunde.sozial'], { anzahl: daten.sozial })}
+        </p>
+      )}
+
       {!geschenke.length ? (
         <p className="karte mt-8 p-6 text-center">{t['kunde.keine.geschenke']}</p>
       ) : (
@@ -144,6 +164,7 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
               {t['kunde.schritt1']}
             </h2>
             <p className="mt-1 text-sm text-tinte/70">{t['kunde.schritt1.hinweis']}</p>
+            {gesamt != null && rest != null && <Kontingent gesamt={gesamt} rest={rest} t={t} berater={daten.berater?.name ?? ''} />}
             <div role="radiogroup" aria-labelledby="s1" className="mt-3 grid gap-3 sm:grid-cols-2">
               {geschenke.map((g) => {
                 const an = g.id === geschenkId;
@@ -172,6 +193,20 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
                 );
               })}
             </div>
+            {geschenk && geschenk.anlaesse.length > 0 && (
+              <div className="anim-hoch mt-4 rounded-2xl border border-akzent/40 bg-white/60 p-4" key={geschenk.id}>
+                <p className="flex items-start gap-2 text-sm font-semibold">
+                  <Lightbulb size={18} className="mt-0.5 shrink-0 text-akzent" aria-hidden /> {t['kunde.anlaesse.titel']}
+                </p>
+                <ul className="mt-2 space-y-1.5 pl-7 text-sm text-tinte/80">
+                  {geschenk.anlaesse.map((a) => (
+                    <li key={a} className="list-disc">
+                      {a}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </section>
 
           {/* 2. Eigener Satz */}
@@ -182,6 +217,17 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
             </h2>
             <p className="mt-1 text-sm text-tinte/70">{t['kunde.schritt2.hinweis']}</p>
             <div className="mt-3 flex flex-wrap gap-2">
+              {daten.zitatVorschlag && (
+                <button
+                  type="button"
+                  aria-pressed={zitat === daten.zitatVorschlag}
+                  onClick={() => zitatAendern(zitat === daten.zitatVorschlag ? '' : daten.zitatVorschlag)}
+                  className={`chip border-akzent ${zitat === daten.zitatVorschlag ? 'chip-an' : ''}`}
+                >
+                  <span className="mr-1.5 rounded-full bg-akzent px-2 py-0.5 text-xs font-semibold text-white">{t['kunde.zitat.erfolg']}</span>
+                  {daten.zitatVorschlag}
+                </button>
+              )}
               {vorschlaege.map((v) => (
                 <button key={v} type="button" aria-pressed={zitat === v} onClick={() => zitatAendern(zitat === v ? '' : v)} className={`chip ${zitat === v ? 'chip-an' : ''}`}>
                   {v}
@@ -253,7 +299,13 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
                   ))}
                 </div>
               )}
-              <TeilenKnoepfe t={t} nachricht={nachricht} link={teilung?.link ?? ''} betreff={geschenk?.titel} deaktiviert={!teilung} onGeteilt={melden} />
+              {gesperrt ? (
+                <p className="rounded-2xl bg-marke-hell px-4 py-4 text-center font-medium text-marke-dunkel">
+                  {fuelle(t['kunde.kontingent.leer'], { gesamt: gesamt ?? 0, berater: daten.berater?.name ?? '' })}
+                </p>
+              ) : (
+                <TeilenKnoepfe t={t} nachricht={nachricht} link={teilung?.link ?? ''} betreff={geschenk?.titel} deaktiviert={!teilung} onGeteilt={melden} />
+              )}
             </div>
             {geteilt && (
               <p role="status" className="anim-pop mt-1 rounded-2xl bg-marke-hell px-4 py-3 text-center font-semibold text-marke-dunkel">
@@ -268,11 +320,14 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
             <div className="mt-5">
               <button
                 type="button"
-                disabled={!teilung}
+                disabled={!teilung || gesperrt}
                 aria-expanded={qr}
                 onClick={() => {
                   setQr(!qr);
-                  if (!qr && teilung) navigator.sendBeacon?.(`/api/k/${token}/geteilt`, JSON.stringify({ code: teilung.code, kanal: 'qr', bearbeitet: false }));
+                  if (!qr && teilung) {
+                    verbrauchen(teilung.code);
+                    navigator.sendBeacon?.(`/api/k/${token}/geteilt`, JSON.stringify({ code: teilung.code, kanal: 'qr', bearbeitet: false }));
+                  }
                 }}
                 className="inline-flex items-center gap-2 text-sm font-medium text-marke-dunkel underline underline-offset-4"
               >
@@ -318,6 +373,8 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
         )}
         <p className="mt-3 text-sm text-tinte/70">{wirkung.verschenkt + wirkung.geoeffnet === 0 ? t['kunde.wirkung.leer'] : t['kunde.wirkung.namen']}</p>
       </section>
+
+      {daten.baeume && <Baeume eigene={daten.baeume.eigene} gesamt={daten.baeume.gesamt} t={t} />}
 
       {daten.dankeSichtbar && <DankeBereich token={token} daten={daten} />}
 
@@ -371,6 +428,57 @@ function DankeBereich({ token, daten }: { token: string; daten: EmpfehlerDaten }
             ))}
         </div>
       ))}
+    </section>
+  );
+}
+
+/** „Du hast 3 Geschenke zu vergeben“ – als kleine Geschenkreihe, verschenkte werden blass. */
+function Kontingent({ gesamt, rest, t, berater }: { gesamt: number; rest: number; t: Record<string, string>; berater: string }) {
+  const text =
+    rest === gesamt
+      ? fuelle(t['kunde.kontingent'], { gesamt })
+      : rest === 1
+        ? t['kunde.kontingent.letztes']
+        : rest === 0
+          ? fuelle(t['kunde.kontingent.leer'], { gesamt, berater })
+          : fuelle(t['kunde.kontingent.rest'], { rest, gesamt });
+  return (
+    <div className="mt-3 flex items-center gap-3 rounded-2xl bg-marke px-4 py-3 text-white" role="status">
+      <span aria-hidden className="flex shrink-0 gap-0.5 text-xl">
+        {Array.from({ length: Math.min(gesamt, 6) }, (_, i) => (
+          <span key={i} className={i < rest ? '' : 'opacity-30 grayscale'}>
+            🎁
+          </span>
+        ))}
+      </span>
+      <span className="text-sm font-semibold leading-snug">{text}</span>
+    </div>
+  );
+}
+
+/** Sichtbare Wirkung: ein Baum je eingelöstem Geschenk. */
+function Baeume({ eigene, gesamt, t }: { eigene: number; gesamt: number; t: Record<string, string> }) {
+  const r = baumReihe(eigene);
+  return (
+    <section className="karte mt-6 p-5" aria-labelledby="baeume">
+      <h2 id="baeume" className="text-lg font-bold">
+        {t['kunde.baeume.titel']}
+      </h2>
+      <p className="mt-1 text-sm text-tinte/80">{t['kunde.baeume.text']}</p>
+      {eigene > 0 ? (
+        <p className="mt-3 text-3xl leading-relaxed" role="img" aria-label={`${eigene} Bäume`}>
+          {'🌳'.repeat(r.symbole)}
+          {r.mehr > 0 && <span className="ml-2 align-middle text-base font-semibold text-marke-dunkel">+{r.mehr}</span>}
+        </p>
+      ) : (
+        <p className="mt-3 flex items-center gap-2 text-sm text-tinte/70">
+          <span className="text-2xl opacity-40" aria-hidden>
+            🌱
+          </span>
+          {t['kunde.baeume.leer']}
+        </p>
+      )}
+      {gesamt > 0 && <p className="mt-3 text-xs font-medium text-tinte/70">{fuelle(t['kunde.baeume.gesamt'], { anzahl: gesamt })}</p>}
     </section>
   );
 }

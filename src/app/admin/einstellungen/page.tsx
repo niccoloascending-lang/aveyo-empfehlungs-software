@@ -243,6 +243,34 @@ export default function Einstellungen() {
           </button>
         </Abschnitt>
 
+        <Abschnitt titel="Anstöße zum Teilen" hinweis="Ohne Druck, ohne Punkte oder Ranglisten. Alle Texte dazu unter „Texte → Empfehler“.">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Feld label="Geschenke je Kunde (12 Monate, 0 = unbegrenzt)">
+              <input className="a-input" type="number" min={0} value={e.kontingent} onChange={(x) => setE({ ...e, kontingent: Number(x.target.value) })} />
+            </Feld>
+            <Feld label="Zähler-Startwert" hinweis="Echte Zahl aus dem alten System. Bitte nicht aufrunden.">
+              <input className="a-input" type="number" min={0} value={e.sozialStartwert} onChange={(x) => setE({ ...e, sozialStartwert: Number(x.target.value) })} />
+            </Feld>
+            <Feld label="Erinnern nach (Tagen)">
+              <input className="a-input" type="number" min={1} value={e.erinnerungNachTagen} onChange={(x) => setE({ ...e, erinnerungNachTagen: Number(x.target.value) })} />
+            </Feld>
+          </div>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!e.sozialAnzeigen} onChange={(x) => setE({ ...e, sozialAnzeigen: x.target.checked })} /> „Schon N Kunden haben ein Geschenk weitergegeben“ anzeigen
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!e.baeume} onChange={(x) => setE({ ...e, baeume: x.target.checked })} /> Ein Baum je eingelöstem Geschenk (⚖️ nur einschalten, wenn ihr wirklich pflanzt)
+          </label>
+          <button
+            className="a-btn"
+            onClick={() =>
+              speichern({ kontingent: e.kontingent, sozialStartwert: e.sozialStartwert, erinnerungNachTagen: e.erinnerungNachTagen, sozialAnzeigen: e.sozialAnzeigen, baeume: e.baeume })
+            }
+          >
+            Speichern
+          </button>
+        </Abschnitt>
+
         <Abschnitt titel="Datenschutz & Löschkonzept">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Feld label="Anfragen ohne Termin löschen nach (Monaten)">

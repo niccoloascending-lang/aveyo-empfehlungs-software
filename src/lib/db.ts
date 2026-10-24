@@ -221,6 +221,10 @@ export function initSchema(d: DatabaseSync) {
   addColumnIfMissing(d, 'anfragen', 'google_event_id', 'TEXT');
   addColumnIfMissing(d, 'geschenke', 'akkusativ', 'TEXT');
   addColumnIfMissing(d, 'kunden', 'anrede', "TEXT NOT NULL DEFAULT ''"); // herr | frau | '' (vom Berater gewählt, nie geraten)
+  addColumnIfMissing(d, 'geschenke', 'anlaesse', 'TEXT'); // „Wer fällt dir ein?“ – je Zeile ein Anlass
+  addColumnIfMissing(d, 'kunden', 'zitat_vorschlag', 'TEXT'); // echter Erfolg, vom Berater eingetragen („Ich spare jetzt 840 € im Jahr“)
+  addColumnIfMissing(d, 'kunden', 'kontingent_extra', 'INTEGER NOT NULL DEFAULT 0');
+  addColumnIfMissing(d, 'kunden', 'erinnert_am', 'TEXT');
   addColumnIfMissing(d, 'kunden', 'ansprache', "TEXT NOT NULL DEFAULT ''"); // du | sie | '' (= allgemeine Einstellung) // Geschenk im Satz: „Lisa schenkt dir <akkusativ>“
 }
 

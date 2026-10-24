@@ -9,6 +9,7 @@ type Zeile = { id: number | string; name: string; geteilt: number; geoeffnet: nu
 type Dash = {
   tage: number;
   neueAnfragen: number;
+  baeume: number | null;
   kundenEingeladen: number;
   kundenGeteilt: number;
   geteilt: number;
@@ -96,6 +97,11 @@ export default function Dashboard() {
       }
     >
       <Meldung text={fehler} />
+      {d && d.baeume != null && d.baeume > 0 && (
+        <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          🌳 Bisher {d.baeume} Bäume zugesagt (ein Baum je eingelöstem Geschenk, gesamt). Bitte regelmäßig pflanzen lassen.
+        </p>
+      )}
       {d && d.neueAnfragen > 0 && (
         <Link href="/admin/anfragen?status=neu" className="mb-4 block rounded-xl bg-marke px-4 py-3 font-semibold text-white">
           {d.neueAnfragen} neue, bestätigte Anfrage{d.neueAnfragen === 1 ? '' : 'n'} ansehen →

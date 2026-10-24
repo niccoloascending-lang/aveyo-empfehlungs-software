@@ -15,6 +15,7 @@ export function geschenkDaten(d: any): Record<string, any> | { fehler: string } 
     kurz: sauber(d.kurz, 240),
     nutzen: mehrzeilig(d.nutzen, 1000),
     ablauf: mehrzeilig(d.ablauf, 1000),
+    anlaesse: mehrzeilig(d.anlaesse, 1000) || null,
     dauer: sauber(d.dauer, 60),
     typ,
     themen: themenLesen(d.themen).join(','),

@@ -1,5 +1,6 @@
 // Daten für „Mein Geschenke-Bereich“ des Empfehlers.
-import { all, run } from './db.ts';
+import { all, one, run } from './db.ts';
+import { kontingent, sozialeZahl, anlaesseLesen } from './anreize.ts';
 import { einstellungen, texte, ansprache } from './einstellungen.ts';
 import { anredeName } from './texte.ts';
 import { aktiveGeschenke, beraterFuerKunde, teilungenVonKunde } from './teilungen.ts';
@@ -25,6 +26,17 @@ export function wirkungVon(kunde: Kunde, zuletztGesehen: string | null) {
   return berechneWirkung(teilungen, ereignisse, anfragen, einw, zuletztGesehen);
 }
 
+/** Kontingent eines Kunden (rollierend 12 Monate). */
+export function kontingentVon(kunde: { id: number; kontingent_extra?: number | null }) {
+  const geteilt = all<{ geteilt_am: string | null }>('SELECT geteilt_am FROM teilungen WHERE kunde_id = ? AND geteilt_am IS NOT NULL', kunde.id).map((r) => r.geteilt_am);
+  return kontingent(einstellungen().kontingent, kunde.kontingent_extra ?? 0, geteilt);
+}
+
+const EINLOESUNG = "('download','rechner','termin_bestaetigt','auswertung_bestaetigt','download_mail_bestaetigt')";
+
+/** Alle Einlösungen (= gepflanzte Bäume) über alle Kunden. */
+export const baeumeGesamt = () => one<{ n: number }>(`SELECT COUNT(*) n FROM ereignisse WHERE typ IN ${EINLOESUNG}`)!.n;
+
 export function empfehlerDaten(kunde: Kunde) {
   const e = einstellungen();
   const wirkung = wirkungVon(kunde, kunde.zuletzt_gesehen);
@@ -40,7 +52,22 @@ export function empfehlerDaten(kunde: Kunde) {
     vorname: kunde.vorname,
     anredeName: anredeName(kunde, form),
     berater: b ? { name: b.name, foto_id: b.foto_id, video_url: b.video_url } : null,
-    geschenke: geschenkeFuer(aktiveGeschenke(), kunde.themen, 4).map((g) => ({ id: g.id, titel: g.titel, satz: imSatz(g), kurz: g.kurz, icon: g.icon, typ: g.typ, bild_id: g.bild_id })),
+    geschenke: geschenkeFuer(aktiveGeschenke(), kunde.themen, 4).map((g) => ({
+      id: g.id,
+      titel: g.titel,
+      satz: imSatz(g),
+      kurz: g.kurz,
+      icon: g.icon,
+      typ: g.typ,
+      bild_id: g.bild_id,
+      anlaesse: anlaesseLesen(g.anlaesse),
+    })),
+    zitatVorschlag: (kunde.zitat_vorschlag ?? '').trim(),
+    kontingent: kontingentVon(kunde),
+    sozial: e.sozialAnzeigen
+      ? sozialeZahl(e.sozialStartwert, one<{ n: number }>('SELECT COUNT(DISTINCT kunde_id) n FROM teilungen WHERE kunde_id IS NOT NULL AND geteilt_am IS NOT NULL')!.n)
+      : null,
+    baeume: e.baeume ? { eigene: wirkung.eingeloest, gesamt: baeumeGesamt() } : null,
     t,
     wirkung,
     // Danke-Bereich erst nach der ersten Einlösung oder einem ausgelösten Dankeschön – Überraschung statt Lockmittel.

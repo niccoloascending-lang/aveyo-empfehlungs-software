@@ -12,6 +12,7 @@ type G = {
   kurz: string;
   nutzen: string;
   ablauf: string;
+  anlaesse: string | null;
   dauer: string;
   typ: 'termin' | 'download' | 'rechner';
   themen: string;
@@ -24,7 +25,7 @@ type G = {
   geteilt?: number;
 };
 
-const LEER: G = { titel: '', akkusativ: '', kurz: '', nutzen: '', ablauf: '', dauer: '', typ: 'termin', themen: '', icon: '🎁', bild_id: null, datei_id: null, inhalt: '', aktiv: 1, reihenfolge: 0 };
+const LEER: G = { titel: '', akkusativ: '', kurz: '', nutzen: '', ablauf: '', anlaesse: '', dauer: '', typ: 'termin', themen: '', icon: '🎁', bild_id: null, datei_id: null, inhalt: '', aktiv: 1, reihenfolge: 0 };
 const TYP: Record<string, string> = { termin: 'Termin buchen', download: 'Download', rechner: 'Rechner' };
 
 export default function Geschenke() {
@@ -65,7 +66,7 @@ export default function Geschenke() {
       <div className="mt-4 grid gap-6 xl:grid-cols-[1fr_1.2fr]">
         <div className="space-y-3">
           {(daten ?? []).map((x) => (
-            <button key={x.id} onClick={() => setG({ ...x, inhalt: x.inhalt ?? '', akkusativ: x.akkusativ ?? '' })} className={`a-karte flex w-full items-start gap-3 text-left hover:border-marke ${g?.id === x.id ? 'border-marke' : ''}`}>
+            <button key={x.id} onClick={() => setG({ ...x, inhalt: x.inhalt ?? '', akkusativ: x.akkusativ ?? '', anlaesse: x.anlaesse ?? '' })} className={`a-karte flex w-full items-start gap-3 text-left hover:border-marke ${g?.id === x.id ? 'border-marke' : ''}`}>
               <span className="text-2xl">{x.icon}</span>
               <span className="flex-1">
                 <span className="block font-semibold">
@@ -104,6 +105,9 @@ export default function Geschenke() {
             </Feld>
             <Feld label="Ablauf (3 Schritte, je Zeile einer)">
               <textarea className="a-input" rows={3} value={g.ablauf} onChange={(e) => setG({ ...g, ablauf: e.target.value })} />
+            </Feld>
+            <Feld label="„Wer fällt dir ein?“ – Denkanstöße für den Empfehler (je Zeile einer)" hinweis="z. B. „gerade Vater oder Mutter geworden ist“. Hilft dem Kunden, an eine konkrete Person zu denken.">
+              <textarea className="a-input" rows={3} value={g.anlaesse ?? ''} onChange={(e) => setG({ ...g, anlaesse: e.target.value })} />
             </Feld>
             <div className="grid gap-3 sm:grid-cols-3">
               <Feld label="Typ">

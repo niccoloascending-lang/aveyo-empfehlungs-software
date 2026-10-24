@@ -1,5 +1,6 @@
 import { admin, json } from '@/lib/admin';
 import { all, one } from '@/lib/db';
+import { einstellungen } from '@/lib/einstellungen';
 import { kennzahlen, type StatAnfrage, type StatEreignis, type StatTeilung } from '@/lib/statistik';
 
 export const dynamic = 'force-dynamic';
@@ -21,5 +22,8 @@ export const GET = admin((req) => {
   );
   const eingeladen = one<{ n: number }>('SELECT COUNT(*) n FROM kunden WHERE token_hash IS NOT NULL AND token_widerrufen IS NULL')!.n;
   const neueAnfragen = one<{ n: number }>("SELECT COUNT(*) n FROM anfragen WHERE status = 'neu' AND bestaetigt IS NOT NULL")!.n;
-  return json({ tage, neueAnfragen, ...kennzahlen(eingeladen, teilungen, ereignisse, anfragen, geschenke, vorlagen) });
+  const baeume = einstellungen().baeume
+    ? one<{ n: number }>("SELECT COUNT(*) n FROM ereignisse WHERE typ IN ('download','rechner','termin_bestaetigt','auswertung_bestaetigt','download_mail_bestaetigt')")!.n
+    : null;
+  return json({ tage, neueAnfragen, baeume, ...kennzahlen(eingeladen, teilungen, ereignisse, anfragen, geschenke, vorlagen) });
 });

@@ -33,6 +33,23 @@ npm run dev         # http://localhost:3200
 | Empfehler | `/k/<magic-token>` | Kein Login. Begrüßung, 2–4 passende Geschenke, eigener Satz (Vorschläge antippen), Ton wählen (locker/kurz/ausführlich), Text editierbar, Vorschau der Freund-Seite, Teilen per WhatsApp/Signal/Telegram/E-Mail/Kopieren/Teilen-Menü, QR-Code, „Meine Wirkung“, Danke-Bereich (erst nach der ersten Einlösung) |
 | Freund | `/g/<code>` | „Lisa schenkt dir …“, Zitat, Nutzen, Ablauf, Dauer, Kosten 0 €, Versprechen „Niemand ruft dich an“. Einlösen: Termin (eigener Slot-Picker oder Cal.com/Calendly-Link), Download (sofort, Mail nur optional mit Double-Opt-in), Rechner (sofort, Auswertung optional). Freiwillige Einwilligung „Lisa darf es erfahren“. Weitergeben erst nach dem Einlösen |
 
+## Anstöße zum Teilen (warum es diesmal funktionieren soll)
+
+Bewusst ohne Geldprämien, Punkte oder Ranglisten – das hat bei Tellscale den Kunden zum Vertriebler gemacht. Stattdessen:
+
+| Anstoß | Wo | Einstellbar |
+|---|---|---|
+| **Geschenk statt Prämie**, Versprechen „Niemand ruft dich an“ | Freund-Seite, Empfehler-Bereich | Texte |
+| **„Wer fällt dir ein?“** – Denkanstöße je Geschenk (konkrete Anlässe statt „empfiehl uns“) | unter den Geschenk-Karten | Geschenke → Denkanstöße |
+| **Kontingent** „Du hast 3 Geschenke zu vergeben“, danach „Noch 2 von 3“ (rollierend 12 Monate) | Empfehler-Bereich | Einstellungen; je Kunde „+3 freischalten“ |
+| **Persönlicher Erfolgs-Satz** („Ich spare jetzt 840 € im Jahr“) als erster Vorschlag – nur echte Zahlen | Schritt 2 | Kunde → Erfolg als Satz-Vorschlag |
+| **Im Termin teilen**: großer QR-Code zum Kunden-Link, der Kunde scannt und teilt sofort | Admin → Kunde | – |
+| **Erinnern**: Liste „geöffnet, aber nichts geteilt“ / „nie geöffnet“ mit fertigem Text, höchstens alle 60 Tage | Admin → Erinnern | Einstellungen (Tage), Texte |
+| **Sichtbare Wirkung**: ein Baum je eingelöstem Geschenk („Dein Wäldchen“), Gesamtzahl aller Kunden | Empfehler-Bereich, Übersicht | Einstellungen (⚖️ nur, wenn wirklich gepflanzt wird) |
+| **Soziale Bestätigung** „Schon 36 Kunden haben ein Geschenk weitergegeben“ – echter Startwert aus Tellscale + Kunden, die hier teilen | Empfehler-Bereich | Einstellungen (Startwert), Texte |
+
+Der wichtigste Hebel bleibt der Moment, in dem ihr fragt: am Ende eines guten Termins, direkt mit dem QR-Code.
+
 ## Annahmen und bewusste Abweichungen vom Vorschlag
 
 1. **SQLite (`node:sqlite`) statt Postgres/Prisma.** Gleicher Stack wie eure beiden anderen Apps (eine Person kann alle drei pflegen), keine zusätzliche Datenbank,

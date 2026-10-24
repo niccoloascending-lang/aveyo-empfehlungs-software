@@ -63,6 +63,11 @@ export const PUT = admin(async (req, b) => {
     setzeEinstellung('belohnungen', { nachricht: !!x.nachricht, spende: !!x.spende, erlebnis: !!x.erlebnis, doppelt: !!x.doppelt });
     protokolliere(b.id, 'belohnungen_geaendert', JSON.stringify(x));
   }
+  if (d.kontingent !== undefined) setzeEinstellung('kontingent', zahl(d.kontingent, 0, 50, 3));
+  if (d.baeume !== undefined) setzeEinstellung('baeume', !!d.baeume);
+  if (d.sozialAnzeigen !== undefined) setzeEinstellung('sozialAnzeigen', !!d.sozialAnzeigen);
+  if (d.sozialStartwert !== undefined) setzeEinstellung('sozialStartwert', zahl(d.sozialStartwert, 0, 100000, 0));
+  if (d.erinnerungNachTagen !== undefined) setzeEinstellung('erinnerungNachTagen', zahl(d.erinnerungNachTagen, 1, 90, 7));
   if (d.registerNr !== undefined) setzeEinstellung('registerNr', sauber(d.registerNr, 80));
   if (d.bewertungenUrl !== undefined) {
     const u = url(d.bewertungenUrl);

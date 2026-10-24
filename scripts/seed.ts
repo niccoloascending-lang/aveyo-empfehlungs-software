@@ -84,6 +84,7 @@ type G = Record<string, string | number>;
 const GESCHENKE: G[] = [
   {
     titel: 'Kostenloser Versicherungs-Check-up',
+    anlaesse: 'gerade umgezogen ist oder mit jemandem zusammenzieht\nein Kind bekommen hat oder heiratet\nsich selbstständig gemacht oder den Job gewechselt hat\nseit Jahren nicht mehr auf seine Versicherungen geschaut hat',
     akkusativ: 'einen kostenlosen Versicherungs-Check-up',
     kurz: 'Ist das Wichtige abgesichert und zahlst du für Unnötiges? Einmal in Ruhe draufschauen.',
     nutzen: 'Überblick, welche Versicherungen du hast und welche wichtigen fehlen\nHinweise auf doppelte oder überflüssige Verträge\nEine ehrliche Einschätzung, auch wenn alles passt',
@@ -96,6 +97,7 @@ const GESCHENKE: G[] = [
   },
   {
     titel: 'Checkliste: Die wichtigsten Versicherungen',
+    anlaesse: 'zum ersten Mal eine eigene Wohnung hat\ngerade mit Studium oder Ausbildung fertig ist\nsich fragt, ob er zu viel oder zu wenig versichert ist',
     akkusativ: 'eine Checkliste mit den wichtigsten Versicherungen',
     kurz: 'In fünf Minuten selbst prüfen, ob das Wichtigste abgesichert ist. Sofort, ohne Termin.',
     nutzen: 'Die wichtigsten Absicherungen auf einen Blick\nZum Abhaken, Ausdrucken oder als PDF speichern\nKeine Anmeldung nötig',
@@ -132,6 +134,7 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
   {
     titel: 'Kostenloser PKV-Beitragscheck',
+    anlaesse: 'privat versichert ist und über steigende Beiträge stöhnt\nseit vielen Jahren im selben PKV-Tarif ist',
     akkusativ: 'einen kostenlosen PKV-Beitragscheck',
     kurz: 'Zahlst du zu viel? Wir schauen gemeinsam auf deinen Tarif.',
     nutzen: 'Klarheit, ob dein Beitrag zu deinen Leistungen passt\nHinweise auf Tarifwechsel innerhalb deiner Gesellschaft (§ 204 VVG)\nEine ehrliche Einschätzung, auch wenn alles passt',
@@ -144,6 +147,7 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
   {
     titel: 'Zweitmeinung zu deiner Altersvorsorge',
+    anlaesse: 'einen Renten- oder Riestervertrag hat und nicht weiß, ob er passt\nsich vorgenommen hat, sich endlich um die Rente zu kümmern\njetzt deutlich mehr verdient als früher',
     akkusativ: 'eine kostenlose Zweitmeinung zu deiner Altersvorsorge',
     kurz: '30 Minuten, unverbindlich. Passt deine Vorsorge zu deinen Plänen?',
     nutzen: 'Ein unabhängiger Blick auf deine bestehenden Verträge\nVerständlich erklärt, ohne Fachchinesisch\nKein Verkaufsgespräch',
@@ -156,6 +160,7 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
   {
     titel: 'Ist dein Einkommen abgesichert?',
+    anlaesse: 'selbstständig ist und von seiner Arbeitskraft lebt\nAlleinverdiener in der Familie ist\neinen Kredit abbezahlt',
     akkusativ: 'einen kostenlosen Check, ob dein Einkommen abgesichert ist',
     kurz: 'Was passiert, wenn du länger nicht arbeiten kannst? Klarheit in 30 Minuten.',
     nutzen: 'Überblick, was im Krankheitsfall wirklich an Geld reinkommt\nVerständlich erklärt für Angestellte und Selbstständige\nEine ehrliche Einschätzung, ohne Verkaufsdruck',
@@ -168,6 +173,7 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
   {
     titel: 'Rentenlücken-Rechner',
+    anlaesse: 'an die Rente noch gar nicht denkt\nerst mal selbst wissen möchte, wo er steht, ganz ohne Gespräch',
     akkusativ: 'einen Rentenlücken-Rechner',
     kurz: 'In zwei Minuten sehen, wie groß deine Lücke im Alter sein könnte.',
     nutzen: 'Sofort ein Ergebnis, ohne Anmeldung\nAlle Annahmen offen sichtbar\nPersönliche Auswertung nur, wenn du willst',
@@ -181,6 +187,7 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
   {
     titel: 'Erstgespräch Kapitalanlage-Immobilie',
+    anlaesse: 'überlegt, eine Wohnung als Geldanlage zu kaufen\nsich fragt, ob eine Immobilie als Geldanlage zu ihm passt',
     akkusativ: 'ein kostenloses Erstgespräch zur Immobilie als Kapitalanlage',
     kurz: 'Wie funktioniert eine vermietete Wohnung als Geldanlage? Verständlich erklärt.',
     nutzen: 'Die Grundlagen verständlich erklärt\nWelche Rolle Eigenkapital, Einkommen und Steuern spielen\nOhne Verpflichtung, ohne Druck',
@@ -193,6 +200,7 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
   {
     titel: 'Checkliste: 7 Fehler beim Wechsel in die PKV',
+    anlaesse: 'überlegt, in die private Krankenversicherung zu wechseln\ngerade selbstständig geworden ist',
     akkusativ: 'eine Checkliste mit 7 Fehlern beim Wechsel in die PKV',
     kurz: 'Sofort zum Download, ganz ohne Termin.',
     nutzen: 'Die typischen Stolperfallen auf einen Blick\nZum Ausdrucken oder als PDF speichern\nKeine Anmeldung nötig',
@@ -206,9 +214,12 @@ Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituat
   },
 ];
 for (const g of GESCHENKE) {
-  const da = one<{ id: number; akkusativ: string | null }>('SELECT id, akkusativ FROM geschenke WHERE titel = ?', g.titel);
+  const da = one<{ id: number; akkusativ: string | null; anlaesse: string | null }>('SELECT id, akkusativ, anlaesse FROM geschenke WHERE titel = ?', g.titel);
   if (!da) insertRow('geschenke', g);
-  else if (!da.akkusativ) run('UPDATE geschenke SET akkusativ = ?, reihenfolge = ? WHERE id = ?', g.akkusativ, g.reihenfolge, da.id);
+  else {
+    if (!da.akkusativ) run('UPDATE geschenke SET akkusativ = ?, reihenfolge = ? WHERE id = ?', g.akkusativ, g.reihenfolge, da.id);
+    if (!da.anlaesse) run('UPDATE geschenke SET anlaesse = ? WHERE id = ?', g.anlaesse, da.id);
+  }
 }
 
 if (!one('SELECT 1 FROM kunden LIMIT 1')) {
@@ -219,6 +230,8 @@ if (!one('SELECT 1 FROM kunden LIMIT 1')) {
 
 // Ältere Test-Datenbanken: Jonas zeigt die Sie-Form
 run("UPDATE kunden SET anrede = 'herr', ansprache = 'sie' WHERE extern_id = 'DEMO-2' AND anrede = '' AND ansprache = ''");
+// Lisa zeigt den persönlichen Erfolgs-Satz (erfundenes Beispiel)
+run("UPDATE kunden SET zitat_vorschlag = 'Ich spare jetzt 840 € im Jahr' WHERE extern_id = 'DEMO-1' AND zitat_vorschlag IS NULL");
 
 console.log('\nBeispieldaten bereit.\n');
 console.log(`Admin:   ${process.env.GESCHENK_BASE_URL || 'http://localhost:3200'}/admin`);

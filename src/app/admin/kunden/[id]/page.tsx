@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageCircle, Mail, RefreshCw, Ban, Trash2, ExternalLink } from 'lucide-react';
+import { MessageCircle, Mail, RefreshCw, Ban, Trash2, ExternalLink, QrCode, X, Gift } from 'lucide-react';
 import Shell from '@/components/admin/Shell';
 import { anfrage, useDaten, datum } from '@/components/admin/api';
 import { AnredeFelder, Feld, KopierKnopf, Meldung, Themen } from '@/components/admin/ui';
@@ -24,6 +24,7 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
   const [f, setF] = useState<any>(null);
   const [meldung, setMeldung] = useState({ text: '', art: 'ok' as 'ok' | 'fehler' });
   const [danke, setDanke] = useState({ art: 'nachricht', text: '' });
+  const [termin, setTermin] = useState(false);
 
   useEffect(() => {
     if (d) {
@@ -77,6 +78,9 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
             <h2 className="font-semibold">Persönlicher Einladungslink</h2>
             {d.link ? (
               <>
+                <button className="a-btn w-full justify-center py-3 text-base" onClick={() => setTermin(true)}>
+                  <QrCode size={18} /> Jetzt im Termin teilen (QR-Code zeigen)
+                </button>
                 <div className="flex flex-wrap items-center gap-2">
                   <code className="min-w-0 flex-1 truncate rounded bg-slate-100 px-2 py-1.5 text-xs">{d.link}</code>
                   <KopierKnopf text={d.link} label="Link kopieren" />
@@ -114,6 +118,36 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
               )}
             </div>
           </section>
+
+          {d.kontingent.gesamt != null && (
+            <section className="a-karte flex flex-wrap items-center justify-between gap-3">
+              <p className="flex items-center gap-2 text-sm">
+                <Gift size={16} /> Geschenke: <strong>{d.kontingent.rest}</strong> von {d.kontingent.gesamt} übrig (letzte 12 Monate)
+              </p>
+              <button
+                className="a-btn2"
+                onClick={async () => {
+                  await anfrage(`/api/admin/kunden/${params.id}/kontingent`, 'POST', { mehr: 3 });
+                  laden();
+                }}
+              >
+                +3 freischalten
+              </button>
+            </section>
+          )}
+
+          {d.erinnerung && (
+            <details className="a-karte">
+              <summary className="cursor-pointer font-semibold">Freundliche Erinnerung schicken</summary>
+              <textarea className="a-input mt-3" rows={4} readOnly value={d.erinnerung} aria-label="Erinnerungstext" />
+              <div className="mt-2 flex flex-wrap gap-2">
+                <KopierKnopf text={d.erinnerung} label="Text kopieren" />
+                <a className="a-btn2" target="_blank" rel="noopener noreferrer" href={`https://wa.me/${wa}?text=${encodeURIComponent(d.erinnerung)}`}>
+                  <MessageCircle size={15} /> WhatsApp
+                </a>
+              </div>
+            </details>
+          )}
 
           <section className="a-karte">
             <h2 className="mb-3 font-semibold">Wirkung</h2>
@@ -229,6 +263,12 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
             <span className="a-label">Themen</span>
             <Themen wert={f.themen ?? ''} onChange={(themen) => setF({ ...f, themen })} />
           </div>
+          <Feld
+            label="Erfolg als Satz-Vorschlag (optional)"
+            hinweis="Nur echte Zahlen aus eurer Beratung, aus Sicht des Kunden, z. B. „Ich spare jetzt 840 € im Jahr“. Der Kunde sieht ihn als ersten Vorschlag für seinen Satz."
+          >
+            <input className="a-input" maxLength={160} value={f.zitat_vorschlag ?? ''} onChange={(e) => setF({ ...f, zitat_vorschlag: e.target.value })} />
+          </Feld>
           <Feld label="Interne Notiz">
             <textarea className="a-input" rows={3} value={f.notiz ?? ''} onChange={(e) => setF({ ...f, notiz: e.target.value })} />
           </Feld>
@@ -242,6 +282,17 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
           </div>
         </form>
       </div>
+      {termin && (
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-white p-6 text-center">
+          <button className="a-btn2 absolute right-4 top-4" onClick={() => setTermin(false)} autoFocus>
+            <X size={16} /> Schließen
+          </button>
+          <p className="text-2xl font-bold text-marke-dunkel">{d.terminQr.titel}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`/api/admin/kunden/${params.id}/qr`} alt="QR-Code zum Geschenke-Bereich" className="h-[min(60vh,420px)] w-[min(60vh,420px)]" />
+          <p className="max-w-md text-slate-600">{d.terminQr.text}</p>
+        </div>
+      )}
     </Shell>
   );
 }

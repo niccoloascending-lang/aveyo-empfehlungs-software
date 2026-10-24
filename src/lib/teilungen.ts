@@ -18,6 +18,7 @@ export type Geschenk = {
   datei_id: number | null;
   inhalt: string | null;
   rechner: string | null;
+  anlaesse: string | null;
   aktiv: number;
   reihenfolge: number;
 };

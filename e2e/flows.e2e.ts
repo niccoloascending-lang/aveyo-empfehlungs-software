@@ -73,6 +73,10 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   const start = Date.now();
   await p.goto(links.Lisa);
   await p.waitForSelector('textarea:not([disabled])');
+  await p.getByText('Du hast 3 Geschenke für Freunde zu vergeben.').waitFor();
+  await p.getByText('Schon 36 Kunden haben ein Geschenk an Freunde weitergegeben.').waitFor();
+  await p.getByText('Wem könnte das helfen?', { exact: false }).waitFor();
+  await p.getByRole('button', { name: /Ich spare jetzt 840 € im Jahr/ }).waitFor(); // persönlicher Erfolgs-Satz
   await p.getByRole('button', { name: 'Ehrlich und ohne Druck' }).click();
   await p.waitForTimeout(600);
   const nachricht = await p.locator('textarea').inputValue();
@@ -81,6 +85,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   assert.match(nachricht, /einen kostenlosen Versicherungs-Check-up/, 'Geschenk steht grammatisch korrekt im Satz');
   await p.getByRole('button', { name: /kopieren/i }).first().click();
   await p.getByText('Danke! Dein Geschenk ist unterwegs.').waitFor();
+  await p.getByText('Noch 2 von 3 Geschenken übrig.').waitFor();
   assert.ok(Date.now() - start < 30_000, 'Teilen in unter 30 Sekunden');
 
   // Keine Eingabefelder für Kontaktdaten von Freunden im Empfehler-Bereich
@@ -119,6 +124,8 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   await p.goto(links.Lisa);
   await p.getByText('Dein Geschenk wurde gerade eingelöst').waitFor();
   await p.getByText('Erika hat „Kostenloser Versicherungs-Check-up“ genutzt').waitFor();
+  await p.getByText('Schon 37 Kunden', { exact: false }).waitFor(); // Lisa zählt jetzt mit
+  await p.getByRole('img', { name: '1 Bäume' }).waitFor();
   await ctx.close();
 });
 
@@ -159,6 +166,15 @@ test('Flow 3: Berater-Login mit 2FA, Anfrage sehen, Status setzen', async () => 
   await a.getByText('Erika').first().waitFor();
   await a.getByText('Empfohlen von').first().waitFor();
   await a.getByLabel('Status').first().selectOption('beratung');
+  await a.waitForTimeout(300);
+  // Erinnern-Liste und QR im Termin
+  const er = await a.request.get(`${B}/api/admin/erinnern`);
+  assert.equal(er.status(), 200);
+  await a.goto(`${B}/admin/kunden/3`);
+  await a.getByRole('button', { name: /Jetzt im Termin teilen/ }).click();
+  await a.getByText('scann mal kurz', { exact: false }).waitFor();
+  assert.equal((await a.request.get(`${B}/api/admin/kunden/3/qr`)).headers()['content-type'], 'image/svg+xml');
+  await a.goto(`${B}/admin/anfragen`);
   await a.waitForTimeout(300);
   await a.reload();
   assert.equal(await a.getByLabel('Status').first().inputValue(), 'beratung');

@@ -2,12 +2,13 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { LayoutDashboard, Users, Gift, Inbox, MessageSquareText, Type, Settings, Heart, Mail, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, Gift, Inbox, MessageSquareText, Type, Settings, Heart, Mail, LogOut, Menu, X, BellRing } from 'lucide-react';
 
 const NAV = [
   { href: '/admin', label: 'Übersicht', icon: LayoutDashboard },
   { href: '/admin/anfragen', label: 'Anfragen', icon: Inbox },
   { href: '/admin/kunden', label: 'Kunden', icon: Users },
+  { href: '/admin/erinnern', label: 'Erinnern', icon: BellRing },
   { href: '/admin/geschenke', label: 'Geschenke', icon: Gift },
   { href: '/admin/vorlagen', label: 'Nachrichten', icon: MessageSquareText },
   { href: '/admin/dankeschoen', label: 'Dankeschön', icon: Heart },
