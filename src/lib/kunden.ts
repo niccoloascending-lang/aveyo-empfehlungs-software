@@ -86,7 +86,7 @@ export function kundeAusToken(token: unknown): Kunde | null {
   return k;
 }
 
-export function kundenListe(suche = ''): (Kunde & { geteilt: number; eingeloest: number; link_aktiv: number })[] {
+export function kundenListe(suche = ''): (Kunde & { geteilt: number; eingeloest: number; link_aktiv: number; berater: string | null })[] {
   const q = `%${suche.trim()}%`;
   return all(
     `SELECT k.id, k.vorname, k.nachname, k.anrede, k.ansprache, k.email, k.handy, k.themen, k.berater_id, k.extern_id, k.token_erstellt, k.token_widerrufen,
@@ -94,7 +94,8 @@ export function kundenListe(suche = ''): (Kunde & { geteilt: number; eingeloest:
             (SELECT COUNT(*) FROM teilungen t WHERE t.kunde_id = k.id AND t.geteilt_am IS NOT NULL) geteilt,
             (SELECT COUNT(*) FROM ereignisse e JOIN teilungen t ON t.id = e.teilung_id
                WHERE t.kunde_id = k.id AND e.typ IN ('download','rechner','termin_bestaetigt','auswertung_bestaetigt','download_mail_bestaetigt')) eingeloest,
-            CASE WHEN k.token_hash IS NOT NULL AND k.token_widerrufen IS NULL THEN 1 ELSE 0 END link_aktiv
+            CASE WHEN k.token_hash IS NOT NULL AND k.token_widerrufen IS NULL THEN 1 ELSE 0 END link_aktiv,
+            (SELECT name FROM berater WHERE id = k.berater_id) berater
        FROM kunden k
       WHERE (? = '%%' OR k.vorname LIKE ? OR k.nachname LIKE ? OR k.email LIKE ?)
       ORDER BY k.erstellt DESC, k.id DESC`,

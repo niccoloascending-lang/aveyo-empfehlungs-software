@@ -20,6 +20,7 @@ const waNummer = (h: string | null) => {
 export default function KundeDetail({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { daten: d, laden, fehler } = useDaten<any>(`/api/admin/kunden/${params.id}`);
+  const beraterListe = useDaten<{ id: number; name: string; email: string }[]>('/api/admin/berater');
   const [f, setF] = useState<any>(null);
   const [meldung, setMeldung] = useState({ text: '', art: 'ok' as 'ok' | 'fehler' });
   const [danke, setDanke] = useState({ art: 'nachricht', text: '' });
@@ -200,6 +201,16 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
         <form onSubmit={speichern} className="a-karte h-fit space-y-3">
           <h2 className="font-semibold">Stammdaten</h2>
           <div className="grid gap-3 sm:grid-cols-2">
+            <Feld label="Zuständiger Berater" hinweis="Sein Foto und seine Vorstellung erscheinen auf den Seiten der Freunde dieses Kunden." className="sm:col-span-2">
+              <select className="a-input" value={f.berater_id ?? ''} onChange={(e) => setF({ ...f, berater_id: Number(e.target.value) })}>
+                {!f.berater_id && <option value="">– bitte wählen –</option>}
+                {(beraterListe.daten ?? []).map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name} ({b.email})
+                  </option>
+                ))}
+              </select>
+            </Feld>
             <AnredeFelder anrede={f.anrede ?? ''} ansprache={f.ansprache ?? ''} onChange={(v) => setF({ ...f, ...v })} />
             <Feld label="Vorname">
               <input className="a-input" value={f.vorname ?? ''} onChange={(e) => setF({ ...f, vorname: e.target.value })} />

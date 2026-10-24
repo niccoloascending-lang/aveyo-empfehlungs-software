@@ -48,6 +48,9 @@ export const PUT = admin(async (req, b, ctx) => {
   if (email && !istEmail(email)) return fehler('E-Mail ungültig.');
   if (handy === null) return fehler('Handynummer ungültig.');
   if (!istAnredeform(d.anrede ?? '') || !istAnsprache(d.ansprache ?? '')) return fehler('Anrede/Ansprache ungültig.');
+  const beraterId = Number(d.berater_id);
+  if (d.berater_id != null && !one('SELECT 1 FROM berater WHERE id = ?', beraterId)) return fehler('Berater unbekannt.');
+  if (d.berater_id != null) run('UPDATE kunden SET berater_id = ? WHERE id = ?', beraterId, id);
   run(
     "UPDATE kunden SET anrede = ?, ansprache = ?, vorname = ?, nachname = ?, email = ?, handy = ?, themen = ?, notiz = ?, geaendert = datetime('now') WHERE id = ?",
     d.anrede ?? '',

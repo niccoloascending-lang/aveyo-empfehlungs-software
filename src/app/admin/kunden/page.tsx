@@ -7,7 +7,7 @@ import Shell from '@/components/admin/Shell';
 import { anfrage, useDaten } from '@/components/admin/api';
 import { AnredeFelder, Feld, Meldung, Themen, THEMEN_LABEL } from '@/components/admin/ui';
 
-type K = { id: number; vorname: string; nachname: string; email: string | null; themen: string; geteilt: number; eingeloest: number; link_aktiv: number; zuletzt_gesehen: string | null };
+type K = { id: number; vorname: string; nachname: string; email: string | null; themen: string; berater: string | null; geteilt: number; eingeloest: number; link_aktiv: number; zuletzt_gesehen: string | null };
 
 export default function Kunden() {
   const router = useRouter();
@@ -71,6 +71,7 @@ export default function Kunden() {
           <thead>
             <tr>
               <th>Name</th>
+              <th>Berater</th>
               <th>Themen</th>
               <th className="text-right">Geteilt</th>
               <th className="text-right">Eingelöst</th>
@@ -86,6 +87,7 @@ export default function Kunden() {
                   </Link>
                   <div className="text-xs text-slate-500">{k.email}</div>
                 </td>
+                <td className="text-xs">{k.berater ?? '–'}</td>
                 <td className="text-xs">{k.themen.split(',').filter(Boolean).map((t) => THEMEN_LABEL[t] ?? t).join(', ')}</td>
                 <td className="text-right tabular-nums">{k.geteilt}</td>
                 <td className="text-right tabular-nums">{k.eingeloest}</td>
