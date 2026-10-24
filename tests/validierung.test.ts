@@ -27,7 +27,7 @@ test('Geschenke passend zu Themen, max. 4', () => {
     { id: 4, themen: 'pkv,vorsorge', reihenfolge: 4 },
     { id: 5, themen: '', reihenfolge: 5 },
   ];
-  assert.deepEqual(geschenkeFuer(g, 'pkv').map((x) => x.id), [2, 4, 1, 3]);
+  assert.deepEqual(geschenkeFuer(g, 'pkv').map((x) => x.id), [2, 4, 5, 1]); // 5 ohne Themen passt zu allen
   assert.deepEqual(geschenkeFuer(g, '').map((x) => x.id), [1, 2, 3, 4]);
 });
 

@@ -39,8 +39,8 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
 
   const neuBauen = useCallback(
     (vorlage: string, link: string, z = zitat) =>
-      setNachricht(baueNachricht(vorlage, { geschenk: geschenk?.titel ?? '', link, absender: daten.vorname, zitat: z })),
-    [geschenk?.titel, daten.vorname, zitat],
+      setNachricht(baueNachricht(vorlage, { geschenk: geschenk?.titel ?? '', geschenkSatz: geschenk?.satz, link, absender: daten.vorname, zitat: z })),
+    [geschenk?.titel, geschenk?.satz, daten.vorname, zitat],
   );
 
   // Persönlichen Link für das gewählte Geschenk holen (einmal je Geschenk)

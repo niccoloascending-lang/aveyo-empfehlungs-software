@@ -6,6 +6,7 @@ import { freundProps } from '@/lib/oeffentlich';
 import { istVorschauBot } from '@/lib/validierung';
 import { texte } from '@/lib/einstellungen';
 import { fuelle } from '@/lib/texte';
+import { imSatz } from '@/lib/teilen';
 import Kopf from '@/components/Kopf';
 import Fusszeile from '@/components/Fusszeile';
 
@@ -16,7 +17,7 @@ export function generateMetadata({ params }: { params: { code: string } }): Meta
   if (!s) return { title: 'Geschenk' };
   const t = texte(['freund.']);
   const von = s.teilung.von_name ? fuelle(t['freund.ueberschrift'], { empfehler: s.teilung.von_name }) : t['freund.ueberschrift.anonym'];
-  const titel = `${von}: ${s.geschenk.titel}`;
+  const titel = s.teilung.von_name ? `${von} ${imSatz(s.geschenk)}` : `${von}: ${s.geschenk.titel}`;
   return {
     title: titel,
     description: `${s.geschenk.kurz} ${t['freund.kosten']}. ${t['freund.versprechen']}`.trim(),

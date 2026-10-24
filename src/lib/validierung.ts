@@ -43,10 +43,17 @@ export function themenLesen(x: unknown): Thema[] {
   return THEMEN.map((t) => t.v).filter((v) => out.has(v));
 }
 
-/** Geschenke für einen Kunden sortieren: passende Themen zuerst, max. `max` Karten. Ohne Themen: alle in Reihenfolge. */
+/**
+ * Geschenke für einen Kunden: passende zuerst, dann nach Reihenfolge, max. `max` Karten.
+ * Ein Geschenk ohne Themen passt zu allen (z. B. Versicherungs-Check-up). Kunde ohne Themen: alle in Reihenfolge.
+ */
 export function geschenkeFuer<T extends { themen: string; reihenfolge: number }>(alle: T[], kundenThemen: string, max = 4): T[] {
   const k = new Set(themenLesen(kundenThemen));
-  const treffer = (g: T) => themenLesen(g.themen).filter((t) => k.has(t)).length;
+  const treffer = (g: T) => {
+    if (!k.size) return 1;
+    const gt = themenLesen(g.themen);
+    return !gt.length || gt.some((t) => k.has(t)) ? 1 : 0;
+  };
   return [...alle].sort((a, b) => treffer(b) - treffer(a) || a.reihenfolge - b.reihenfolge).slice(0, max);
 }
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { waehleVariante, baueNachricht, teilenUrl, saeubereZitat, freundLink, istKanal, type Vorlage } from '../src/lib/teilen.ts';
+import { waehleVariante, baueNachricht, imSatz, teilenUrl, saeubereZitat, freundLink, istKanal, type Vorlage } from '../src/lib/teilen.ts';
 
 const V: Vorlage[] = [
   { id: 1, ton: 'locker', variante: 'A', text: 'Hey! {geschenk} {link}', aktiv: 1 },
@@ -27,6 +27,13 @@ test('A/B: gleichverteilt über aktive Varianten, inaktive nie', () => {
 test('Nachricht: Link wird ergänzt, falls er in der Vorlage fehlt', () => {
   assert.equal(baueNachricht('Hey! {geschenk} {link}', { geschenk: 'PKV-Check', link: 'https://x/g/1' }), 'Hey! PKV-Check https://x/g/1');
   assert.equal(baueNachricht('{geschenk}', { geschenk: 'PKV-Check', link: 'https://x/g/1' }), 'PKV-Check https://x/g/1');
+  assert.equal(
+    baueNachricht('Ich schenk dir {geschenk_satz}: {link}', { geschenk: 'PKV-Check', geschenkSatz: 'einen kostenlosen PKV-Check', link: 'https://x/g/1' }),
+    'Ich schenk dir einen kostenlosen PKV-Check: https://x/g/1',
+  );
+  assert.equal(baueNachricht('Ich schenk dir {geschenk_satz} {link}', { geschenk: 'PKV-Check', link: 'L' }), 'Ich schenk dir PKV-Check L');
+  assert.equal(imSatz({ titel: 'PKV-Check', akkusativ: ' ' }), 'PKV-Check');
+  assert.equal(imSatz({ titel: 'PKV-Check', akkusativ: 'einen PKV-Check' }), 'einen PKV-Check');
 });
 
 test('Teilen-URLs öffnen nur die Apps des Kunden', () => {

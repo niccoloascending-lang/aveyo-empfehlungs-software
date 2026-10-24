@@ -4,6 +4,7 @@ import { einstellungen, texte } from './einstellungen.ts';
 import { aktiveGeschenke, beraterFuerKunde, teilungenVonKunde } from './teilungen.ts';
 import { berechneWirkung, type Einwilligung } from './einwilligung.ts';
 import { geschenkeFuer } from './validierung.ts';
+import { imSatz } from './teilen.ts';
 import type { Kunde } from './kunden.ts';
 
 export function wirkungVon(kunde: Kunde, zuletztGesehen: string | null) {
@@ -36,7 +37,7 @@ export function empfehlerDaten(kunde: Kunde) {
   return {
     vorname: kunde.vorname,
     berater: b ? { name: b.name, foto_id: b.foto_id, video_url: b.video_url } : null,
-    geschenke: geschenkeFuer(aktiveGeschenke(), kunde.themen, 4).map((g) => ({ id: g.id, titel: g.titel, kurz: g.kurz, icon: g.icon, typ: g.typ, bild_id: g.bild_id })),
+    geschenke: geschenkeFuer(aktiveGeschenke(), kunde.themen, 4).map((g) => ({ id: g.id, titel: g.titel, satz: imSatz(g), kurz: g.kurz, icon: g.icon, typ: g.typ, bild_id: g.bild_id })),
     t,
     wirkung,
     // Danke-Bereich erst nach der ersten Einlösung oder einem ausgelösten Dankeschön – Überraschung statt Lockmittel.

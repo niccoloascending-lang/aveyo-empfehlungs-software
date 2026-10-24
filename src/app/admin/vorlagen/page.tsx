@@ -32,7 +32,7 @@ export default function Vorlagen() {
     >
       <Meldung
         art="info"
-        text="Texte, die der Kunde an Freunde schickt (er kann sie vorher ändern). Platzhalter: {geschenk}, {link}, {absender}, {zitat}. Mehrere aktive Varianten je Ton = A/B-Test: Jeder Link bekommt zufällig eine Variante; die Einlösequote steht in der Übersicht."
+        text="Texte, die der Kunde an Freunde schickt (er kann sie vorher ändern). Platzhalter: {geschenk_satz} (z. B. „einen kostenlosen PKV-Beitragscheck“), {geschenk} (Titel), {link}, {absender}, {zitat}. Mehrere aktive Varianten je Ton = A/B-Test: Jeder Link bekommt zufällig eine Variante; die Einlösequote steht in der Übersicht."
       />
       <Meldung text={fehler} />
       <div className="mt-4 space-y-6">

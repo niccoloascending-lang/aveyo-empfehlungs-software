@@ -3,6 +3,8 @@ import { fuelle } from '@/lib/texte';
 import type { FreundSeite } from '@/lib/teilungen';
 import { Avatar } from './Bild';
 import Einloesen from './Einloesen';
+import GeschenkBox from './GeschenkBox';
+import { imSatz } from '@/lib/teilen';
 import Kopf from './Kopf';
 import Fusszeile from './Fusszeile';
 
@@ -28,7 +30,7 @@ const zeilen = (s: string) =>
 export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenUrl, orte, terminExtern }: Props) {
   const { teilung, geschenk: g, berater } = seite;
   const empfehler = teilung.von_name?.trim() || '';
-  const ueberschrift = empfehler ? fuelle(t['freund.ueberschrift'], { empfehler }) : t['freund.ueberschrift.anonym'];
+  const ueberschrift = empfehler ? fuelle(t['freund.ueberschrift'], { empfehler }) : `${t['freund.ueberschrift.anonym']}:`;
   const nutzen = zeilen(g.nutzen);
   const ablauf = zeilen(g.ablauf);
 
@@ -44,15 +46,11 @@ export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenU
         {/* Geschenk-Karte: auf einen Blick */}
         <section aria-labelledby="titel" className="karte anim-hoch relative mt-6 overflow-hidden px-6 pb-7 pt-8 text-center">
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-marke-hell to-transparent" />
-          <div aria-hidden className="relative mx-auto mb-5 h-20 w-24">
-            <div className="anim-deckel absolute inset-x-0 top-0 h-6 rounded-lg bg-marke-dunkel" />
-            <div className="absolute inset-x-1.5 bottom-0 top-5 rounded-lg bg-marke" />
-            <div className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 bg-gradient-to-b from-marke-hell to-akzent" />
-            <span className="absolute inset-x-0 bottom-1.5 mx-auto grid h-11 w-11 place-items-center rounded-full bg-white text-2xl shadow-sm">{g.icon || '🎁'}</span>
-          </div>
-          <p className="relative text-lg font-medium text-marke-dunkel">{ueberschrift}</p>
-          <h1 id="titel" className="relative mt-1 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
-            {g.titel}
+          <GeschenkBox icon={g.icon} />
+          {/* Ein ganzer Satz: „Mia schenkt dir einen kostenlosen PKV-Beitragscheck“ */}
+          <h1 id="titel" className="relative">
+            <span className="block text-xl font-medium text-tinte/80">{ueberschrift}</span>
+            <span className="mt-1 block text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{empfehler ? imSatz(g) : g.titel}</span>
           </h1>
           {g.kurz && <p className="relative mx-auto mt-3 max-w-md text-lg leading-snug text-tinte/80">{g.kurz}</p>}
           <ul className="relative mt-5 flex flex-wrap justify-center gap-2 text-sm font-semibold">
@@ -119,6 +117,7 @@ export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenU
             code={teilung.code}
             typ={g.typ}
             titel={g.titel}
+            satz={imSatz(g)}
             empfehler={empfehler}
             t={t}
             vorschau={vorschau}

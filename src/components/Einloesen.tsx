@@ -12,6 +12,7 @@ type Props = {
   code: string;
   typ: 'termin' | 'download' | 'rechner';
   titel: string;
+  satz: string;
   empfehler: string;
   t: T;
   vorschau: boolean;
@@ -35,7 +36,7 @@ export default function Einloesen(p: Props) {
         {p.typ === 'download' && <DownloadFlow {...p} onFertig={() => setEingeloest(true)} />}
         {p.typ === 'rechner' && <RechnerFlow {...p} onFertig={() => setEingeloest(true)} />}
       </fieldset>
-      {eingeloest && !p.vorschau && <Weitergeben code={p.code} titel={p.titel} t={p.t} />}
+      {eingeloest && !p.vorschau && <Weitergeben code={p.code} titel={p.titel} satz={p.satz} t={p.t} />}
     </div>
   );
 }
@@ -413,7 +414,7 @@ function RechnerFlow({ code, t, empfehler, onFertig }: Props & { onFertig: () =>
 
 // ---------- Weitergeben (erst nach dem Einlösen, unaufdringlich) ----------
 
-function Weitergeben({ code, titel, t }: { code: string; titel: string; t: T }) {
+function Weitergeben({ code, titel, satz, t }: { code: string; titel: string; satz: string; t: T }) {
   const [offen, setOffen] = useState(false);
   const [name, setName] = useState('');
   const [link, setLink] = useState('');
@@ -445,7 +446,7 @@ function Weitergeben({ code, titel, t }: { code: string; titel: string; t: T }) 
         </div>
       ) : (
         <div className="anim-hoch">
-          <TeilenKnoepfe t={t} link={link} betreff={titel} nachricht={baueNachricht(t['freund.weitergeben.nachricht'], { geschenk: titel, link })} />
+          <TeilenKnoepfe t={t} link={link} betreff={titel} nachricht={baueNachricht(t['freund.weitergeben.nachricht'], { geschenk: titel, geschenkSatz: satz, link })} />
         </div>
       )}
     </div>

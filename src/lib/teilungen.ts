@@ -6,6 +6,7 @@ import { saeubereZitat, waehleVariante, type Ton, type Vorlage } from './teilen.
 export type Geschenk = {
   id: number;
   titel: string;
+  akkusativ: string | null;
   kurz: string;
   nutzen: string;
   ablauf: string;

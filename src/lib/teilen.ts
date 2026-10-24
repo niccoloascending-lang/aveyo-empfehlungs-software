@@ -24,11 +24,14 @@ export function waehleVariante(vorlagen: Vorlage[], ton: Ton, zufall: number): V
   return kandidaten[i];
 }
 
-export type NachrichtVars = { geschenk: string; link: string; absender?: string; zitat?: string };
+export type NachrichtVars = { geschenk: string; geschenkSatz?: string; link: string; absender?: string; zitat?: string };
+
+/** Geschenk so, wie es im Satz steht: „Lisa schenkt dir einen kostenlosen PKV-Beitragscheck“. Ohne Pflege: der Titel. */
+export const imSatz = (g: { titel: string; akkusativ?: string | null }) => (g.akkusativ ?? '').trim() || g.titel;
 
 /** Nachricht füllen. Steht {link} nicht in der Vorlage, wird der Link angehängt – ohne Link wäre das Teilen sinnlos. */
 export function baueNachricht(vorlage: string, v: NachrichtVars): string {
-  const text = fuelle(vorlage, { geschenk: v.geschenk, link: v.link, absender: v.absender ?? '', zitat: v.zitat ?? '' }).trim();
+  const text = fuelle(vorlage, { geschenk: v.geschenk, geschenk_satz: v.geschenkSatz || v.geschenk, link: v.link, absender: v.absender ?? '', zitat: v.zitat ?? '' }).trim();
   return text.includes(v.link) ? text : `${text} ${v.link}`.trim();
 }
 

@@ -120,7 +120,7 @@ export const TEXTE = {
   'kunde.keine.geschenke': { bereich: 'Empfehler', beschreibung: 'Wenn keine Geschenke aktiv sind', du: 'Gerade sind keine Geschenke verfügbar. Schau bald wieder vorbei.' },
 
   // ---------- Freund: Landingpage ----------
-  'freund.ueberschrift': { bereich: 'Freund', beschreibung: 'Über dem Geschenktitel', du: '{empfehler} schenkt dir', sie: '{empfehler} schenkt Ihnen' },
+  'freund.ueberschrift': { bereich: 'Freund', beschreibung: 'Satzanfang vor dem Geschenk („… einen kostenlosen PKV-Beitragscheck“)', du: '{empfehler} schenkt dir', sie: '{empfehler} schenkt Ihnen' },
   'freund.ueberschrift.anonym': { bereich: 'Freund', beschreibung: 'Wenn kein Name bekannt ist', du: 'Ein Geschenk für dich', sie: 'Ein Geschenk für Sie' },
   'freund.kosten': { bereich: 'Freund', beschreibung: 'Kosten-Hinweis', du: 'Kosten: 0 €' },
   'freund.versprechen': {
@@ -222,7 +222,7 @@ export const TEXTE = {
   'freund.weitergeben.nachricht': {
     bereich: 'Freund',
     beschreibung: 'Nachricht beim Weitergeben',
-    du: 'Hab ich gerade bekommen und fand es gut: {geschenk}. Kostenlos, und niemand ruft dich an. {link}',
+    du: 'Ich hab gerade {geschenk_satz} geschenkt bekommen und fand es richtig gut. Das kann ich weitergeben – vielleicht ist es auch was für dich? Kostet nichts, und niemand ruft dich an. {link}',
   },
   'freund.form.senden': { bereich: 'Freund', beschreibung: 'Button Absenden', du: 'Absenden' },
   'freund.form.pflicht': { bereich: 'Freund', beschreibung: 'Fehler Pflichtfelder', du: 'Bitte Vorname, E-Mail und den Datenschutz-Hinweis ausfüllen.' },

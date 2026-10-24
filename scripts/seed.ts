@@ -3,7 +3,7 @@
 import { ladeEnv } from './env.ts';
 ladeEnv();
 
-const { getDb, one, insertRow } = await import('../src/lib/db.ts');
+const { getDb, one, run, insertRow } = await import('../src/lib/db.ts');
 const { hashPasswort } = await import('../src/lib/token.ts');
 const { kundeAnlegen, linkFuer } = await import('../src/lib/kunden.ts');
 
@@ -23,64 +23,7 @@ const adrian = berater(
 );
 berater('Timo', 'timo@example.org', '[Beispieltext – bitte im Admin anpassen]');
 
-if (!one('SELECT 1 FROM vorlagen LIMIT 1')) {
-  const v = (ton: string, variante: string, text: string) => insertRow('vorlagen', { ton, variante, text });
-  v('locker', 'A', 'Hey! Ich hab da jemanden, der mir echt weitergeholfen hat. Er schenkt dir: {geschenk}. Kostenlos, und niemand ruft dich danach an. Schau mal: {link}');
-  v('locker', 'B', 'Kleiner Tipp von mir 🙂 {geschenk}, geschenkt von mir. Kein Haken, du entscheidest selbst, ob du dich meldest. {link}');
-  v('kurz', 'A', 'Geschenk von mir für dich 🎁 {geschenk}: {link}');
-  v(
-    'ausfuehrlich',
-    'A',
-    'Hi! Ich bin seit einer Weile bei AVEYO und wirklich zufrieden: ehrlich, verständlich, ohne Druck. Ich darf dir etwas schenken: {geschenk}. Kostet nichts, verpflichtet zu nichts, und niemand ruft dich ungefragt an. Wenn es dich interessiert, schau hier: {link}',
-  );
-}
-
-if (!one('SELECT 1 FROM geschenke LIMIT 1')) {
-  insertRow('geschenke', {
-    titel: 'Kostenloser PKV-Beitragscheck',
-    kurz: 'Zahlst du zu viel? Wir schauen gemeinsam auf deinen Tarif.',
-    nutzen: 'Klarheit, ob dein Beitrag zu deinen Leistungen passt\nHinweise auf Tarifwechsel innerhalb deiner Gesellschaft (§ 204 VVG)\nEine ehrliche Einschätzung, auch wenn alles passt',
-    ablauf: 'Termin aussuchen (online oder in Hamburg)\nTarifunterlagen bereitlegen\n30 Minuten Gespräch, danach entscheidest du',
-    dauer: '30 Minuten',
-    typ: 'termin',
-    themen: 'pkv',
-    icon: '🩺',
-    reihenfolge: 1,
-  });
-  insertRow('geschenke', {
-    titel: 'Zweitmeinung zu deiner Altersvorsorge',
-    kurz: '30 Minuten, unverbindlich. Passt deine Vorsorge zu deinen Plänen?',
-    nutzen: 'Ein unabhängiger Blick auf deine bestehenden Verträge\nVerständlich erklärt, ohne Fachchinesisch\nKein Verkaufsgespräch',
-    ablauf: 'Termin aussuchen\nUnterlagen mitbringen, die du schon hast\nGespräch, danach hast du eine Einschätzung',
-    dauer: '30 Minuten',
-    typ: 'termin',
-    themen: 'vorsorge,vermoegen',
-    icon: '🧭',
-    reihenfolge: 2,
-  });
-  insertRow('geschenke', {
-    titel: 'Rentenlücken-Rechner',
-    kurz: 'In zwei Minuten sehen, wie groß deine Lücke im Alter sein könnte.',
-    nutzen: 'Sofort ein Ergebnis, ohne Anmeldung\nAlle Annahmen offen sichtbar\nPersönliche Auswertung nur, wenn du willst',
-    ablauf: 'Ein paar Zahlen eintragen\nErgebnis ansehen\nOptional: Auswertung per Mail anfragen',
-    dauer: '2 Minuten',
-    typ: 'rechner',
-    rechner: 'rentenluecke',
-    themen: 'vorsorge,vermoegen',
-    icon: '🧮',
-    reihenfolge: 3,
-  });
-  insertRow('geschenke', {
-    titel: 'Checkliste: 7 Fehler beim Wechsel in die PKV',
-    kurz: 'Sofort zum Download, ganz ohne Termin.',
-    nutzen: 'Die typischen Stolperfallen auf einen Blick\nZum Ausdrucken oder als PDF speichern\nKeine Anmeldung nötig',
-    ablauf: 'Auf „Jetzt ansehen“ tippen\nLesen oder speichern\nFertig',
-    dauer: '5 Minuten Lesezeit',
-    typ: 'download',
-    themen: 'pkv',
-    icon: '✅',
-    reihenfolge: 4,
-    inhalt: `# 7 Fehler beim Wechsel in die PKV
+const PKV_CHECKLISTE = `# 7 Fehler beim Wechsel in die PKV
 
 [Beispielinhalt – vor Veröffentlichung fachlich und rechtlich prüfen]
 
@@ -108,8 +51,164 @@ In der PKV wird jede Person einzeln versichert. Kinder kosten eigene Beiträge.
 Gerade Selbstständige sollten prüfen, wie ihr Einkommen bei längerer Krankheit abgesichert ist (z. B. Krankentagegeld).
 
 ## 7. Den Rückweg in die gesetzliche Kasse unterschätzen
-Ein Wechsel zurück ist oft nur eingeschränkt möglich. Die Entscheidung sollte deshalb gut überlegt sein.`,
-  });
+Ein Wechsel zurück ist oft nur eingeschränkt möglich. Die Entscheidung sollte deshalb gut überlegt sein.`;
+
+// ---------- Nachrichtenvorlagen (Empfehler → Freund) ----------
+// Alte Standardtexte aus früheren Versionen werden ersetzt, selbst geänderte Texte bleiben.
+const ALTE_VORLAGEN = [
+  'Hey! Ich hab da jemanden, der mir echt weitergeholfen hat. Er schenkt dir: {geschenk}. Kostenlos, und niemand ruft dich danach an. Schau mal: {link}',
+  'Kleiner Tipp von mir 🙂 {geschenk}, geschenkt von mir. Kein Haken, du entscheidest selbst, ob du dich meldest. {link}',
+  'Geschenk von mir für dich 🎁 {geschenk}: {link}',
+  'Hi! Ich bin seit einer Weile bei AVEYO und wirklich zufrieden: ehrlich, verständlich, ohne Druck. Ich darf dir etwas schenken: {geschenk}. Kostet nichts, verpflichtet zu nichts, und niemand ruft dich ungefragt an. Wenn es dich interessiert, schau hier: {link}',
+];
+const VORLAGEN: [string, string, string][] = [
+  ['locker', 'A', 'Hey! Ich bin ja bei AVEYO und echt happy damit. Jetzt darf ich Freunden was schenken, und da musste ich direkt an dich denken: {geschenk_satz}. Kostet dich nichts, und keiner ruft dich an. Schau einfach mal rein, wenn du magst 🙂 {link}'],
+  ['locker', 'B', 'Kleiner Tipp unter uns: Ich hab hier {geschenk_satz} für dich 🎁 Ganz ohne Haken, du entscheidest selbst, ob du dich meldest. {link}'],
+  ['kurz', 'A', 'Ich schenk dir {geschenk_satz} 🎁 {link}'],
+  [
+    'ausfuehrlich',
+    'A',
+    'Hi! Ich lasse mich seit einer Weile von AVEYO beraten und bin wirklich zufrieden: ehrlich, verständlich und ohne Verkaufsdruck. Jetzt darf ich Freunden etwas schenken, und ich dachte sofort an dich: {geschenk_satz}. Das kostet dich nichts, verpflichtet zu nichts, und niemand ruft dich ungefragt an. Wenn es dich interessiert, schau hier: {link}',
+  ],
+];
+for (const alt of ALTE_VORLAGEN) {
+  const v = one<{ id: number; ton: string; variante: string }>('SELECT id, ton, variante FROM vorlagen WHERE text = ?', alt);
+  const neu = v && VORLAGEN.find(([ton, variante]) => ton === v.ton && variante === v.variante);
+  if (v && neu) run('UPDATE vorlagen SET text = ? WHERE id = ?', neu[2], v.id);
+}
+for (const [ton, variante, text] of VORLAGEN)
+  if (!one('SELECT 1 FROM vorlagen WHERE ton = ? AND variante = ?', ton, variante)) insertRow('vorlagen', { ton, variante, text });
+
+// ---------- Geschenke (nach Titel ergänzt; vorhandene bekommen nur fehlende Satzform) ----------
+type G = Record<string, string | number>;
+const GESCHENKE: G[] = [
+  {
+    titel: 'Kostenloser Versicherungs-Check-up',
+    akkusativ: 'einen kostenlosen Versicherungs-Check-up',
+    kurz: 'Ist das Wichtige abgesichert und zahlst du für Unnötiges? Einmal in Ruhe draufschauen.',
+    nutzen: 'Überblick, welche Versicherungen du hast und welche wichtigen fehlen\nHinweise auf doppelte oder überflüssige Verträge\nEine ehrliche Einschätzung, auch wenn alles passt',
+    ablauf: 'Termin aussuchen (online oder in Hamburg)\nVerträge grob zusammensuchen, es muss nicht vollständig sein\n30 Minuten Gespräch, danach entscheidest du',
+    dauer: '30 Minuten',
+    typ: 'termin',
+    themen: '',
+    icon: '🛡️',
+    reihenfolge: 1,
+  },
+  {
+    titel: 'Checkliste: Die wichtigsten Versicherungen',
+    akkusativ: 'eine Checkliste mit den wichtigsten Versicherungen',
+    kurz: 'In fünf Minuten selbst prüfen, ob das Wichtigste abgesichert ist. Sofort, ohne Termin.',
+    nutzen: 'Die wichtigsten Absicherungen auf einen Blick\nZum Abhaken, Ausdrucken oder als PDF speichern\nKeine Anmeldung nötig',
+    ablauf: 'Auf „Jetzt ansehen“ tippen\nPunkt für Punkt abhaken\nFertig, ganz ohne Gespräch',
+    dauer: '5 Minuten',
+    typ: 'download',
+    themen: '',
+    icon: '📋',
+    reihenfolge: 2,
+    inhalt: `# Die wichtigsten Versicherungen – hast du sie?
+
+[Beispielinhalt – vor Veröffentlichung fachlich und rechtlich prüfen]
+
+Diese Checkliste dient der Information und ersetzt keine individuelle Beratung. Was sinnvoll ist, hängt von deiner Lebenssituation ab.
+
+## Für fast alle wichtig
+- ☐ Private Haftpflichtversicherung: schützt dich, wenn du anderen einen Schaden zufügst
+- ☐ Krankenversicherung (gesetzlich oder privat): in Deutschland Pflicht
+- ☐ Absicherung der Arbeitskraft (z. B. Berufsunfähigkeitsversicherung): wenn du von deinem Einkommen lebst
+
+## Je nach Lebenslage
+- ☐ Risikolebensversicherung: wenn Familie oder ein Kredit von deinem Einkommen abhängt
+- ☐ Wohngebäudeversicherung: wenn du ein Haus besitzt
+- ☐ Kfz-Haftpflicht: Pflicht, sobald du ein Auto hast
+- ☐ Hausratversicherung: wenn dein Hausrat einen größeren Wert hat
+- ☐ Krankentagegeld: vor allem für Selbstständige und privat Versicherte
+
+## Für später im Blick behalten
+- ☐ Altersvorsorge: Wie groß ist deine Rentenlücke?
+- ☐ Pflegevorsorge
+
+## Gut zu wissen
+Viele Verträge laufen doppelt oder passen nicht mehr zur aktuellen Lebenssituation. Ein Blick alle paar Jahre lohnt sich.`,
+  },
+  {
+    titel: 'Kostenloser PKV-Beitragscheck',
+    akkusativ: 'einen kostenlosen PKV-Beitragscheck',
+    kurz: 'Zahlst du zu viel? Wir schauen gemeinsam auf deinen Tarif.',
+    nutzen: 'Klarheit, ob dein Beitrag zu deinen Leistungen passt\nHinweise auf Tarifwechsel innerhalb deiner Gesellschaft (§ 204 VVG)\nEine ehrliche Einschätzung, auch wenn alles passt',
+    ablauf: 'Termin aussuchen (online oder in Hamburg)\nTarifunterlagen bereitlegen\n30 Minuten Gespräch, danach entscheidest du',
+    dauer: '30 Minuten',
+    typ: 'termin',
+    themen: 'pkv',
+    icon: '🩺',
+    reihenfolge: 3,
+  },
+  {
+    titel: 'Zweitmeinung zu deiner Altersvorsorge',
+    akkusativ: 'eine kostenlose Zweitmeinung zu deiner Altersvorsorge',
+    kurz: '30 Minuten, unverbindlich. Passt deine Vorsorge zu deinen Plänen?',
+    nutzen: 'Ein unabhängiger Blick auf deine bestehenden Verträge\nVerständlich erklärt, ohne Fachchinesisch\nKein Verkaufsgespräch',
+    ablauf: 'Termin aussuchen\nUnterlagen mitbringen, die du schon hast\nGespräch, danach hast du eine Einschätzung',
+    dauer: '30 Minuten',
+    typ: 'termin',
+    themen: 'vorsorge,vermoegen',
+    icon: '🧭',
+    reihenfolge: 4,
+  },
+  {
+    titel: 'Ist dein Einkommen abgesichert?',
+    akkusativ: 'einen kostenlosen Check, ob dein Einkommen abgesichert ist',
+    kurz: 'Was passiert, wenn du länger nicht arbeiten kannst? Klarheit in 30 Minuten.',
+    nutzen: 'Überblick, was im Krankheitsfall wirklich an Geld reinkommt\nVerständlich erklärt für Angestellte und Selbstständige\nEine ehrliche Einschätzung, ohne Verkaufsdruck',
+    ablauf: 'Termin aussuchen\nGehaltsabrechnung oder Einkommen grob parat haben\n30 Minuten Gespräch, danach entscheidest du',
+    dauer: '30 Minuten',
+    typ: 'termin',
+    themen: 'vorsorge',
+    icon: '💪',
+    reihenfolge: 5,
+  },
+  {
+    titel: 'Rentenlücken-Rechner',
+    akkusativ: 'einen Rentenlücken-Rechner',
+    kurz: 'In zwei Minuten sehen, wie groß deine Lücke im Alter sein könnte.',
+    nutzen: 'Sofort ein Ergebnis, ohne Anmeldung\nAlle Annahmen offen sichtbar\nPersönliche Auswertung nur, wenn du willst',
+    ablauf: 'Ein paar Zahlen eintragen\nErgebnis ansehen\nOptional: Auswertung per Mail anfragen',
+    dauer: '2 Minuten',
+    typ: 'rechner',
+    rechner: 'rentenluecke',
+    themen: 'vorsorge,vermoegen',
+    icon: '🧮',
+    reihenfolge: 6,
+  },
+  {
+    titel: 'Erstgespräch Kapitalanlage-Immobilie',
+    akkusativ: 'ein kostenloses Erstgespräch zur Immobilie als Kapitalanlage',
+    kurz: 'Wie funktioniert eine vermietete Wohnung als Geldanlage? Verständlich erklärt.',
+    nutzen: 'Die Grundlagen verständlich erklärt\nWelche Rolle Eigenkapital, Einkommen und Steuern spielen\nOhne Verpflichtung, ohne Druck',
+    ablauf: 'Termin aussuchen (online oder in Hamburg)\nFragen mitbringen, Unterlagen sind nicht nötig\n45 Minuten Gespräch, danach entscheidest du',
+    dauer: '45 Minuten',
+    typ: 'termin',
+    themen: 'immobilien,vermoegen',
+    icon: '🏠',
+    reihenfolge: 7,
+  },
+  {
+    titel: 'Checkliste: 7 Fehler beim Wechsel in die PKV',
+    akkusativ: 'eine Checkliste mit 7 Fehlern beim Wechsel in die PKV',
+    kurz: 'Sofort zum Download, ganz ohne Termin.',
+    nutzen: 'Die typischen Stolperfallen auf einen Blick\nZum Ausdrucken oder als PDF speichern\nKeine Anmeldung nötig',
+    ablauf: 'Auf „Jetzt ansehen“ tippen\nLesen oder speichern\nFertig',
+    dauer: '5 Minuten Lesezeit',
+    typ: 'download',
+    themen: 'pkv',
+    icon: '✅',
+    reihenfolge: 8,
+    inhalt: PKV_CHECKLISTE,
+  },
+];
+for (const g of GESCHENKE) {
+  const da = one<{ id: number; akkusativ: string | null }>('SELECT id, akkusativ FROM geschenke WHERE titel = ?', g.titel);
+  if (!da) insertRow('geschenke', g);
+  else if (!da.akkusativ) run('UPDATE geschenke SET akkusativ = ?, reihenfolge = ? WHERE id = ?', g.akkusativ, g.reihenfolge, da.id);
 }
 
 if (!one('SELECT 1 FROM kunden LIMIT 1')) {

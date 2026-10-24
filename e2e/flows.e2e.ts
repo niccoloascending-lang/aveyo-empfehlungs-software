@@ -78,6 +78,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   const nachricht = await p.locator('textarea').inputValue();
   const wa = await p.getByRole('link', { name: 'WhatsApp' }).getAttribute('href');
   assert.match(wa!, /^https:\/\/wa\.me\/\?text=/);
+  assert.match(nachricht, /einen kostenlosen Versicherungs-Check-up/, 'Geschenk steht grammatisch korrekt im Satz');
   await p.getByRole('button', { name: /kopieren/i }).first().click();
   await p.getByText('Danke! Dein Geschenk ist unterwegs.').waitFor();
   assert.ok(Date.now() - start < 30_000, 'Teilen in unter 30 Sekunden');
@@ -89,7 +90,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   const f = await ctx.newPage();
   await f.goto(link);
   // 5-Sekunden-Test: Wer, was, Kosten, keine Anrufe – alles im ersten Bildschirm
-  for (const text of ['Lisa schenkt dir', 'Kostenloser PKV-Beitragscheck', 'Kosten: 0 €', 'Niemand ruft dich an']) {
+  for (const text of ['Lisa schenkt dir', 'einen kostenlosen Versicherungs-Check-up', 'Kosten: 0 €', 'Niemand ruft dich an']) {
     const box = await f.getByText(text).first().boundingBox();
     assert.ok(box && box.y + box.height <= 844, `${text} sichtbar ohne Scrollen`);
   }
@@ -117,7 +118,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   // Wirkung beim Empfehler: Name nur dank Einwilligung
   await p.goto(links.Lisa);
   await p.getByText('Dein Geschenk wurde gerade eingelöst').waitFor();
-  await p.getByText('Erika hat „Kostenloser PKV-Beitragscheck“ genutzt').waitFor();
+  await p.getByText('Erika hat „Kostenloser Versicherungs-Check-up“ genutzt').waitFor();
   await ctx.close();
 });
 
@@ -132,7 +133,7 @@ test('Flow 2b: Download ohne Termin und ohne Daten, danach Weitergeben', async (
   const f = await ctx.newPage();
   await f.goto(link);
   const [dl] = await Promise.all([ctx.waitForEvent('page'), f.getByRole('link', { name: /ansehen/ }).click()]);
-  await dl.getByRole('heading', { name: '7 Fehler beim Wechsel in die PKV' }).waitFor();
+  await dl.getByRole('heading', { name: 'Die wichtigsten Versicherungen – hast du sie?' }).waitFor();
   await f.getByRole('button', { name: /Kennst du noch jemanden/ }).click();
   await f.getByRole('button', { name: 'Geschenk weitergeben' }).click();
   const wa = await f.getByRole('link', { name: 'WhatsApp' }).getAttribute('href');

@@ -8,6 +8,7 @@ import { Feld, Meldung, Themen, THEMEN_LABEL } from '@/components/admin/ui';
 type G = {
   id?: number;
   titel: string;
+  akkusativ: string | null;
   kurz: string;
   nutzen: string;
   ablauf: string;
@@ -23,7 +24,7 @@ type G = {
   geteilt?: number;
 };
 
-const LEER: G = { titel: '', kurz: '', nutzen: '', ablauf: '', dauer: '', typ: 'termin', themen: '', icon: '🎁', bild_id: null, datei_id: null, inhalt: '', aktiv: 1, reihenfolge: 0 };
+const LEER: G = { titel: '', akkusativ: '', kurz: '', nutzen: '', ablauf: '', dauer: '', typ: 'termin', themen: '', icon: '🎁', bild_id: null, datei_id: null, inhalt: '', aktiv: 1, reihenfolge: 0 };
 const TYP: Record<string, string> = { termin: 'Termin buchen', download: 'Download', rechner: 'Rechner' };
 
 export default function Geschenke() {
@@ -64,7 +65,7 @@ export default function Geschenke() {
       <div className="mt-4 grid gap-6 xl:grid-cols-[1fr_1.2fr]">
         <div className="space-y-3">
           {(daten ?? []).map((x) => (
-            <button key={x.id} onClick={() => setG({ ...x, inhalt: x.inhalt ?? '' })} className={`a-karte flex w-full items-start gap-3 text-left hover:border-marke ${g?.id === x.id ? 'border-marke' : ''}`}>
+            <button key={x.id} onClick={() => setG({ ...x, inhalt: x.inhalt ?? '', akkusativ: x.akkusativ ?? '' })} className={`a-karte flex w-full items-start gap-3 text-left hover:border-marke ${g?.id === x.id ? 'border-marke' : ''}`}>
               <span className="text-2xl">{x.icon}</span>
               <span className="flex-1">
                 <span className="block font-semibold">
@@ -89,6 +90,12 @@ export default function Geschenke() {
                 <input className="a-input" required value={g.titel} onChange={(e) => setG({ ...g, titel: e.target.value })} placeholder="Kostenloser PKV-Beitragscheck" />
               </Feld>
             </div>
+            <Feld label="Im Satz" hinweis="So steht es auf der Freund-Seite und in den Nachrichten: „Lisa schenkt dir …“. Leer = Titel.">
+              <div className="flex items-center gap-2">
+                <span className="shrink-0 text-sm text-slate-500">Lisa schenkt dir</span>
+                <input className="a-input" value={g.akkusativ ?? ''} onChange={(e) => setG({ ...g, akkusativ: e.target.value })} placeholder="einen kostenlosen PKV-Beitragscheck" />
+              </div>
+            </Feld>
             <Feld label="Kurzbeschreibung / Nutzenversprechen">
               <input className="a-input" value={g.kurz} onChange={(e) => setG({ ...g, kurz: e.target.value })} placeholder="Zahlst du zu viel? Wir schauen gemeinsam drauf." />
             </Feld>

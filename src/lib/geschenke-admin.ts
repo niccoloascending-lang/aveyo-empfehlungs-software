@@ -11,6 +11,7 @@ export function geschenkDaten(d: any): Record<string, any> | { fehler: string } 
   if (typ === 'download' && !id(d.datei_id) && !inhalt.trim()) return { fehler: 'Für einen Download bitte eine Datei hochladen oder einen Inhalt eintragen.' };
   return {
     titel,
+    akkusativ: sauber(d.akkusativ, 160) || null,
     kurz: sauber(d.kurz, 240),
     nutzen: mehrzeilig(d.nutzen, 1000),
     ablauf: mehrzeilig(d.ablauf, 1000),
