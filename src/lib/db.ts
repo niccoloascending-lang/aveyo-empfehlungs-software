@@ -214,6 +214,11 @@ export function initSchema(d: DatabaseSync) {
       zeit      TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
+
+  // Ergänzungen (abwärtskompatibel)
+  addColumnIfMissing(d, 'berater', 'kalender_id', 'TEXT'); // Google-Kalender-ID (meist die E-Mail-Adresse)
+  addColumnIfMissing(d, 'anfragen', 'berater_id', 'INTEGER'); // zuständiger Berater (Kalender)
+  addColumnIfMissing(d, 'anfragen', 'google_event_id', 'TEXT');
 }
 
 export type Row = Record<string, any>;

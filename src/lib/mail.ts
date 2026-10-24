@@ -22,9 +22,17 @@ export async function sendeMail(m: Mail): Promise<boolean> {
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT || 587),
       secure: Number(process.env.SMTP_PORT) === 465,
+      // Google SMTP-Relay erwartet einen echten Hostnamen im EHLO
+      name: (() => {
+        try {
+          return new URL(process.env.GESCHENK_BASE_URL || '').hostname || undefined;
+        } catch {
+          return undefined;
+        }
+      })(),
       auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
     });
-    await transport.sendMail({ from: process.env.MAIL_FROM || 'AVEYO <no-reply@localhost>', to: m.an, subject: m.betreff, text: m.text, replyTo: m.antwortAn });
+    await transport.sendMail({ from: process.env.MAIL_FROM || 'AVEYO <kontakt@aveyo.de>', to: m.an, subject: m.betreff, text: m.text, replyTo: m.antwortAn });
     return true;
   } catch (e) {
     console.error('Mailversand fehlgeschlagen:', (e as Error).message);

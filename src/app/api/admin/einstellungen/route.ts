@@ -69,6 +69,12 @@ export const PUT = admin(async (req, b) => {
     if (u === null) return fehler('Bewertungs-Link ist keine gültige Adresse.');
     setzeEinstellung('bewertungenUrl', u);
   }
+  for (const k of ['impressumUrl', 'datenschutzUrl'] as const) {
+    if (d[k] === undefined) continue;
+    const u = url(d[k]);
+    if (u === null) return fehler('Link zu Impressum/Datenschutz ist keine gültige Adresse.');
+    setzeEinstellung(k, u);
+  }
   if (d.adminMail !== undefined) {
     const m = sauber(d.adminMail, 200);
     if (m && !istEmail(m)) return fehler('Benachrichtigungs-Adresse ungültig.');

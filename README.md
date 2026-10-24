@@ -39,8 +39,8 @@ npm run dev         # http://localhost:3200
    kein weiterer Auftragsverarbeiter, Backup = eine Datei. Die Datenmenge (Kunden, Links, Anfragen) ist klein. Alle Zugriffe sind rohes SQL in `src/lib/*.ts` – ein späterer Umzug auf Postgres betrifft nur diese Dateien.
 2. **Hosting: ein kleiner EU-Server (z. B. Hetzner, Falkenstein/Nürnberg) statt Vercel + Supabase.** Die Freund-Seiten müssen öffentlich erreichbar sein
    (anders als Immo-Match, das nur per Tailscale läuft). Ein Server in Deutschland mit Caddy (automatisches HTTPS) ist datenschutzrechtlich am einfachsten: ein AVV (Hoster) + einer (Mail-Anbieter).
-3. **Eigener Slot-Picker als Standard,** Cal.com/Calendly optional (Einstellungen → Terminbuchung: extern + Link im Profil). Grund: keine Drittanbieter-Cookies auf der Freund-Seite, kein weiterer AVV.
-   Der eigene Picker kennt allerdings eure Outlook-/Google-Kalender nicht – belegte Zeiten außerhalb der App müssen über die Verfügbarkeit gesteuert werden (siehe offene Fragen).
+3. **Eigener Slot-Picker mit Google-Kalender-Abgleich.** Belegte Zeiten im Google-Kalender des Beraters werden ausgeblendet (nur frei/belegt, keine Inhalte),
+   bestätigte Termine landen automatisch im Kalender (bei „kein Interesse“ oder Löschen wieder raus). Cal.com/Calendly bleibt als Alternative einstellbar.
 4. **Tracking ohne Cookies und ohne IP-Adressen:** Die App zählt nur anonyme Ereignisse (geöffnet, eingelöst …) je Link. Link-Vorschau-Bots (WhatsApp & Co.) zählen nicht. Kein Plausible/Umami nötig; lässt sich zusätzlich einbinden.
 5. **Admin-Login: Passwort + TOTP (Authenticator-App)** statt E-Mail-Magic-Link – unabhängig vom Mail-Versand und phishing-robuster als Mail-Links.
 6. **Double-Opt-in per Knopfdruck:** Der Bestätigungslink öffnet eine Seite mit „Ja, ich bestätige“. So bestätigen Mail-Virenscanner, die Links automatisch öffnen, nicht versehentlich.
@@ -48,15 +48,43 @@ npm run dev         # http://localhost:3200
 8. **Download-Inhalte** können als PDF hochgeladen oder als Text gepflegt werden (druckbare Seite, „Als PDF speichern“). Die Beispiel-Checkliste ist als Beispielinhalt markiert.
 9. **Weitergabe durch Freunde** erzeugt einen neuen Link (optional mit dem Vornamen des Freundes). Einlösungen daraus zählen in der Wirkung des ursprünglichen Empfehlers mit, ohne Namen.
 10. **Admin-Oberfläche** (Menüs, Beschriftungen) ist fest auf Deutsch; **alle Texte, die Kunden und Freunde sehen** (Seiten, Mails, Nachrichten, Rechtsseiten, Vorschaubild), sind im Admin unter „Texte“ änderbar, je in Du- und Sie-Form.
-11. Farben sind ein warmer Platzhalter (`src/lib/theme.ts`), bis die echten AVEYO-Farben/Logo im Admin eingetragen sind.
+11. **Branding nach AVEYO Brand Guidelines:** Navy `#172545`, Taupe `#8B806F`, Sand `#B3AE9A`, Logo (`public/logo-aveyo.png`). Hausschrift Proxima Nova ist lizenzpflichtig;
+    wird sie nicht geladen, greift Montserrat als nahe Ersatzschrift (beim Build eingebunden, keine Anfrage an Google zur Laufzeit). Alles im Admin änderbar.
 
-## Rückfragen an Adrian (beeinflussen die nächsten Schritte, nicht den jetzigen Stand)
+## Entscheidungen von Adrian (Stand Oktober 2026)
 
-1. **Kalender:** Sollen Termine mit eurem Outlook/Google-Kalender abgeglichen werden (dann ist Cal.com als Zwischenschicht der einfachste Weg) oder reicht die feste Wochen-Verfügbarkeit?
-2. **Hosting:** Ist ein eigener kleiner Server (Hetzner) in Ordnung, oder soll es bewusst eine Managed-Plattform sein?
-3. **Domain:** Unter welcher Adresse soll es laufen (z. B. `geschenk.aveyo.de`)? Die Adresse steht in jedem geteilten Link.
-4. **Mail-Anbieter:** Brevo (Paris) oder Postmark (EU-Region)? Absender, z. B. `hallo@aveyo.de`?
-5. **Dankeschön:** Welche Spendenzwecke (3 Organisationen) und ob „Erlebnis“/„Doppeltes Geschenk“ überhaupt angeboten werden sollen (rechtliche Prüfung vorausgesetzt).
+- **Kalender:** Abgleich mit Google-Kalender → umgesetzt (siehe „Google-Kalender einrichten“).
+- **Mail:** Google Workspace, Absender `kontakt@aveyo.de` → siehe „E-Mail einrichten“.
+- **Spendenzwecke:** Einen Baum in Deutschland pflanzen · S.O.S Kinderhilfe · Ärzte ohne Grenzen (Texte → Dankeschön). Spende ist als Dankeschön-Art eingeschaltet.
+- **Impressum / Datenschutz:** verlinkt auf https://www.aveyo.de/impressum und https://www.aveyo.de/datenschutz (Einstellungen). Zusätzlich gibt es
+  „Datenschutz bei dieser Seite“ mit den App-spezifischen Punkten (Double-Opt-in, Löschfristen, Kalender) – gehört juristisch geprüft bzw. in die Hauptdatenschutzerklärung übernommen.
+- **Domain:** Vorschlag `geschenk.aveyo.de` (siehe unten).
+
+### Noch offen
+1. Erstinformation nach § 15 VersVermV: eigene Seite auf aveyo.de verlinken oder Text hier einpflegen (aktuell Platzhalter).
+2. Adresse für Vor-Ort-Termine in Hamburg (Text `mail.termin.ort.hamburg`).
+3. Vermittlerregister-Nummer für die Fußzeile (Einstellungen).
+4. Welche Organisation genau mit „S.O.S Kinderhilfe“ gemeint ist (z. B. SOS-Kinderdorf e.V.) – der Text ist im Admin änderbar.
+
+## Server: Hetzner oder Büro?
+
+Die Freund-Seiten müssen **aus dem Internet** erreichbar sein – jeder, der einen Link per WhatsApp bekommt, öffnet ihn auf seinem Handy.
+Ein Büro-Rechner, der nur über Tailscale erreichbar ist (wie Immo-Match), reicht dafür **nicht**: Kunden und Freunde sind nicht in eurem Tailnet.
+
+Technisch ginge ein Büro-Server trotzdem, z. B. mit einem **Cloudflare Tunnel** (eigene Domain, kein Port in der Firewall öffnen). Davon raten wir ab:
+- Ein öffentlich erreichbarer Dienst gehört nicht auf denselben Rechner/ins selbe Netz wie FinanzCRM und Immo-Match mit sensiblen Kundendaten.
+- Stromausfall, Windows-Updates, Internetstörung im Büro = geteilte Links funktionieren nicht. Ein Link, der „kaputt“ ist, kostet genau das Vertrauen, um das es geht.
+- Ein zusätzlicher Dienstleister (Cloudflare, USA) läuft dann trotzdem mit, inklusive AVV.
+
+**Empfehlung:** ein kleiner Hetzner-Cloud-Server in Deutschland (wenige Euro im Monat), getrennt vom Büro. Anleitung unten.
+
+## Domain
+
+Die Adresse steht in jedem geteilten Link und im Chat-Vorschaubild. Sie sollte für **beide** Seiten nach etwas Schönem klingen und Vertrauen geben:
+
+- **`geschenk.aveyo.de`** (Empfehlung): Der Empfehler verschenkt etwas, der Freund bekommt ein Geschenk – beide lesen dasselbe positive Wort. Die Marke steckt mit drin, das
+  schafft Vertrauen und kostet nichts extra (Subdomain, nur ein DNS-Eintrag). Link sieht so aus: `geschenk.aveyo.de/g/x7Kp2…`
+- Alternativen: `fuer-dich.aveyo.de` (stark für den Freund), `danke.aveyo.de` (eher Empfehler-Sicht). Eine eigene Domain ohne „aveyo“ wirkt im Chat schnell wie Werbung oder Spam.
 
 ## Umgebungsvariablen
 
@@ -67,7 +95,8 @@ npm run dev         # http://localhost:3200
 | `GESCHENK_HTTPS` | produktiv | `1` = Cookies nur über HTTPS |
 | `GESCHENK_2FA` | – | `an` (Standard). Nur lokal `aus` |
 | `GESCHENK_DATA_DIR` | – | Datenordner (Standard `./data`): `geschenk.db`, `dateien/`, `postausgang/` |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | produktiv | EU-Mailanbieter. Ohne `SMTP_HOST` → Entwicklungs-Postausgang |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | produktiv | Google Workspace, Absender `kontakt@aveyo.de`. Ohne `SMTP_HOST` → Entwicklungs-Postausgang |
+| `GOOGLE_SERVICE_ACCOUNT_FILE` | für Kalender | Pfad zum JSON-Schlüssel des Google-Dienstkontos (alternativ Inhalt in `GOOGLE_SERVICE_ACCOUNT_JSON`) |
 
 ## Befehle
 
@@ -117,6 +146,30 @@ npm run admin:add -- "Name" mail@aveyo.de "passwort-mit-12-zeichen"   # Zugang a
    Port 3200 per Firewall nur lokal erreichbar lassen (`ufw allow 80,443/tcp`).
 6. **Backup:** `data/` täglich sichern (z. B. `sqlite3 data/geschenk.db ".backup /backup/geschenk-$(date +%F).db"` per Cron + Hetzner-Snapshots).
 7. **Update:** `git pull && npm ci && npm test && npm run build && sudo systemctl restart geschenk`.
+
+## E-Mail einrichten (Google Workspace, kontakt@aveyo.de)
+
+**Variante A – SMTP-Relay (empfohlen für den Server):** Google Admin → Apps → Google Workspace → Gmail → Routing → **SMTP-Relay-Dienst** hinzufügen:
+nur eigene Domains, Zugriff nur von der festen IP des Hetzner-Servers, TLS erforderlich. In `.env.local`:
+`SMTP_HOST=smtp-relay.gmail.com`, `SMTP_PORT=587`, `MAIL_FROM="AVEYO <kontakt@aveyo.de>"` (ohne Benutzer/Passwort).
+
+**Variante B – App-Passwort:** Ein Konto mit Bestätigung in zwei Schritten, das als `kontakt@aveyo.de` senden darf (eigenes Postfach oder „Senden als“-Alias),
+erzeugt unter myaccount.google.com → Sicherheit → App-Passwörter ein Passwort. `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER=…`, `SMTP_PASS=<App-Passwort>`.
+
+SPF/DKIM für aveyo.de sind bei Google Workspace normalerweise schon eingerichtet. Wichtig für DSGVO: Data Processing Amendment (AVV) in der Google Admin-Konsole akzeptieren.
+
+## Google-Kalender einrichten
+
+1. Google Cloud Console (mit dem Workspace-Konto): Projekt anlegen → **Google Calendar API** aktivieren → **Dienstkonto** anlegen → Schlüssel (JSON) erzeugen.
+2. JSON auf den Server legen, z. B. `/opt/aveyo/geheim/google-dienstkonto.json` (nur für den Dienst lesbar, **nie ins Repository**), und in `.env.local`
+   `GOOGLE_SERVICE_ACCOUNT_FILE=/opt/aveyo/geheim/google-dienstkonto.json` setzen.
+3. Jeder Berater: Google Kalender → Einstellungen seines Kalenders → „Für bestimmte Personen freigeben“ → E-Mail des Dienstkontos (steht im Admin) mit
+   **„Änderungen an Terminen vornehmen“**. Falls die Freigabe für externe Konten gesperrt ist: Google Admin → Apps → Kalender → Freigabeeinstellungen anpassen.
+4. Im Admin unter Einstellungen → Mein Profil die Kalender-ID eintragen (meist die eigene E-Mail) und **„Kalender testen“** drücken.
+
+Was passiert: Freie Termine = Wochen-Verfügbarkeit minus Buchungen in der App minus belegte Zeiten im Kalender (2 Minuten zwischengespeichert, Inhalte von Terminen
+werden nie gelesen). Nach dem Double-Opt-in trägt die App den Termin mit Vorname, Kontakt und Geschenk in den Kalender ein; ohne Telefon steht dort „bitte nicht anrufen“.
+Ist Google nicht erreichbar, zeigt die App weiter Termine aus der Wochen-Verfügbarkeit an (dann ggf. per Mail umplanen).
 
 ## CRM-Anbindung
 
@@ -190,7 +243,7 @@ Außerdem prüfen: die Inhalte der Geschenke (Titel, Nutzen, Checkliste – Beis
 - **Phase 2:** ✅ Wirkung-Anzeige mit Freudenmoment, Einwilligung „Empfehler darf es erfahren“, Dankeschön-Workflow, dynamische OG-Bilder (`/g/<code>/opengraph-image`), QR-Code.
 - **Phase 3:** ✅ Dashboard mit Conversion je Geschenk, Nachrichtenvorlage und Kanal, A/B-Test der Nachrichtentexte, CRM-Webhook + REST-API, CSV-Import.
 
-Noch offen / Ideen: Kalenderabgleich (siehe Rückfrage 1), Lighthouse-Messung auf dem Produktivserver (lokal: Freund-Seite ~100 kB JS, serverseitig gerendert),
+Noch offen / Ideen: Lighthouse-Messung auf dem Produktivserver (lokal: Freund-Seite ~100 kB JS, serverseitig gerendert),
 Sitzungen nach Passwortwechsel sofort beenden, eigene Bewertungs-Einbindung.
 
 ## Aufbau

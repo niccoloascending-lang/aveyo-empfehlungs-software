@@ -12,15 +12,16 @@ export type Theme = {
   firmenname: string;
 };
 
-// Warme Platzhalter-Palette. Bitte im Admin auf die echten AVEYO-Farben setzen.
+// AVEYO Brand Guidelines: Navy #172545, Taupe #8B806F, Sand #B3AE9A, Schrift Proxima Nova.
+// Im Admin änderbar. Hell-/Dunkeltöne sind aus der Palette abgeleitet (Kontrast WCAG AA).
 export const STANDARD_THEME: Theme = {
-  marke: '#B4532A',
-  markeDunkel: '#7A3417',
-  markeHell: '#F8E6DA',
-  akzent: '#E0A458',
-  papier: '#FFFBF6',
-  tinte: '#2A211C',
-  schrift: 'system-ui',
+  marke: '#172545',
+  markeDunkel: '#0E1830',
+  markeHell: '#ECEAE3',
+  akzent: '#8B806F',
+  papier: '#FAF9F6',
+  tinte: '#172545',
+  schrift: "'Proxima Nova'",
   logoDateiId: null,
   firmenname: 'AVEYO',
 };

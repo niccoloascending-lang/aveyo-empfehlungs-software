@@ -5,7 +5,7 @@ import { hashPasswort, passwortProblem, pruefePasswort } from '@/lib/token';
 
 export const dynamic = 'force-dynamic';
 
-export const GET = admin((_req, b) => json(one('SELECT id, name, email, foto_id, vorstellung, video_url, termin_url, totp_aktiv FROM berater WHERE id = ?', b.id)));
+export const GET = admin((_req, b) => json(one('SELECT id, name, email, foto_id, vorstellung, video_url, termin_url, kalender_id, totp_aktiv FROM berater WHERE id = ?', b.id)));
 
 const url = (x: unknown) => {
   const s = sauber(x, 500);
@@ -30,11 +30,12 @@ export const PUT = admin(async (req, b) => {
   const name = sauber(d.name, 80);
   if (!name) return fehler('Name fehlt.');
   run(
-    'UPDATE berater SET name = ?, vorstellung = ?, video_url = ?, termin_url = ?, foto_id = ? WHERE id = ?',
+    'UPDATE berater SET name = ?, vorstellung = ?, video_url = ?, termin_url = ?, kalender_id = ?, foto_id = ? WHERE id = ?',
     name,
     mehrzeilig(d.vorstellung, 1000) || null,
     video || null,
     termin || null,
+    sauber(d.kalender_id, 200) || null,
     Number(d.foto_id) > 0 ? Number(d.foto_id) : null,
     b.id,
   );

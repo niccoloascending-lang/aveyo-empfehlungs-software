@@ -34,7 +34,7 @@ export async function POST(req: Request, { params }: { params: { code: string } 
     termin_start = typeof b.termin_start === 'string' ? b.termin_start : '';
     const orte = einstellungen().verfuegbarkeit.orte;
     termin_ort = orte.includes(b.termin_ort) ? b.termin_ort : orte[0] ?? 'online';
-    if (!freieTermine().includes(termin_start!)) return NextResponse.json({ fehler: 'Dieser Termin ist leider nicht mehr frei. Bitte wähle einen anderen.', belegt: true }, { status: 409 });
+    if (!(await freieTermine(s.berater?.id ?? null)).includes(termin_start!)) return NextResponse.json({ fehler: 'Dieser Termin ist leider nicht mehr frei. Bitte wähle einen anderen.', belegt: true }, { status: 409 });
   }
   let daten: string | undefined;
   if (typ === 'auswertung' && b.daten) {

@@ -20,6 +20,7 @@ export default function Einstellungen() {
   const { daten, laden } = useDaten<any>('/api/admin/einstellungen');
   const profil = useDaten<any>('/api/admin/profil');
   const berater = useDaten<any[]>('/api/admin/berater');
+  const kal = useDaten<{ aktiv: boolean; dienstkonto: string | null }>('/api/admin/kalender');
   const [e, setE] = useState<any>(null);
   const [p, setP] = useState<any>(null);
   const [meldung, setMeldung] = useState({ text: '', art: 'ok' as 'ok' | 'fehler' });
@@ -82,9 +83,31 @@ export default function Einstellungen() {
           <Feld label="Externes Buchungstool (optional, Cal.com/Calendly-Link)" hinweis="Wird nur genutzt, wenn unten „Terminbuchung: extern“ gewählt ist.">
             <input className="a-input" value={p.termin_url ?? ''} onChange={(x) => setP({ ...p, termin_url: x.target.value })} />
           </Feld>
-          <button className="a-btn" onClick={async () => zeige(await anfrage('/api/admin/profil', 'PUT', p))}>
-            Profil speichern
-          </button>
+          <Feld
+            label="Google-Kalender (Kalender-ID, meist deine E-Mail)"
+            hinweis={
+              kal.daten?.dienstkonto
+                ? `Gib deinen Kalender in Google Kalender → Einstellungen → „Für bestimmte Personen freigeben“ für ${kal.daten.dienstkonto} frei (Berechtigung: „Änderungen an Terminen vornehmen“). Belegte Zeiten werden dann ausgeblendet, bestätigte Termine eingetragen.`
+                : 'Noch kein Google-Dienstkonto auf dem Server eingerichtet (siehe README → Google-Kalender).'
+            }
+          >
+            <input className="a-input" placeholder="adrian@aveyo.de" value={p.kalender_id ?? ''} onChange={(x) => setP({ ...p, kalender_id: x.target.value })} />
+          </Feld>
+          <div className="flex flex-wrap gap-2">
+            <button className="a-btn" onClick={async () => zeige(await anfrage('/api/admin/profil', 'PUT', p))}>
+              Profil speichern
+            </button>
+            <button
+              className="a-btn2"
+              onClick={async () => {
+                const r = await anfrage('/api/admin/kalender', 'POST');
+                setMeldung({ text: r.text ?? r.error ?? 'Fehler', art: r.ok ? 'ok' : 'fehler' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              Kalender testen
+            </button>
+          </div>
         </Abschnitt>
 
         <Abschnitt titel="Ansprache & Branding">
@@ -241,13 +264,19 @@ export default function Einstellungen() {
           <Feld label="Vermittlerregister-Nummer (Fußzeile)">
             <input className="a-input" value={e.registerNr} onChange={(x) => setE({ ...e, registerNr: x.target.value })} />
           </Feld>
+          <Feld label="Impressum (Link, leer = eigene Seite)">
+            <input className="a-input" value={e.impressumUrl} onChange={(x) => setE({ ...e, impressumUrl: x.target.value })} />
+          </Feld>
+          <Feld label="Datenschutzerklärung (Link)" hinweis="Zusätzlich verlinkt jede Seite „Datenschutz bei dieser Seite“ (Texte → Rechtliches) mit den App-spezifischen Punkten.">
+            <input className="a-input" value={e.datenschutzUrl} onChange={(x) => setE({ ...e, datenschutzUrl: x.target.value })} />
+          </Feld>
           <Feld label="Link zu echten Bewertungen (optional)" hinweis="Nur echte, öffentlich verlinkbare Bewertungen (z. B. Google, ProvenExpert). Leer = nicht anzeigen.">
             <input className="a-input" value={e.bewertungenUrl} onChange={(x) => setE({ ...e, bewertungenUrl: x.target.value })} />
           </Feld>
           <Feld label="Benachrichtigung bei neuen Anfragen an (E-Mail)" hinweis="Die Mail enthält keine Namen, nur einen Link in den Admin.">
             <input className="a-input" type="email" value={e.adminMail} onChange={(x) => setE({ ...e, adminMail: x.target.value })} />
           </Feld>
-          <button className="a-btn" onClick={() => speichern({ registerNr: e.registerNr, bewertungenUrl: e.bewertungenUrl, adminMail: e.adminMail })}>
+          <button className="a-btn" onClick={() => speichern({ registerNr: e.registerNr, impressumUrl: e.impressumUrl, datenschutzUrl: e.datenschutzUrl, bewertungenUrl: e.bewertungenUrl, adminMail: e.adminMail })}>
             Speichern
           </button>
         </Abschnitt>

@@ -62,13 +62,19 @@ const minuten = (hhmm: string) => {
   return h * 60 + m;
 };
 
-/** Freie Termine (UTC-ISO) ab `jetzt`, ohne bereits belegte (mit Puffer). */
-export function freieSlots(v: Verfuegbarkeit, belegt: string[], jetzt: Date = new Date()): string[] {
+export type Zeitraum = { start: string; end: string };
+
+/**
+ * Freie Termine (UTC-ISO) ab `jetzt`, ohne bereits belegte (mit Puffer).
+ * `blockiert`: belegte Zeiträume aus dem Google-Kalender des Beraters (frei/belegt, ohne Inhalte).
+ */
+export function freieSlots(v: Verfuegbarkeit, belegt: string[], jetzt: Date = new Date(), blockiert: Zeitraum[] = []): string[] {
   const out: string[] = [];
   const dauer = Math.max(10, v.dauerMin) * 60000;
   const puffer = Math.max(0, v.pufferMin) * 60000;
   const frueheste = jetzt.getTime() + v.vorlaufStunden * 3600_000;
   const belegtMs = belegt.map((b) => Date.parse(b)).filter((n) => !Number.isNaN(n));
+  const bloecke = blockiert.map((b) => [Date.parse(b.start), Date.parse(b.end)]).filter(([s, e]) => !Number.isNaN(s) && !Number.isNaN(e));
   const schritt = Math.max(10, v.dauerMin + v.pufferMin);
   const start = berlinDatum(jetzt.getTime());
   for (let i = 0; i <= v.tageVoraus; i++) {
@@ -81,6 +87,7 @@ export function freieSlots(v: Verfuegbarkeit, belegt: string[], jetzt: Date = ne
       const t = berlinZuUtc(d.jahr, d.monat, d.tag, hhmm);
       if (t < frueheste) continue;
       if (belegtMs.some((b) => t < b + dauer + puffer && b < t + dauer + puffer)) continue;
+      if (bloecke.some(([s, e]) => t < e + puffer && s < t + dauer + puffer)) continue;
       out.push(new Date(t).toISOString());
     }
   }
@@ -110,4 +117,5 @@ export function nachTag(slots: string[]): { tag: string; slots: { iso: string; z
 }
 
 /** Ist ein gewünschter Slot (noch) gültig? Schutz gegen manipulierte Anfragen. */
-export const slotGueltig = (v: Verfuegbarkeit, belegt: string[], iso: string, jetzt = new Date()) => freieSlots(v, belegt, jetzt).includes(iso);
+export const slotGueltig = (v: Verfuegbarkeit, belegt: string[], iso: string, jetzt = new Date(), blockiert: Zeitraum[] = []) =>
+  freieSlots(v, belegt, jetzt, blockiert).includes(iso);

@@ -9,12 +9,17 @@ export default function Fusszeile() {
   return (
     <footer className="mx-auto mt-12 max-w-xl px-4 pb-10 text-center text-sm text-tinte/70">
       <nav aria-label="Rechtliches" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
-        <Link className="underline-offset-4 hover:underline" href="/info/impressum">
+        <a className="underline-offset-4 hover:underline" href={e.impressumUrl || '/info/impressum'}>
           {t['footer.impressum']}
-        </Link>
-        <Link className="underline-offset-4 hover:underline" href="/info/datenschutz">
+        </a>
+        <a className="underline-offset-4 hover:underline" href={e.datenschutzUrl || '/info/datenschutz'}>
           {t['footer.datenschutz']}
-        </Link>
+        </a>
+        {e.datenschutzUrl && (
+          <Link className="underline-offset-4 hover:underline" href="/info/datenschutz">
+            {t['footer.datenschutz.seite']}
+          </Link>
+        )}
         <Link className="underline-offset-4 hover:underline" href="/info/erstinformation">
           {t['footer.erstinformation']}
         </Link>

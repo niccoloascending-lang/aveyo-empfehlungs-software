@@ -360,7 +360,7 @@ export const TEXTE = {
     sie: 'Als Dankeschön spenden wir einen Betrag an einen Zweck, den Sie aussuchen.',
     rechtlich: true,
   },
-  'belohnung.spende.zwecke': { bereich: 'Dankeschön', beschreibung: 'Spendenzwecke (mit | trennen)', du: '[Organisation 1]|[Organisation 2]|[Organisation 3]', rechtlich: true },
+  'belohnung.spende.zwecke': { bereich: 'Dankeschön', beschreibung: 'Spendenzwecke (mit | trennen)', du: 'Einen Baum in Deutschland pflanzen|S.O.S Kinderhilfe|Ärzte ohne Grenzen', rechtlich: true },
   'belohnung.erlebnis.titel': { bereich: 'Dankeschön', beschreibung: 'Erlebnis: Titel', du: 'Kaffee mit {berater}?', rechtlich: true },
   'belohnung.erlebnis.text': {
     bereich: 'Dankeschön',
@@ -381,6 +381,7 @@ export const TEXTE = {
   // ---------- Fußzeile & Rechtliches ----------
   'footer.impressum': { bereich: 'Rechtliches', beschreibung: 'Link Impressum', du: 'Impressum' },
   'footer.datenschutz': { bereich: 'Rechtliches', beschreibung: 'Link Datenschutz', du: 'Datenschutz' },
+  'footer.datenschutz.seite': { bereich: 'Rechtliches', beschreibung: 'Link Datenschutz-Hinweise dieser App', du: 'Datenschutz bei dieser Seite' },
   'footer.erstinformation': { bereich: 'Rechtliches', beschreibung: 'Link Erstinformation', du: 'Erstinformation (§ 15 VersVermV)' },
   'footer.register': { bereich: 'Rechtliches', beschreibung: 'Registerangabe in der Fußzeile', du: 'Vermittlerregister: {nr}' },
   'seite.impressum': {
@@ -392,8 +393,8 @@ export const TEXTE = {
   },
   'seite.datenschutz': {
     bereich: 'Rechtliches',
-    beschreibung: 'Seite Datenschutzhinweise',
-    du: '# Datenschutzhinweise\n\n[ENTWURF – vor Livegang juristisch prüfen]\n\n## Verantwortlicher\nAVEYO GmbH, [BITTE AUSFÜLLEN: Anschrift, Kontakt Datenschutz]\n\n## Was wir speichern\n- Wenn Sie einen Termin oder eine Zusendung anfragen: die Angaben, die Sie selbst eingeben (Vorname, ggf. Nachname, E-Mail, freiwillig Telefon), den gewählten Termin und Ihre Einwilligungen mit Zeitpunkt.\n- Wir speichern keine Daten über Sie, die Ihnen jemand anderes mitgeteilt hat.\n- Beim Aufruf der Seite zählen wir nur anonym, dass sie geöffnet wurde. Keine Cookies, keine IP-Adresse, kein Tracking über andere Seiten.\n\n## Wofür\nAusschließlich, um Ihre Anfrage zu bearbeiten. Keine Werbung ohne Ihre ausdrückliche Einwilligung. Wir rufen Sie nicht ungefragt an.\n\n## E-Mails\nE-Mails senden wir erst, nachdem Sie Ihre Adresse über den Bestätigungslink bestätigt haben (Double-Opt-in).\n\n## Löschung\nAnfragen ohne Termin löschen wir automatisch nach {loeschen_monate} Monaten, unbestätigte Anfragen nach {doi_tage} Tagen.\n\n## Hosting\nServer in der EU: [BITTE AUSFÜLLEN: Anbieter, Standort]\nE-Mail-Versand: [BITTE AUSFÜLLEN: Anbieter]\n\n## Ihre Rechte\nAuskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit, Widerruf von Einwilligungen mit Wirkung für die Zukunft, Beschwerde bei einer Aufsichtsbehörde.',
+    beschreibung: 'Datenschutz-Hinweise zu dieser App (Ergänzung zur Datenschutzerklärung auf aveyo.de)',
+    du: '# Datenschutz bei dieser Seite\n\n[ENTWURF – vor Livegang juristisch prüfen]\n\nEs gilt die Datenschutzerklärung der AVEYO GmbH: {datenschutz_url}\nErgänzend dazu für diese Geschenk-Seite:\n\n## Was wir speichern\n- Wenn Sie einen Termin oder eine Zusendung anfragen: die Angaben, die Sie selbst eingeben (Vorname, ggf. Nachname, E-Mail, freiwillig Telefon), den gewählten Termin und Ihre Einwilligungen mit Zeitpunkt.\n- Wir speichern keine Daten über Sie, die Ihnen jemand anderes mitgeteilt hat.\n- Beim Aufruf der Seite zählen wir nur anonym, dass sie geöffnet wurde. Keine Cookies, keine IP-Adresse, kein Tracking über andere Seiten.\n\n## Wofür\nAusschließlich, um Ihre Anfrage zu bearbeiten. Keine Werbung ohne Ihre ausdrückliche Einwilligung. Wir rufen Sie nicht ungefragt an.\n\n## E-Mails und Termine\nE-Mails senden wir erst, nachdem Sie Ihre Adresse über den Bestätigungslink bestätigt haben (Double-Opt-in). Für E-Mail-Versand und Terminkalender nutzen wir Google Workspace (Google Ireland Ltd.) als Auftragsverarbeiter. Bestätigte Termine werden mit Vorname und Kontaktdaten in den Kalender des Beraters eingetragen.\n\n## Löschung\nAnfragen ohne Termin löschen wir automatisch nach {loeschen_monate} Monaten, unbestätigte Anfragen nach {doi_tage} Tagen.\n\n## Hosting\nServer in der EU: [BITTE AUSFÜLLEN: Anbieter, Standort]\n\n## Ihre Rechte\nAuskunft, Berichtigung, Löschung, Einschränkung, Widerspruch, Datenübertragbarkeit, Widerruf von Einwilligungen mit Wirkung für die Zukunft, Beschwerde bei einer Aufsichtsbehörde.',
     lang: true,
     rechtlich: true,
   },

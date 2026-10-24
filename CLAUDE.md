@@ -12,4 +12,5 @@ Ausführlich: `README.md`.
 6. Tracking ohne Cookies und ohne IP; Link-Vorschau-Bots zählen nicht (`istVorschauBot`).
 7. Schema nur abwärtskompatibel (`CREATE TABLE IF NOT EXISTS`, `addColumnIfMissing`).
 8. Logik in reine Dateien (nur relative Importe mit `.ts`-Endung, keine `@/`-Importe in `src/lib`) + Test. Vor jedem Push: `npx tsc --noEmit`, `npm test`, `npm run build`, möglichst `npm run test:e2e`.
-9. Keine echten Kundendaten in Repo, Logs, Tests, Screenshots. Beispieldaten nur mit `example.org`.
+9. Google-Kalender (`kalender.ts`): nur frei/belegt lesen, Termine erst nach Double-Opt-in eintragen. Dienstkonto-Schlüssel nie ins Repo.
+10. Keine echten Kundendaten in Repo, Logs, Tests, Screenshots. Beispieldaten nur mit `example.org`.

@@ -13,7 +13,7 @@ const config: Config = {
         papier: v('papier'),
         tinte: v('tinte'),
       },
-      fontFamily: { sans: ['var(--schrift)', 'system-ui', 'Segoe UI', 'sans-serif'] },
+      fontFamily: { sans: ['var(--schrift)', 'var(--schrift-ersatz)', 'system-ui', 'Segoe UI', 'sans-serif'] },
       boxShadow: { karte: '0 1px 2px rgba(0,0,0,.04), 0 8px 24px -8px rgba(0,0,0,.12)' },
     },
   },

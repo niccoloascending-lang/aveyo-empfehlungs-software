@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --marke: 180 83 42;
-  --marke-dunkel: 122 52 23;
-  --marke-hell: 248 230 218;
-  --akzent: 224 164 88;
-  --papier: 255 251 246;
-  --tinte: 42 33 28;
-  --schrift: system-ui;
+  --marke: 23 37 69;
+  --marke-dunkel: 14 24 48;
+  --marke-hell: 236 234 227;
+  --akzent: 139 128 111;
+  --papier: 250 249 246;
+  --tinte: 23 37 69;
+  --schrift: 'Proxima Nova';
 }
 
 html { -webkit-text-size-adjust: 100%; }

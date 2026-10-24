@@ -77,6 +77,6 @@ test('Theme', () => {
   assert.equal(hexZuRgb('#B4532A'), '180 83 42');
   assert.equal(hexZuRgb('#fff'), '255 255 255');
   assert.equal(hexZuRgb('rot'), null);
-  assert.match(themeCss({ marke: 'kaputt', schrift: 'x;}body{display:none' }), /--marke: 180 83 42;.*--schrift: system-ui;/);
+  assert.match(themeCss({ marke: 'kaputt', schrift: 'x;}body{display:none' }), /--marke: 23 37 69;.*--schrift: 'Proxima Nova';/);
   assert.equal(kontrast('#000000', '#ffffff'), 21);
 });

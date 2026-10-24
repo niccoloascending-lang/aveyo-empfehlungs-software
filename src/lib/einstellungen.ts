@@ -16,6 +16,8 @@ export type Einstellungen = {
   doiTage: number;
   belohnungen: Belohnungen;
   registerNr: string;
+  impressumUrl: string; // externe Seiten (aveyo.de); leer = eigene Seite unter /info/…
+  datenschutzUrl: string;
   bewertungenUrl: string; // nur echte, verlinkbare Bewertungen
   adminMail: string; // Benachrichtigung bei neuen bestätigten Anfragen (ohne Namen)
   webhookUrl: string;
@@ -31,9 +33,12 @@ export const STANDARD: Einstellungen = {
   linkGueltigTage: 0,
   loeschenMonate: 6,
   doiTage: 7,
-  // Standard: nur die persönliche Danke-Nachricht. Alles andere bewusst aus (Provisionsabgabeverbot, Tippgeber-Abgrenzung).
-  belohnungen: { nachricht: true, spende: false, erlebnis: false, doppelt: false },
+  // Standard: Danke-Nachricht + Spende (von AVEYO gewünscht). Erlebnis/Doppeltes Geschenk aus. Nie Geld an den Empfehler
+  // (Provisionsabgabeverbot, Tippgeber-Abgrenzung).
+  belohnungen: { nachricht: true, spende: true, erlebnis: false, doppelt: false },
   registerNr: '',
+  impressumUrl: 'https://www.aveyo.de/impressum',
+  datenschutzUrl: 'https://www.aveyo.de/datenschutz',
   bewertungenUrl: '',
   adminMail: '',
   webhookUrl: '',

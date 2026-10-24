@@ -47,7 +47,7 @@ export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenU
           <div aria-hidden className="relative mx-auto mb-5 h-20 w-24">
             <div className="anim-deckel absolute inset-x-0 top-0 h-6 rounded-lg bg-marke-dunkel" />
             <div className="absolute inset-x-1.5 bottom-0 top-5 rounded-lg bg-marke" />
-            <div className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 bg-akzent/90" />
+            <div className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 bg-gradient-to-b from-marke-hell to-akzent" />
             <span className="absolute inset-x-0 bottom-1.5 mx-auto grid h-11 w-11 place-items-center rounded-full bg-white text-2xl shadow-sm">{g.icon || '🎁'}</span>
           </div>
           <p className="relative text-lg font-medium text-marke-dunkel">{ueberschrift}</p>

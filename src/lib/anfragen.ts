@@ -9,6 +9,7 @@ import { sendeMail } from './mail.ts';
 import { ereignis, type FreundSeite } from './teilungen.ts';
 import { terminText, freieSlots } from './slots.ts';
 import { webhookEinreihen } from './webhook.ts';
+import { belegtImKalender, kalenderVonBerater, terminEintragen } from './kalender.ts';
 
 export const STATUS = [
   { v: 'neu', t: 'Neu' },
@@ -35,14 +36,18 @@ export type AnfrageNeu = {
 };
 
 /** Alle belegten Termine (für den Slot-Picker). Unbestätigte halten den Slot bis zum Ablauf des DOI. */
-export function belegteTermine(): string[] {
+export function belegteTermine(beraterId: number | null = null): string[] {
   return all<{ termin_start: string }>(
-    "SELECT termin_start FROM anfragen WHERE typ = 'termin' AND termin_start IS NOT NULL AND status != 'kein_interesse'",
+    "SELECT termin_start FROM anfragen WHERE typ = 'termin' AND termin_start IS NOT NULL AND status != 'kein_interesse' AND (? IS NULL OR berater_id IS NULL OR berater_id = ?)",
+    beraterId,
+    beraterId,
   ).map((r) => r.termin_start);
 }
 
-export function freieTermine(): string[] {
-  return freieSlots(einstellungen().verfuegbarkeit, belegteTermine());
+/** Freie Termine des Beraters: Verfügbarkeit minus Buchungen in der App minus belegte Zeiten im Google-Kalender. */
+export async function freieTermine(beraterId: number | null = null): Promise<string[]> {
+  const blockiert = await belegtImKalender(kalenderVonBerater(beraterId));
+  return freieSlots(einstellungen().verfuegbarkeit, belegteTermine(beraterId), new Date(), blockiert);
 }
 
 function jetztSql() {
@@ -55,11 +60,13 @@ export async function anfrageAnlegen(seite: FreundSeite, a: AnfrageNeu): Promise
   const t = (k: string) => tx[k] ?? k;
   const empfehler = seite.teilung.von_name || '';
   const token = neuesToken();
+  const beraterId = seite.berater?.id ?? null;
+  const blockiert = a.typ === 'termin' ? await belegtImKalender(kalenderVonBerater(beraterId)) : [];
 
   const id = transaktion(() => {
     if (a.typ === 'termin') {
       // Doppelbuchung verhindern (innerhalb der Transaktion erneut prüfen)
-      if (!a.termin_start || !freieSlots(einstellungen().verfuegbarkeit, belegteTermine()).includes(a.termin_start)) return null;
+      if (!a.termin_start || !freieSlots(einstellungen().verfuegbarkeit, belegteTermine(beraterId), new Date(), blockiert).includes(a.termin_start)) return null;
     }
     const id = insertRow('anfragen', {
       teilung_id: seite.teilung.id,
@@ -73,6 +80,7 @@ export async function anfrageAnlegen(seite: FreundSeite, a: AnfrageNeu): Promise
       termin_ort: a.termin_ort ?? null,
       daten: a.daten ?? null,
       doi_hash: hashToken(token),
+      berater_id: beraterId,
     });
     // Einwilligungen mit Wortlaut zum Zeitpunkt der Erteilung
     insertRow('einwilligungen', { anfrage_id: id, art: 'datenschutz', wortlaut: t('freund.einwilligung.datenschutz') });
@@ -110,6 +118,7 @@ type AnfrageZeile = {
   erstellt: string;
   teilung_id: number | null;
   geschenk_id: number | null;
+  berater_id: number | null;
 };
 
 /** Bestätigungsseite: Token gültig? (ohne zu bestätigen – Mail-Scanner rufen Links automatisch auf) */
@@ -152,6 +161,7 @@ export async function doiBestaetigen(token: unknown): Promise<{ typ: AnfrageTyp;
     link: code ? `${basisUrl()}/g/${code}/download` : '',
     berater: berater ?? 'Dein AVEYO-Team',
   };
+  if (a.typ === 'termin') await terminEintragen(a.id, a.berater_id);
   if (a.typ === 'termin') await sendeMail({ an: a.email, betreff: fuelle(t('mail.termin.betreff'), vars), text: fuelle(t('mail.termin.text'), vars) });
   if (a.typ === 'download_mail' && code) await sendeMail({ an: a.email, betreff: fuelle(t('mail.download.betreff'), vars), text: fuelle(t('mail.download.text'), vars) });
 
