@@ -1,5 +1,6 @@
-// Beispieldaten zum Durchklicken: 2 Berater, 4 Geschenke, Nachrichtenvorlagen (A/B), 3 erfundene Beispiel-Kunden.
+// Beispieldaten zum Durchklicken: 2 Berater, Geschenke, Nachrichtenvorlagen (A/B), Anlässe, 3 erfundene Beispiel-Kunden.
 // Keine echten Kundendaten! Aufruf: npm run seed
+// Auf dem Server: npm run seed -- --produktiv  → nur Geschenke, Vorlagen und Anlässe, keine Demo-Zugänge und keine Beispielkunden.
 import { ladeEnv } from './env.ts';
 ladeEnv();
 
@@ -8,6 +9,7 @@ const { hashPasswort } = await import('../src/lib/token.ts');
 const { kundeAnlegen, linkFuer } = await import('../src/lib/kunden.ts');
 
 getDb();
+const PRODUKTIV = process.argv.includes('--produktiv');
 const DEMO_PASSWORT = 'geschenk-demo-2026';
 
 function berater(name: string, email: string, vorstellung: string) {
@@ -16,12 +18,14 @@ function berater(name: string, email: string, vorstellung: string) {
   return insertRow('berater', { name, email, pw_hash: hashPasswort(DEMO_PASSWORT), vorstellung });
 }
 
-const adrian = berater(
+const adrian = PRODUKTIV
+  ? 0
+  : berater(
   'Adrian',
   'adrian@example.org',
   'Ich bin Mitgründer von AVEYO in Hamburg und unabhängiger Versicherungsmakler. Mein Schwerpunkt: private Krankenversicherung und Altersvorsorge für Selbstständige und Angestellte. [Beispieltext – bitte im Admin anpassen]',
 );
-berater('Timo', 'timo@example.org', '[Beispieltext – bitte im Admin anpassen]');
+if (!PRODUKTIV) berater('Timo', 'timo@example.org', '[Beispieltext – bitte im Admin anpassen]');
 
 const PKV_CHECKLISTE = `# 7 Fehler beim Wechsel in die PKV
 
@@ -260,6 +264,12 @@ if (!one('SELECT 1 FROM anlaesse LIMIT 1')) {
     const geschenke = titel.map(id).filter(Boolean).join(',');
     if (geschenke) insertRow('anlaesse', { icon, text, geschenke, themen, reihenfolge: i + 1 });
   });
+}
+
+if (PRODUKTIV) {
+  console.log('\nGeschenke, Nachrichtenvorlagen und Anlässe sind angelegt (ohne Demo-Zugänge und Beispielkunden).');
+  console.log('Inhalte mit [Beispielinhalt …] vor dem Start im Admin prüfen und anpassen.\n');
+  process.exit(0);
 }
 
 if (!one('SELECT 1 FROM kunden LIMIT 1')) {

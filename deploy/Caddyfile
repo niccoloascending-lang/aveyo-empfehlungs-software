@@ -1,0 +1,10 @@
+# Wird von einrichten.sh nach /etc/caddy/Caddyfile geschrieben (__DOMAIN__ ersetzt).
+# Keine Zugriffsprotokolle (keine IP-Adressen gespeichert). HTTPS-Zertifikat holt Caddy automatisch.
+__DOMAIN__ {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3200
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
