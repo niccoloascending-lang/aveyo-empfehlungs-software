@@ -4,13 +4,14 @@ Kunden verschenken etwas Wertvolles an Freunde (einen PKV-Beitragscheck, eine Zw
 statt „einen Berater zu vermitteln“. Der Freund entscheidet selbst, ob und wann er sich meldet. **Niemand ruft ihn an.**
 Geteilt wird ausschließlich über die eigenen Apps des Kunden; die App selbst schreibt nie an Freunde.
 
-Eigene App im Unterordner `geschenk/` dieses Repositorys: eigene Datenbank, eigener Login, eigener Port (3200).
-Gleicher Stack und Stil wie Immo-Match und FinanzCRM. Lässt sich bei Bedarf mit `git subtree split -P geschenk` in ein eigenes Repository herauslösen.
+Eigenständige App mit eigenem Repository, eigener Datenbank, eigenem Login und eigenem Port (3200).
+Gleicher Stack und Stil wie Immo-Match und FinanzCRM (bis Oktober 2026 als Unterordner im Immo-Match-Repository entstanden).
 
 ## Schnellstart (lokal, in 2 Minuten durchklicken)
 
 ```bash
-cd geschenk
+git clone https://github.com/niccoloascending-lang/aveyo-empfehlungs-software.git
+cd aveyo-empfehlungs-software
 npm install
 cp .env.example .env.local
 # SESSION_SECRET füllen:
@@ -136,7 +137,7 @@ npm run admin:add -- "Name" mail@aveyo.de "passwort-mit-12-zeichen"   # Zugang a
 2. Node.js 22 installieren (`curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash - && sudo apt install -y nodejs`) und Caddy (`sudo apt install caddy`).
 3. Code holen und bauen:
    ```bash
-   git clone https://github.com/niccoloascending-lang/immo-crm.git /opt/aveyo && cd /opt/aveyo/geschenk
+   git clone https://github.com/niccoloascending-lang/aveyo-empfehlungs-software.git /opt/geschenk && cd /opt/geschenk
    npm ci && cp .env.example .env.local   # ausfüllen: SESSION_SECRET, GESCHENK_BASE_URL, GESCHENK_HTTPS=1, SMTP_*
    npm test && npm run build
    npm run admin:add -- "Adrian" adrian@aveyo.de "…"
@@ -147,7 +148,7 @@ npm run admin:add -- "Name" mail@aveyo.de "passwort-mit-12-zeichen"   # Zugang a
    Description=AVEYO Geschenk-Empfehlung
    After=network.target
    [Service]
-   WorkingDirectory=/opt/aveyo/geschenk
+   WorkingDirectory=/opt/geschenk
    ExecStart=/usr/bin/npm start
    Restart=always
    User=www-data
@@ -155,7 +156,7 @@ npm run admin:add -- "Name" mail@aveyo.de "passwort-mit-12-zeichen"   # Zugang a
    [Install]
    WantedBy=multi-user.target
    ```
-   `sudo chown -R www-data /opt/aveyo/geschenk/data && sudo systemctl enable --now geschenk`
+   `sudo chown -R www-data /opt/geschenk/data && sudo systemctl enable --now geschenk`
 5. Caddy `/etc/caddy/Caddyfile`:
    ```
    geschenk.aveyo.de {

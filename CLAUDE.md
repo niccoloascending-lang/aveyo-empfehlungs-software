@@ -1,6 +1,6 @@
 # AVEYO Geschenk-Empfehlung – Hinweise für Claude Code
 
-Eigene App im Unterordner `geschenk/` (Port 3200, eigene DB `data/geschenk.db`). Gleicher Stil wie Immo-Match im Elternordner; Texte und Kommentare auf Deutsch.
+Eigenständige App (Port 3200, eigene DB `data/geschenk.db`). Gleicher Stil wie Immo-Match (eigenes Repository `immo-crm`); Texte und Kommentare auf Deutsch.
 Ausführlich: `README.md`.
 
 ## Harte Regeln

@@ -1,0 +1,26 @@
+# Abhängigkeiten und Build
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Daten, Sicherungen, Geheimnisse – nie ins Repository (DSGVO)
+data/
+data-*/
+/backup/
+logs/
+.claude/
+*.db
+*.db-*
+*.sqlite
+.env*
+!.env.example
+*.pem
+*-key.json
+import/
+
+# System
+.DS_Store
+Thumbs.db
+npm-debug.log*
