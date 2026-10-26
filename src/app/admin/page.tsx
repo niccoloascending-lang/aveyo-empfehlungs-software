@@ -9,7 +9,9 @@ type Zeile = { id: number | string; name: string; geteilt: number; geoeffnet: nu
 type Dash = {
   tage: number;
   neueAnfragen: number;
-  baeume: number | null;
+  offen: { spenden: number; praemien: number };
+  abAktiv: boolean;
+  abVergleich: { variante: 'A' | 'B'; kunden: number; teilten: number; geteilt: number; eingeloest: number; gespraeche: number }[];
   kundenEingeladen: number;
   kundenGeteilt: number;
   geteilt: number;
@@ -98,10 +100,10 @@ export default function Dashboard() {
       }
     >
       <Meldung text={fehler} />
-      {d && d.baeume != null && d.baeume > 0 && (
-        <p className="mb-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-          🌳 Bisher {d.baeume} Bäume zugesagt (ein Baum je eingelöstem Geschenk, gesamt). Bitte regelmäßig pflanzen lassen.
-        </p>
+      {d && (d.offen.spenden > 0 || d.offen.praemien > 0) && (
+        <Link href="/admin/dankeschoen" className="mb-4 block rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+          Offen: {d.offen.spenden} € Spenden (Gruppe A) · {d.offen.praemien} € Gutscheine (Gruppe B) → abarbeiten
+        </Link>
       )}
       {d && d.neueAnfragen > 0 && (
         <Link href="/admin/anfragen?status=neu" className="mb-4 block rounded-xl bg-marke px-4 py-3 font-semibold text-white">
@@ -118,6 +120,39 @@ export default function Dashboard() {
       </div>
       {d && (
         <div className="mt-6 space-y-6">
+          <section className="a-karte overflow-x-auto">
+            <h2 className="mb-1 font-semibold">A/B-Test Dankeschön {d.abAktiv ? '' : '(pausiert)'}</h2>
+            <p className="mb-3 text-xs text-slate-500">A = Spende für einen guten Zweck, B = Gutschein für den Kunden. Entscheidend sind „teilen“ und „Gespräche“.</p>
+            <table className="a-tab min-w-[560px]">
+              <thead>
+                <tr>
+                  <th>Gruppe</th>
+                  <th className="text-right">Kunden</th>
+                  <th className="text-right">davon geteilt</th>
+                  <th className="text-right">Links geteilt</th>
+                  <th className="text-right">Eingelöst</th>
+                  <th className="text-right">Gespräche</th>
+                  <th className="text-right">Gespräche je 10 Kunden</th>
+                </tr>
+              </thead>
+              <tbody>
+                {d.abVergleich.map((g) => (
+                  <tr key={g.variante}>
+                    <td className="font-semibold">{g.variante === 'A' ? 'A · Spende' : 'B · Gutschein'}</td>
+                    <td className="text-right tabular-nums">{g.kunden}</td>
+                    <td className="text-right tabular-nums">
+                      {g.teilten} ({g.kunden ? Math.round((g.teilten / g.kunden) * 100) : 0} %)
+                    </td>
+                    <td className="text-right tabular-nums">{g.geteilt}</td>
+                    <td className="text-right tabular-nums">{g.eingeloest}</td>
+                    <td className="text-right tabular-nums">{g.gespraeche}</td>
+                    <td className="text-right tabular-nums">{g.kunden ? Math.round((g.gespraeche / g.kunden) * 100) / 10 : 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="mt-2 text-xs text-slate-500">Aussagekräftig erst ab etwa 30–50 Kunden je Gruppe. Kleine Unterschiede bei wenigen Kunden sind meist Zufall.</p>
+          </section>
           <Tabelle titel="Welches Geschenk funktioniert am besten?" zeilen={d.proGeschenk} />
           <Tabelle titel="Welcher Anlass bringt am meisten? (Jemandem, der …)" zeilen={d.proAnlass} />
           <Tabelle titel="Nachrichtenvorlagen (A/B-Test)" zeilen={d.proVorlage} />

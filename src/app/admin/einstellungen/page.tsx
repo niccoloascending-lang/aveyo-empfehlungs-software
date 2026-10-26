@@ -272,15 +272,54 @@ export default function Einstellungen() {
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={!!e.sozialAnzeigen} onChange={(x) => setE({ ...e, sozialAnzeigen: x.target.checked })} /> „Schon N Kunden haben ein Geschenk weitergegeben“ anzeigen
           </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={!!e.baeume} onChange={(x) => setE({ ...e, baeume: x.target.checked })} /> Ein Baum je eingelöstem Geschenk (⚖️ nur einschalten, wenn ihr wirklich pflanzt)
-          </label>
           <button
             className="a-btn"
             onClick={() =>
-              speichern({ kontingent: e.kontingent, sozialStartwert: e.sozialStartwert, erinnerungNachTagen: e.erinnerungNachTagen, sozialAnzeigen: e.sozialAnzeigen, baeume: e.baeume })
+              speichern({ kontingent: e.kontingent, sozialStartwert: e.sozialStartwert, erinnerungNachTagen: e.erinnerungNachTagen, sozialAnzeigen: e.sozialAnzeigen })
             }
           >
+            Speichern
+          </button>
+        </Abschnitt>
+
+        <Abschnitt
+          titel="A/B-Test Dankeschön"
+          hinweis="Jeder Kunde kommt zufällig und dauerhaft in Gruppe A oder B. A: Spende in seinem Namen je eingelöstem Geschenk (Zweck wählbar, Zwecke unter Texte → Dankeschön). B: Gutschein für ihn je stattgefundenem Gespräch (Status „Beratung“ oder „Kunde“). Der Freund sieht davon nichts. ⚖️ Prämien vorher rechtlich prüfen lassen."
+        >
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!e.abTest.aktiv} onChange={(x) => setE({ ...e, abTest: { ...e.abTest, aktiv: x.target.checked } })} /> Test läuft (aus = alle neuen
+            Kunden in Gruppe A)
+          </label>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <Feld label="Anteil Gruppe B (%)">
+              <input className="a-input" type="number" min={0} max={100} value={e.abTest.anteilB} onChange={(x) => setE({ ...e, abTest: { ...e.abTest, anteilB: Number(x.target.value) } })} />
+            </Feld>
+            <Feld label="A: Spende je Einlösung (€)">
+              <input className="a-input" type="number" min={0} value={e.spendeBetrag} onChange={(x) => setE({ ...e, spendeBetrag: Number(x.target.value) })} />
+            </Feld>
+            <Feld label="B: Gutschein je Gespräch (€)">
+              <input className="a-input" type="number" min={0} value={e.praemieBetrag} onChange={(x) => setE({ ...e, praemieBetrag: Number(x.target.value) })} />
+            </Feld>
+          </div>
+          <Feld label="B: eigenes Bild für den Gutschein (optional)">
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={async (x) => {
+                const f = x.target.files?.[0];
+                if (!f) return;
+                const r = await hochladen(f);
+                if (!r.id) return zeige(r);
+                await speichern({ praemieBildId: r.id });
+              }}
+            />
+            {e.praemieBildId && (
+              <button type="button" className="a-btn2 mt-2" onClick={() => speichern({ praemieBildId: 0 })}>
+                Bild entfernen (Standard-Karte verwenden)
+              </button>
+            )}
+          </Feld>
+          <button className="a-btn" onClick={() => speichern({ abTest: e.abTest, spendeBetrag: e.spendeBetrag, praemieBetrag: e.praemieBetrag })}>
             Speichern
           </button>
         </Abschnitt>

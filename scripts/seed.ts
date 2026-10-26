@@ -270,6 +270,9 @@ if (!one('SELECT 1 FROM kunden LIMIT 1')) {
 
 // Ältere Test-Datenbanken: Jonas zeigt die Sie-Form
 run("UPDATE kunden SET anrede = 'herr', ansprache = 'sie' WHERE extern_id = 'DEMO-2' AND anrede = '' AND ansprache = ''");
+// A/B-Test Dankeschön: Lisa und Mia in Gruppe A (Spende), Jonas in Gruppe B (Gutschein)
+run("UPDATE kunden SET belohnung_variante = 'A' WHERE extern_id IN ('DEMO-1', 'DEMO-3') AND belohnung_variante = ''");
+run("UPDATE kunden SET belohnung_variante = 'B' WHERE extern_id = 'DEMO-2' AND belohnung_variante = ''");
 // Lisa zeigt den persönlichen Erfolgs-Satz (erfundenes Beispiel)
 run("UPDATE kunden SET zitat_vorschlag = 'Ich spare jetzt 840 € im Jahr' WHERE extern_id = 'DEMO-1' AND zitat_vorschlag IS NULL");
 

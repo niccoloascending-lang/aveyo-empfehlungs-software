@@ -229,6 +229,24 @@ export function initSchema(d: DatabaseSync) {
     );
   `);
 
+  // Zusagen aus dem A/B-Test Dankeschön: Spenden (A) und Prämien (B), abzuarbeiten im Admin
+  d.exec(`
+    CREATE TABLE IF NOT EXISTS zusagen (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      kunde_id    INTEGER REFERENCES kunden(id) ON DELETE SET NULL,
+      variante    TEXT NOT NULL,              -- A | B
+      art         TEXT NOT NULL,              -- spende | praemie
+      zweck       TEXT,                       -- bei Spende
+      betrag      INTEGER NOT NULL,           -- €
+      teilung_id  INTEGER,
+      anfrage_id  INTEGER,
+      status      TEXT NOT NULL DEFAULT 'offen', -- offen | erledigt
+      erstellt    TEXT NOT NULL DEFAULT (datetime('now')),
+      erledigt    TEXT
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS zusagen_praemie ON zusagen(anfrage_id) WHERE art = 'praemie';
+  `);
+
   // Ergänzungen (abwärtskompatibel)
   addColumnIfMissing(d, 'berater', 'kalender_id', 'TEXT'); // Google-Kalender-ID (meist die E-Mail-Adresse)
   addColumnIfMissing(d, 'anfragen', 'berater_id', 'INTEGER'); // zuständiger Berater (Kalender)
@@ -237,7 +255,9 @@ export function initSchema(d: DatabaseSync) {
   addColumnIfMissing(d, 'kunden', 'anrede', "TEXT NOT NULL DEFAULT ''"); // herr | frau | '' (vom Berater gewählt, nie geraten)
   addColumnIfMissing(d, 'geschenke', 'anlaesse', 'TEXT'); // (früher: Denkanstöße je Geschenk; ersetzt durch Tabelle anlaesse)
   addColumnIfMissing(d, 'teilungen', 'anlass_id', 'INTEGER');
-  addColumnIfMissing(d, 'geschenke', 'wert', 'INTEGER'); // € – nur angeben, wenn ihr diesen Betrag wirklich berechnet (Gespräch ohne Abschluss) // anonym: über welchen Anlass verschenkt wurde (Auswertung) // „Wer fällt dir ein?“ – je Zeile ein Anlass
+  addColumnIfMissing(d, 'geschenke', 'wert', 'INTEGER');
+  addColumnIfMissing(d, 'kunden', 'belohnung_variante', "TEXT NOT NULL DEFAULT ''"); // A/B-Test: A = Spende, B = Prämie
+  addColumnIfMissing(d, 'kunden', 'spendenzweck', 'TEXT'); // € – nur angeben, wenn ihr diesen Betrag wirklich berechnet (Gespräch ohne Abschluss) // anonym: über welchen Anlass verschenkt wurde (Auswertung) // „Wer fällt dir ein?“ – je Zeile ein Anlass
   addColumnIfMissing(d, 'kunden', 'zitat_vorschlag', 'TEXT'); // echter Erfolg, vom Berater eingetragen („Ich spare jetzt 840 € im Jahr“)
   addColumnIfMissing(d, 'kunden', 'kontingent_extra', 'INTEGER NOT NULL DEFAULT 0');
   addColumnIfMissing(d, 'kunden', 'erinnert_am', 'TEXT');

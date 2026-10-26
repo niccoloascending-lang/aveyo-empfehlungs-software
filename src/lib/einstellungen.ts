@@ -16,7 +16,10 @@ export type Einstellungen = {
   doiTage: number;
   belohnungen: Belohnungen;
   kontingent: number; // Geschenke je Kunde und 12 Monate, 0 = unbegrenzt
-  baeume: boolean; // je eingelöstem Geschenk ein Baum (sichtbar beim Empfehler)
+  abTest: { aktiv: boolean; anteilB: number }; // Dankeschön-Test: Anteil der Kunden in Gruppe B (Prozent)
+  spendeBetrag: number; // A: € je eingelöstem Geschenk für den gewählten Zweck
+  praemieBetrag: number; // B: € Gutschein je stattgefundenem Gespräch
+  praemieBildId: number | null;
   sozialAnzeigen: boolean;
   sozialStartwert: number; // echte Zahl aus dem alten System (Tellscale)
   erinnerungNachTagen: number;
@@ -41,9 +44,12 @@ export const STANDARD: Einstellungen = {
   doiTage: 7,
   // Standard: Danke-Nachricht + Spende (von AVEYO gewünscht). Erlebnis/Doppeltes Geschenk aus. Nie Geld an den Empfehler
   // (Provisionsabgabeverbot, Tippgeber-Abgrenzung).
-  belohnungen: { nachricht: true, spende: true, erlebnis: false, doppelt: false },
+  belohnungen: { nachricht: true, spende: false, erlebnis: false, doppelt: false }, // Spende läuft jetzt automatisch über den A/B-Test
   kontingent: 3,
-  baeume: true,
+  abTest: { aktiv: true, anteilB: 50 },
+  spendeBetrag: 10,
+  praemieBetrag: 50,
+  praemieBildId: null,
   sozialAnzeigen: true,
   sozialStartwert: 36,
   erinnerungNachTagen: 7,

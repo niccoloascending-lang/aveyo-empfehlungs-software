@@ -246,6 +246,12 @@ export default function KundeDetail({ params }: { params: { id: string } }) {
               </select>
             </Feld>
             <AnredeFelder anrede={f.anrede ?? ''} ansprache={f.ansprache ?? ''} onChange={(v) => setF({ ...f, ...v })} />
+            <Feld label="Dankeschön-Gruppe (A/B-Test)" hinweis="Wird zufällig vergeben. Nur ändern, wenn nötig – sonst verfälscht es den Test." className="sm:col-span-2">
+              <select className="a-input" value={f.belohnung_variante || d.variante} onChange={(e) => setF({ ...f, belohnung_variante: e.target.value })}>
+                <option value="A">A · Spende für einen guten Zweck{d.zusagen.spenden ? ` (bisher ${d.zusagen.spendeSumme} €${f.spendenzweck ? `, ${f.spendenzweck}` : ''})` : ''}</option>
+                <option value="B">B · Gutschein für den Kunden{d.zusagen.praemien ? ` (bisher ${d.zusagen.praemieSumme} €)` : ''}</option>
+              </select>
+            </Feld>
             <Feld label="Vorname">
               <input className="a-input" value={f.vorname ?? ''} onChange={(e) => setF({ ...f, vorname: e.target.value })} />
             </Feld>

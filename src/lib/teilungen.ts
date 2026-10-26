@@ -1,6 +1,7 @@
 // Teilungen (persönliche Freund-Links) und anonyme Ereignisse.
 import { all, one, run, insertRow } from './db.ts';
 import { neuerCode, istCodeFormat } from './token.ts';
+import { beiEinloesung } from './zusagen.ts';
 import { saeubereZitat, waehleVariante, type Ton, type Vorlage } from './teilen.ts';
 
 export type Geschenk = {
@@ -141,6 +142,7 @@ export function freundSeite(code: unknown): FreundSeite | null {
 /** Anonymes Ereignis. Keine IP, kein Cookie, keine Inhalte. */
 export function ereignis(typ: string, teilungId: number | null, kundeId: number | null = null) {
   run('INSERT INTO ereignisse (typ, teilung_id, kunde_id) VALUES (?, ?, ?)', typ, teilungId, kundeId);
+  beiEinloesung(typ, teilungId); // A/B-Test: Spende zusagen
 }
 
 /** Ursprünglicher Empfehler (für Wirkung): Ereignisse von Weitergaben zählen beim ursprünglichen Kunden mit. */

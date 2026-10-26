@@ -1,6 +1,7 @@
 // Daten für „Mein Geschenke-Bereich“ des Empfehlers.
 import { all, one, run } from './db.ts';
-import { kontingent, sozialeZahl, anlaesseFuer, type Anlass } from './anreize.ts';
+import { kontingent, sozialeZahl, anlaesseFuer, zweckOderStandard, type Anlass } from './anreize.ts';
+import { varianteVon, zusagenVon, spendenZwecke, spendenGesamt } from './zusagen.ts';
 import { einstellungen, texte, ansprache } from './einstellungen.ts';
 import { anredeName } from './texte.ts';
 import { aktiveGeschenke, beraterFuerKunde, teilungenVonKunde } from './teilungen.ts';
@@ -32,10 +33,6 @@ export function kontingentVon(kunde: { id: number; kontingent_extra?: number | n
   return kontingent(einstellungen().kontingent, kunde.kontingent_extra ?? 0, geteilt);
 }
 
-const EINLOESUNG = "('download','rechner','termin_bestaetigt','auswertung_bestaetigt','download_mail_bestaetigt')";
-
-/** Alle Einlösungen (= gepflanzte Bäume) über alle Kunden. */
-export const baeumeGesamt = () => one<{ n: number }>(`SELECT COUNT(*) n FROM ereignisse WHERE typ IN ${EINLOESUNG}`)!.n;
 
 /** Anlässe („Jemandem, der …“) und Geschenke für den Kunden. `karten` = Auswahl für „Ich weiß schon, was ich verschenken will“. */
 function geschenkAuswahl(kunde: Kunde) {
@@ -49,6 +46,22 @@ function geschenkAuswahl(kunde: Kunde) {
       .map((g) => ({ id: g.id, titel: g.titel, satz: imSatz(g), kurz: g.kurz, icon: g.icon, typ: g.typ, bild_id: g.bild_id })),
     karten: karten.map((g) => g.id),
     anlaesse: anlaesse.map((a) => ({ id: a.id, text: a.text, icon: a.icon, geschenkIds: a.geschenkIds })),
+  };
+}
+
+/** A/B-Test: Gruppe A sieht die Spende (Zweck wählbar), Gruppe B die Prämie. Der Freund sieht davon nichts. */
+function dankeschoenTest(kunde: Kunde) {
+  const e = einstellungen();
+  const variante = varianteVon(kunde.id);
+  const z = zusagenVon(kunde.id);
+  const zwecke = spendenZwecke();
+  return {
+    variante,
+    spende:
+      variante === 'A' && e.spendeBetrag > 0
+        ? { betrag: e.spendeBetrag, zwecke, gewaehlt: zweckOderStandard(kunde.spendenzweck, zwecke), summe: z.spendeSumme, gesamt: spendenGesamt() }
+        : null,
+    praemie: variante === 'B' && e.praemieBetrag > 0 ? { betrag: e.praemieBetrag, bildId: e.praemieBildId, anzahl: z.praemien } : null,
   };
 }
 
@@ -73,7 +86,7 @@ export function empfehlerDaten(kunde: Kunde) {
     sozial: e.sozialAnzeigen
       ? sozialeZahl(e.sozialStartwert, one<{ n: number }>('SELECT COUNT(DISTINCT kunde_id) n FROM teilungen WHERE kunde_id IS NOT NULL AND geteilt_am IS NOT NULL')!.n)
       : null,
-    baeume: e.baeume ? { eigene: wirkung.eingeloest, gesamt: baeumeGesamt() } : null,
+    ...dankeschoenTest(kunde),
     t,
     wirkung,
     // Danke-Bereich erst nach der ersten Einlösung oder einem ausgelösten Dankeschön – Überraschung statt Lockmittel.

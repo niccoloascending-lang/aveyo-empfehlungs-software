@@ -64,7 +64,13 @@ export const PUT = admin(async (req, b) => {
     protokolliere(b.id, 'belohnungen_geaendert', JSON.stringify(x));
   }
   if (d.kontingent !== undefined) setzeEinstellung('kontingent', zahl(d.kontingent, 0, 50, 3));
-  if (d.baeume !== undefined) setzeEinstellung('baeume', !!d.baeume);
+  if (d.abTest) {
+    setzeEinstellung('abTest', { aktiv: !!d.abTest.aktiv, anteilB: zahl(d.abTest.anteilB, 0, 100, 50) });
+    protokolliere(b.id, 'ab_test', JSON.stringify(d.abTest));
+  }
+  if (d.spendeBetrag !== undefined) setzeEinstellung('spendeBetrag', zahl(d.spendeBetrag, 0, 1000, 10));
+  if (d.praemieBetrag !== undefined) setzeEinstellung('praemieBetrag', zahl(d.praemieBetrag, 0, 1000, 50));
+  if (d.praemieBildId !== undefined) setzeEinstellung('praemieBildId', Number(d.praemieBildId) > 0 ? Number(d.praemieBildId) : null);
   if (d.sozialAnzeigen !== undefined) setzeEinstellung('sozialAnzeigen', !!d.sozialAnzeigen);
   if (d.sozialStartwert !== undefined) setzeEinstellung('sozialStartwert', zahl(d.sozialStartwert, 0, 100000, 0));
   if (d.erinnerungNachTagen !== undefined) setzeEinstellung('erinnerungNachTagen', zahl(d.erinnerungNachTagen, 1, 90, 7));

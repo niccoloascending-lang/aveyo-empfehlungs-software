@@ -90,6 +90,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   assert.match(nachricht, /einen persönlichen Versicherungs-Check-up/, 'Geschenk steht grammatisch korrekt im Satz');
   await p.getByRole('button', { name: /kopieren/i }).first().click();
   await p.getByText('Danke! Dein Geschenk ist unterwegs.').waitFor();
+  assert.equal(await p.getByText('Amazon-Gutschein').count(), 0, 'Gruppe A sieht keine Prämie');
   await p.getByText('Noch 2 von 3 Geschenken übrig.').waitFor();
   assert.ok(Date.now() - start < 30_000, 'Teilen in unter 30 Sekunden');
 
@@ -130,7 +131,10 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   await p.getByText('Dein Geschenk wurde gerade eingelöst').waitFor();
   await p.getByText('Erika hat „Versicherungs-Check-up“ genutzt').waitFor();
   await p.getByText('Schon 37 Kunden', { exact: false }).waitFor(); // Lisa zählt jetzt mit
-  await p.getByRole('img', { name: '1 Bäume' }).waitFor();
+  // Gruppe A: Spende je Einlösung, Zweck wählbar
+  await p.getByText('Dein Geschenk tut doppelt Gutes', { exact: false }).waitFor();
+  await p.getByText('Deine Spenden bisher: 10 €').waitFor();
+  await p.getByRole('radio', { name: /Ärzte ohne Grenzen/ }).click();
   await ctx.close();
 });
 
@@ -138,6 +142,7 @@ test('Flow 2b: Download ohne Termin und ohne Daten, danach Weitergeben', async (
   const ctx = await handy();
   const p = await ctx.newPage();
   await p.goto(links.Jonas);
+  await p.getByText('Ihr Dankeschön', { exact: false }).first().waitFor(); // Gruppe B: Gutschein (Jonas: Sie-Form)
   await p.getByRole('radio', { name: /Ich weiß schon/ }).click();
   await p.getByRole('radio', { name: /Checkliste/ }).click();
   await p.waitForSelector('textarea:not([disabled])');

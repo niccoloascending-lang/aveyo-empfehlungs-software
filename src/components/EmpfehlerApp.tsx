@@ -1,7 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Eye, QrCode, X, ShieldCheck, PlayCircle, Heart, Users } from 'lucide-react';
-import { baumReihe } from '@/lib/anreize';
 import { baueNachricht, TOENE, type Kanal, type Ton } from '@/lib/teilen';
 import { fuelle } from '@/lib/texte';
 import type { EmpfehlerDaten } from '@/lib/empfehler';
@@ -178,6 +177,18 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
             </h2>
             <p className="mt-1 text-sm text-tinte/70">{t['kunde.schritt1.hinweis']}</p>
             {gesamt != null && rest != null && <Kontingent gesamt={gesamt} rest={rest} t={t} berater={daten.berater?.name ?? ''} />}
+            {daten.spende && (
+              <a href="#gutes" className="mt-2 flex items-center gap-2 rounded-2xl bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-900">
+                <span aria-hidden>{daten.spende.zwecke.find((z) => z.name === daten.spende!.gewaehlt)?.icon ?? '💚'}</span>
+                {fuelle(t['kunde.gutes.kurz'], { betrag: daten.spende.betrag, zweck: daten.spende.gewaehlt })}
+              </a>
+            )}
+            {daten.praemie && (
+              <a href="#praemie" className="mt-2 flex items-center gap-3 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-900">
+                <span aria-hidden className="text-lg">🎁</span>
+                {fuelle(t['kunde.praemie.text'], { betrag: daten.praemie.betrag })}
+              </a>
+            )}
 
             {daten.anlaesse.length > 0 && (
               <>
@@ -444,7 +455,8 @@ export default function EmpfehlerApp({ token, daten }: { token: string; daten: E
         <p className="mt-3 text-sm text-tinte/70">{wirkung.verschenkt + wirkung.geoeffnet === 0 ? t['kunde.wirkung.leer'] : t['kunde.wirkung.namen']}</p>
       </section>
 
-      {daten.baeume && <Baeume eigene={daten.baeume.eigene} gesamt={daten.baeume.gesamt} t={t} />}
+      {daten.spende && <GutesTun token={token} spende={daten.spende} t={t} />}
+      {daten.praemie && <Praemie praemie={daten.praemie} t={t} berater={daten.berater?.name ?? ''} />}
 
       {daten.dankeSichtbar && <DankeBereich token={token} daten={daten} />}
 
@@ -526,29 +538,71 @@ function Kontingent({ gesamt, rest, t, berater }: { gesamt: number; rest: number
   );
 }
 
-/** Sichtbare Wirkung: ein Baum je eingelöstem Geschenk. */
-function Baeume({ eigene, gesamt, t }: { eigene: number; gesamt: number; t: Record<string, string> }) {
-  const r = baumReihe(eigene);
+/** Gruppe A: Spende für einen selbst gewählten guten Zweck – je eingelöstem Geschenk. */
+function GutesTun({ token, spende, t }: { token: string; spende: NonNullable<EmpfehlerDaten['spende']>; t: Record<string, string> }) {
+  const [zweck, setZweck] = useState(spende.gewaehlt);
+  const waehlen = async (z: string) => {
+    setZweck(z);
+    await api(`/api/k/${token}/zweck`, 'POST', { zweck: z });
+  };
   return (
-    <section className="karte mt-6 p-5" aria-labelledby="baeume">
-      <h2 id="baeume" className="text-lg font-bold">
-        {t['kunde.baeume.titel']}
+    <section id="gutes" className="karte mt-6 scroll-mt-4 p-5" aria-labelledby="gutes-titel">
+      <h2 id="gutes-titel" className="text-lg font-bold">
+        {t['kunde.gutes.titel']} 💚
       </h2>
-      <p className="mt-1 text-sm text-tinte/80">{t['kunde.baeume.text']}</p>
-      {eigene > 0 ? (
-        <p className="mt-3 text-3xl leading-relaxed" role="img" aria-label={`${eigene} Bäume`}>
-          {'🌳'.repeat(r.symbole)}
-          {r.mehr > 0 && <span className="ml-2 align-middle text-base font-semibold text-marke-dunkel">+{r.mehr}</span>}
-        </p>
-      ) : (
-        <p className="mt-3 flex items-center gap-2 text-sm text-tinte/70">
-          <span className="text-2xl opacity-40" aria-hidden>
-            🌱
-          </span>
-          {t['kunde.baeume.leer']}
-        </p>
-      )}
-      {gesamt > 0 && <p className="mt-3 text-xs font-medium text-tinte/70">{fuelle(t['kunde.baeume.gesamt'], { anzahl: gesamt })}</p>}
+      <p className="mt-1 text-sm text-tinte/80">{fuelle(t['kunde.gutes.text'], { betrag: spende.betrag })}</p>
+      <div role="radiogroup" aria-labelledby="gutes-titel" className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {spende.zwecke.map((z) => (
+          <button
+            key={z.name}
+            type="button"
+            role="radio"
+            aria-checked={zweck === z.name}
+            onClick={() => waehlen(z.name)}
+            className={`flex min-h-[52px] items-center gap-3 rounded-2xl border px-4 py-2.5 text-left text-sm font-medium transition ${
+              zweck === z.name ? 'border-emerald-600 bg-emerald-50 ring-2 ring-emerald-600' : 'border-tinte/15 bg-white hover:border-emerald-600/50'
+            }`}
+          >
+            <span aria-hidden className="text-2xl">
+              {z.icon}
+            </span>
+            {z.name}
+          </button>
+        ))}
+      </div>
+      <p className="mt-4 text-base font-semibold text-emerald-900">
+        {spende.summe > 0 ? fuelle(t['kunde.gutes.bisher'], { summe: spende.summe }) : <span className="text-sm font-normal text-tinte/70">{t['kunde.gutes.leer']}</span>}
+      </p>
+      {spende.gesamt > 0 && <p className="mt-1 text-xs font-medium text-tinte/70">{fuelle(t['kunde.gutes.gesamt'], { summe: spende.gesamt })}</p>}
+    </section>
+  );
+}
+
+/** Gruppe B: kleine Prämie für den Kunden nach einem stattgefundenen Gespräch. */
+function Praemie({ praemie, t, berater }: { praemie: NonNullable<EmpfehlerDaten['praemie']>; t: Record<string, string>; berater: string }) {
+  return (
+    <section id="praemie" className="karte mt-6 scroll-mt-4 p-5" aria-labelledby="praemie-titel">
+      <h2 id="praemie-titel" className="text-lg font-bold">
+        {t['kunde.praemie.titel']} 🎁
+      </h2>
+      <div className="mt-3 flex flex-col items-center gap-4 sm:flex-row sm:items-start">
+        {praemie.bildId ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={`/api/datei/${praemie.bildId}`} alt="" className="h-28 w-44 shrink-0 rounded-2xl object-cover shadow-karte" />
+        ) : (
+          <div aria-hidden className="relative flex h-28 w-44 shrink-0 flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-tinte to-marke-dunkel p-3 text-white shadow-karte">
+            <span className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-akzent/40" />
+            <span className="relative text-xs font-semibold uppercase tracking-wider opacity-80">{t['kunde.praemie.karte']}</span>
+            <span className="relative text-4xl font-extrabold">{praemie.betrag} €</span>
+          </div>
+        )}
+        <div>
+          <p className="text-sm leading-relaxed text-tinte/80">{fuelle(t['kunde.praemie.text'], { betrag: praemie.betrag })}</p>
+          {praemie.anzahl > 0 && (
+            <p className="mt-2 font-semibold text-marke-dunkel">{fuelle(t['kunde.praemie.verdient'], { anzahl: praemie.anzahl, betrag: praemie.betrag, berater })}</p>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

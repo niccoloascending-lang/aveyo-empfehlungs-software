@@ -11,7 +11,8 @@ export default function Dankeschoen() {
   return (
     <Shell titel="Dankeschön">
       <Meldung art="info" text="Belohnung ist nie der Grund fürs Teilen, sondern eine Überraschung danach. Hier siehst du, wem du noch Danke sagen könntest, und offene Dankeschöns." />
-      <div className="mt-4 grid gap-6 lg:grid-cols-2">
+      <Zusagen />
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <section className="a-karte">
           <h2 className="mb-3 font-semibold">Noch kein Danke bekommen</h2>
           <ul className="divide-y divide-slate-100 text-sm">
@@ -56,5 +57,57 @@ export default function Dankeschoen() {
         </section>
       </div>
     </Shell>
+  );
+}
+
+/** A/B-Test: zugesagte Spenden (A) und Gutscheine (B) abarbeiten. */
+function Zusagen() {
+  const { daten, laden } = useDaten<{ offen: any[]; summen: { art: string; zweck: string; status: string; anzahl: number; summe: number }[] }>('/api/admin/zusagen');
+  const spenden = (daten?.offen ?? []).filter((z) => z.art === 'spende');
+  const praemien = (daten?.offen ?? []).filter((z) => z.art === 'praemie');
+  const jeZweck = new Map<string, number>();
+  for (const z of spenden) jeZweck.set(z.zweck, (jeZweck.get(z.zweck) ?? 0) + z.betrag);
+  const erledigt = async (b: Record<string, unknown>) => {
+    await anfrage('/api/admin/zusagen', 'PUT', b);
+    laden();
+  };
+  return (
+    <div className="mt-4 grid gap-6 lg:grid-cols-2">
+      <section className="a-karte">
+        <h2 className="mb-1 font-semibold">Offene Spenden (Gruppe A)</h2>
+        <p className="mb-3 text-xs text-slate-500">Je eingelöstem Geschenk, an den Zweck, den der Kunde gewählt hat. Gesammelt überweisen, dann abhaken.</p>
+        {[...jeZweck.entries()].map(([zweck, summe]) => (
+          <div key={zweck} className="flex items-center justify-between gap-2 border-b border-slate-100 py-2 text-sm">
+            <span>
+              {zweck}: <strong>{summe} €</strong>
+            </span>
+            <button className="a-btn2" onClick={() => erledigt({ art: 'spende', zweck })}>
+              Gespendet
+            </button>
+          </div>
+        ))}
+        {!spenden.length && <p className="text-sm text-slate-500">Nichts offen.</p>}
+      </section>
+      <section className="a-karte">
+        <h2 className="mb-1 font-semibold">Offene Gutscheine (Gruppe B)</h2>
+        <p className="mb-3 text-xs text-slate-500">Je stattgefundenem Gespräch eines empfohlenen Freundes. Gutschein selbst verschicken, dann abhaken.</p>
+        <ul className="divide-y divide-slate-100 text-sm">
+          {praemien.map((z) => (
+            <li key={z.id} className="flex items-center justify-between gap-2 py-2">
+              <span>
+                <Link className="font-medium underline" href={`/admin/kunden/${z.kunde_id}`}>
+                  {z.vorname} {z.nachname}
+                </Link>{' '}
+                · {z.betrag} € · {datum(z.erstellt)}
+              </span>
+              <button className="a-btn2" onClick={() => erledigt({ id: z.id })}>
+                Verschickt
+              </button>
+            </li>
+          ))}
+        </ul>
+        {!praemien.length && <p className="text-sm text-slate-500">Nichts offen.</p>}
+      </section>
+    </div>
   );
 }

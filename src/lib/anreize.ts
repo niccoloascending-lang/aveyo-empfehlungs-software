@@ -94,3 +94,36 @@ export const anlaesseLesen = (s: string | null | undefined) =>
     .map((z) => z.trim())
     .filter(Boolean)
     .slice(0, 6);
+
+// ---------- A/B-Test Dankeschön: A = Spende für einen guten Zweck, B = kleine Prämie für den Kunden ----------
+
+export type Variante = 'A' | 'B';
+export const istVariante = (x: unknown): x is Variante => x === 'A' || x === 'B';
+
+/** Gruppe eines Kunden: bleibt fest, sobald vergeben. Ohne laufenden Test immer A. `zufall` ∈ [0,1). */
+export function belohnungsVariante(vorhanden: unknown, testAktiv: boolean, anteilB: number, zufall: number): Variante {
+  if (istVariante(vorhanden)) return vorhanden;
+  if (!testAktiv) return 'A';
+  return zufall * 100 < Math.min(100, Math.max(0, anteilB)) ? 'B' : 'A';
+}
+
+/** Prämie (B) wird fällig, wenn ein Gespräch stattgefunden hat: Status wechselt auf „Beratung“ oder „Kunde“. */
+export const praemieFaellig = (alt: string, neu: string) => ['beratung', 'kunde'].includes(neu) && !['beratung', 'kunde'].includes(alt);
+
+export type Zweck = { icon: string; name: string };
+
+/** „🌳 Bäume pflanzen|🏠 SOS-Kinderdorf e.V.“ → [{icon, name}] (ohne Symbol: 💚). */
+export function zweckeLesen(text: string): Zweck[] {
+  return (text ?? '')
+    .split('|')
+    .map((z) => z.trim())
+    .filter(Boolean)
+    .map((z) => {
+      const m = /^(\p{Extended_Pictographic}[\p{Extended_Pictographic}‍️]*)\s+(.+)$/u.exec(z);
+      return m ? { icon: m[1], name: m[2].trim() } : { icon: '💚', name: z };
+    });
+}
+
+/** Gewählter Zweck, falls (noch) gültig, sonst der erste. */
+export const zweckOderStandard = (gewaehlt: string | null | undefined, zwecke: Zweck[]) =>
+  zwecke.find((z) => z.name === gewaehlt)?.name ?? zwecke[0]?.name ?? '';

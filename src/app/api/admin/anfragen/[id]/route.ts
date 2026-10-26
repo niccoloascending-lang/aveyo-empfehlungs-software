@@ -4,6 +4,7 @@ import { istStatus, einwilligungenVon } from '@/lib/anfragen';
 import { sauber } from '@/lib/validierung';
 import { webhookEinreihen } from '@/lib/webhook';
 import { terminAustragen, terminEintragen } from '@/lib/kalender';
+import { beiStatuswechsel } from '@/lib/zusagen';
 import { one } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -15,7 +16,9 @@ export const PUT = admin(async (req, b, ctx) => {
   const d = await body(req);
   if (d.status !== undefined) {
     if (!istStatus(d.status)) return fehler('Ungültiger Status');
+    const alt = one<{ status: string }>('SELECT status FROM anfragen WHERE id = ?', id)?.status ?? '';
     run("UPDATE anfragen SET status = ?, geaendert = datetime('now') WHERE id = ?", d.status, id);
+    beiStatuswechsel(id, alt, d.status); // A/B-Test: Prämie nach stattgefundenem Gespräch
     webhookEinreihen(id, 'anfrage.status');
     const a = one<{ berater_id: number | null; bestaetigt: string | null }>('SELECT berater_id, bestaetigt FROM anfragen WHERE id = ?', id);
     if (d.status === 'kein_interesse') await terminAustragen(id, a?.berater_id ?? null);

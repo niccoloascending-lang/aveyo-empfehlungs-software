@@ -27,6 +27,8 @@ export type Kunde = {
   token_widerrufen: string | null;
   zuletzt_gesehen: string | null;
   zitat_vorschlag: string | null;
+  belohnung_variante: string;
+  spendenzweck: string | null;
   kontingent_extra: number;
   erinnert_am: string | null;
   notiz: string | null;

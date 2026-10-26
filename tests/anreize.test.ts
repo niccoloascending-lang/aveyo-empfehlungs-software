@@ -50,3 +50,36 @@ test('Anlässe: passende Themen zuerst, fremde Themen weg, nur mit aktiven Gesch
   assert.deepEqual(anlaesseFuer(alle, 'pkv', [2, 5]).map((x) => [x.id, x.geschenkIds]), [[3, [5]], [1, [2]]]);
   assert.equal(anlaesseFuer(Array.from({ length: 9 }, (_, i) => a(i + 1, '', '1')), '', [1]).length, 6);
 });
+
+import { belohnungsVariante, praemieFaellig, zweckeLesen, zweckOderStandard } from '../src/lib/anreize.ts';
+
+test('A/B-Gruppe: fest, wenn vergeben; ohne Test immer A; Anteil B in Prozent', () => {
+  assert.equal(belohnungsVariante('B', true, 0, 0.1), 'B');
+  assert.equal(belohnungsVariante('', false, 100, 0.1), 'A');
+  assert.equal(belohnungsVariante(null, true, 50, 0.49), 'B');
+  assert.equal(belohnungsVariante(null, true, 50, 0.5), 'A');
+  assert.equal(belohnungsVariante(null, true, 0, 0), 'A');
+  assert.equal(belohnungsVariante(null, true, 100, 0.999), 'B');
+  let b = 0;
+  for (let i = 0; i < 2000; i++) if (belohnungsVariante(null, true, 50, Math.random()) === 'B') b++;
+  assert.ok(b > 850 && b < 1150);
+});
+
+test('Prämie erst nach stattgefundenem Gespräch, nur einmal beim Wechsel', () => {
+  assert.equal(praemieFaellig('termin', 'beratung'), true);
+  assert.equal(praemieFaellig('neu', 'kunde'), true);
+  assert.equal(praemieFaellig('beratung', 'kunde'), false);
+  assert.equal(praemieFaellig('neu', 'termin'), false);
+  assert.equal(praemieFaellig('termin', 'kein_interesse'), false);
+});
+
+test('Spendenzwecke mit Symbol lesen', () => {
+  const z = zweckeLesen('🌳 Bäume in Deutschland pflanzen|SOS-Kinderdorf e.V.| ❤️ Caritas |');
+  assert.deepEqual(z, [
+    { icon: '🌳', name: 'Bäume in Deutschland pflanzen' },
+    { icon: '💚', name: 'SOS-Kinderdorf e.V.' },
+    { icon: '❤️', name: 'Caritas' },
+  ]);
+  assert.equal(zweckOderStandard('Caritas', z), 'Caritas');
+  assert.equal(zweckOderStandard('gibt es nicht', z), 'Bäume in Deutschland pflanzen');
+});
