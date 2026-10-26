@@ -16,6 +16,7 @@ export function geschenkDaten(d: any): Record<string, any> | { fehler: string } 
     nutzen: mehrzeilig(d.nutzen, 1000),
     ablauf: mehrzeilig(d.ablauf, 1000),
     dauer: sauber(d.dauer, 60),
+    wert: Number(d.wert) > 0 ? Math.round(Number(d.wert)) : null,
     typ,
     themen: themenLesen(d.themen).join(','),
     icon: sauber(d.icon, 8) || '🎁',

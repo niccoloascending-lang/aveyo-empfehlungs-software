@@ -153,9 +153,17 @@ export const TEXTE = {
   'kunde.keine.geschenke': { bereich: 'Empfehler', beschreibung: 'Wenn keine Geschenke aktiv sind', du: 'Gerade sind keine Geschenke verfügbar. Schau bald wieder vorbei.' },
 
   // ---------- Freund: Landingpage ----------
-  'freund.ueberschrift': { bereich: 'Freund', beschreibung: 'Satzanfang vor dem Geschenk („… einen kostenlosen PKV-Beitragscheck“)', du: '{empfehler} schenkt dir', sie: '{empfehler} schenkt Ihnen' },
+  'freund.ueberschrift': { bereich: 'Freund', beschreibung: 'Satzanfang vor dem Geschenk („… einen persönlichen PKV-Beitragscheck“)', du: '{empfehler} schenkt dir', sie: '{empfehler} schenkt Ihnen' },
   'freund.ueberschrift.anonym': { bereich: 'Freund', beschreibung: 'Wenn kein Name bekannt ist', du: 'Ein Geschenk für dich', sie: 'Ein Geschenk für Sie' },
-  'freund.kosten': { bereich: 'Freund', beschreibung: 'Kosten-Hinweis', du: 'Kosten: 0 €' },
+  'freund.kosten': { bereich: 'Freund', beschreibung: 'Hinweis bei Geschenken ohne Wert (Checkliste, Rechner)', du: 'Für dich geschenkt' },
+  'freund.wert': { bereich: 'Freund', beschreibung: 'Hinweis bei Geschenken mit Wert (Gespräche)', du: 'Wert {wert} € · für dich geschenkt', rechtlich: true },
+  'freund.wert.hinweis': {
+    bereich: 'Freund',
+    beschreibung: 'Erklärung zum Wert',
+    du: 'So viel berechnen wir normalerweise für ein Beratungsgespräch, wenn daraus keine Zusammenarbeit entsteht. Für dich ist es geschenkt.',
+    sie: 'So viel berechnen wir normalerweise für ein Beratungsgespräch, wenn daraus keine Zusammenarbeit entsteht. Für Sie ist es geschenkt.',
+    rechtlich: true,
+  },
   'freund.versprechen': {
     bereich: 'Freund',
     beschreibung: 'Das zentrale Versprechen (null Druck)',
@@ -255,7 +263,7 @@ export const TEXTE = {
   'freund.weitergeben.nachricht': {
     bereich: 'Freund',
     beschreibung: 'Nachricht beim Weitergeben',
-    du: 'Ich hab gerade {geschenk_satz} geschenkt bekommen und fand es richtig gut. Das kann ich weitergeben – vielleicht ist es auch was für dich? Kostet nichts, und niemand ruft dich an. {link}',
+    du: 'Ich hab gerade {geschenk_satz} geschenkt bekommen und fand es richtig gut. Das kann ich weitergeben – vielleicht ist es auch was für dich? Ist geschenkt, und niemand ruft dich an. {link}',
   },
   'freund.form.senden': { bereich: 'Freund', beschreibung: 'Button Absenden', du: 'Absenden' },
   'freund.form.pflicht': { bereich: 'Freund', beschreibung: 'Fehler Pflichtfelder', du: 'Bitte Vorname, E-Mail und den Datenschutz-Hinweis ausfüllen.' },
@@ -309,7 +317,7 @@ export const TEXTE = {
   'doi.knopf': { bereich: 'Bestätigung', beschreibung: 'Button auf der Bestätigungsseite', du: 'Ja, ich bestätige' },
   'og.von': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat: Absender', du: 'Ein Geschenk von {empfehler}' },
   'og.anonym': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat ohne Namen', du: 'Ein Geschenk für dich', sie: 'Ein Geschenk für Sie' },
-  'og.zeile': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat: Unterzeile', du: 'Kostenlos · Niemand ruft dich an · Du entscheidest', sie: 'Kostenlos · Niemand ruft Sie an · Sie entscheiden', rechtlich: true },
+  'og.zeile': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat: Unterzeile', du: 'Geschenkt · Niemand ruft dich an · Du entscheidest', sie: 'Geschenkt · Niemand ruft Sie an · Sie entscheiden', rechtlich: true },
   'freund.drucken': { bereich: 'Freund', beschreibung: 'Button auf der Download-Inhaltsseite', du: 'Drucken / als PDF speichern' },
   'doi.fehler': { bereich: 'Bestätigung', beschreibung: 'Link abgelaufen/ungültig', du: 'Dieser Bestätigungslink ist abgelaufen oder ungültig.' },
 
@@ -385,8 +393,8 @@ export const TEXTE = {
   'erinnerung.text': {
     bereich: 'Einladung',
     beschreibung: 'Freundliche Erinnerung an den Kunden (vom Berater selbst verschickt)',
-    du: 'Hey {vorname}, nur eine kleine Erinnerung, ganz ohne Druck: Falls dir jemand einfällt, dem ein kostenloser Check bei uns helfen würde, hier ist nochmal dein Link mit den Geschenken für Freunde: {link}',
-    sie: 'Hallo {anrede_name}, nur eine kleine Erinnerung, ganz ohne Druck: Falls Ihnen jemand einfällt, dem ein kostenloser Check bei uns helfen würde, hier ist noch einmal Ihr Link mit den Geschenken für Freunde: {link}',
+    du: 'Hey {vorname}, nur eine kleine Erinnerung, ganz ohne Druck: Falls dir jemand einfällt, dem ein Check bei uns helfen würde, hier ist nochmal dein Link mit den Geschenken für Freunde: {link}',
+    sie: 'Hallo {anrede_name}, nur eine kleine Erinnerung, ganz ohne Druck: Falls Ihnen jemand einfällt, dem ein Check bei uns helfen würde, hier ist noch einmal Ihr Link mit den Geschenken für Freunde: {link}',
     lang: true,
   },
   'einladung.betreff': { bereich: 'Einladung', beschreibung: 'Betreff, falls per Mail', du: 'Ein Geschenk für deine Freunde', sie: 'Ein Geschenk für Ihre Freunde' },

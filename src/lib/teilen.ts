@@ -26,7 +26,7 @@ export function waehleVariante(vorlagen: Vorlage[], ton: Ton, zufall: number): V
 
 export type NachrichtVars = { geschenk: string; geschenkSatz?: string; link: string; absender?: string; zitat?: string };
 
-/** Geschenk so, wie es im Satz steht: „Lisa schenkt dir einen kostenlosen PKV-Beitragscheck“. Ohne Pflege: der Titel. */
+/** Geschenk so, wie es im Satz steht: „Lisa schenkt dir einen persönlichen PKV-Beitragscheck“. Ohne Pflege: der Titel. */
 export const imSatz = (g: { titel: string; akkusativ?: string | null }) => (g.akkusativ ?? '').trim() || g.titel;
 
 /** Nachricht füllen. Steht {link} nicht in der Vorlage, wird der Link angehängt – ohne Link wäre das Teilen sinnlos. */

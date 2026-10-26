@@ -236,7 +236,8 @@ export function initSchema(d: DatabaseSync) {
   addColumnIfMissing(d, 'geschenke', 'akkusativ', 'TEXT');
   addColumnIfMissing(d, 'kunden', 'anrede', "TEXT NOT NULL DEFAULT ''"); // herr | frau | '' (vom Berater gewählt, nie geraten)
   addColumnIfMissing(d, 'geschenke', 'anlaesse', 'TEXT'); // (früher: Denkanstöße je Geschenk; ersetzt durch Tabelle anlaesse)
-  addColumnIfMissing(d, 'teilungen', 'anlass_id', 'INTEGER'); // anonym: über welchen Anlass verschenkt wurde (Auswertung) // „Wer fällt dir ein?“ – je Zeile ein Anlass
+  addColumnIfMissing(d, 'teilungen', 'anlass_id', 'INTEGER');
+  addColumnIfMissing(d, 'geschenke', 'wert', 'INTEGER'); // € – nur angeben, wenn ihr diesen Betrag wirklich berechnet (Gespräch ohne Abschluss) // anonym: über welchen Anlass verschenkt wurde (Auswertung) // „Wer fällt dir ein?“ – je Zeile ein Anlass
   addColumnIfMissing(d, 'kunden', 'zitat_vorschlag', 'TEXT'); // echter Erfolg, vom Berater eingetragen („Ich spare jetzt 840 € im Jahr“)
   addColumnIfMissing(d, 'kunden', 'kontingent_extra', 'INTEGER NOT NULL DEFAULT 0');
   addColumnIfMissing(d, 'kunden', 'erinnert_am', 'TEXT');

@@ -14,6 +14,7 @@ type G = {
   ablauf: string;
   anlaesse: string | null;
   dauer: string;
+  wert: number | null;
   typ: 'termin' | 'download' | 'rechner';
   themen: string;
   icon: string;
@@ -25,7 +26,7 @@ type G = {
   geteilt?: number;
 };
 
-const LEER: G = { titel: '', akkusativ: '', kurz: '', nutzen: '', ablauf: '', anlaesse: '', dauer: '', typ: 'termin', themen: '', icon: '🎁', bild_id: null, datei_id: null, inhalt: '', aktiv: 1, reihenfolge: 0 };
+const LEER: G = { titel: '', akkusativ: '', kurz: '', nutzen: '', ablauf: '', anlaesse: '', dauer: '', wert: null, typ: 'termin', themen: '', icon: '🎁', bild_id: null, datei_id: null, inhalt: '', aktiv: 1, reihenfolge: 0 };
 const TYP: Record<string, string> = { termin: 'Termin buchen', download: 'Download', rechner: 'Rechner' };
 
 export default function Geschenke() {
@@ -88,13 +89,13 @@ export default function Geschenke() {
                 <input className="a-input text-center text-xl" value={g.icon} onChange={(e) => setG({ ...g, icon: e.target.value })} />
               </Feld>
               <Feld label="Titel *">
-                <input className="a-input" required value={g.titel} onChange={(e) => setG({ ...g, titel: e.target.value })} placeholder="Kostenloser PKV-Beitragscheck" />
+                <input className="a-input" required value={g.titel} onChange={(e) => setG({ ...g, titel: e.target.value })} placeholder="PKV-Beitragscheck" />
               </Feld>
             </div>
             <Feld label="Im Satz" hinweis="So steht es auf der Freund-Seite und in den Nachrichten: „Lisa schenkt dir …“. Leer = Titel.">
               <div className="flex items-center gap-2">
                 <span className="shrink-0 text-sm text-slate-500">Lisa schenkt dir</span>
-                <input className="a-input" value={g.akkusativ ?? ''} onChange={(e) => setG({ ...g, akkusativ: e.target.value })} placeholder="einen kostenlosen PKV-Beitragscheck" />
+                <input className="a-input" value={g.akkusativ ?? ''} onChange={(e) => setG({ ...g, akkusativ: e.target.value })} placeholder="einen persönlichen PKV-Beitragscheck" />
               </div>
             </Feld>
             <Feld label="Kurzbeschreibung / Nutzenversprechen">
@@ -106,7 +107,7 @@ export default function Geschenke() {
             <Feld label="Ablauf (3 Schritte, je Zeile einer)">
               <textarea className="a-input" rows={3} value={g.ablauf} onChange={(e) => setG({ ...g, ablauf: e.target.value })} />
             </Feld>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <Feld label="Typ">
                 <select className="a-input" value={g.typ} onChange={(e) => setG({ ...g, typ: e.target.value as G['typ'] })}>
                   {Object.entries(TYP).map(([k, l]) => (
@@ -118,6 +119,9 @@ export default function Geschenke() {
               </Feld>
               <Feld label="Dauer">
                 <input className="a-input" value={g.dauer} onChange={(e) => setG({ ...g, dauer: e.target.value })} placeholder="30 Minuten" />
+              </Feld>
+              <Feld label="Wert in € (optional)" hinweis="Nur, wenn ihr das wirklich berechnet, z. B. 299 € für ein Gespräch ohne Abschluss.">
+                <input className="a-input" type="number" min={0} value={g.wert ?? ''} onChange={(e) => setG({ ...g, wert: e.target.value ? Number(e.target.value) : null })} />
               </Feld>
               <Feld label="Reihenfolge">
                 <input className="a-input" type="number" value={g.reihenfolge} onChange={(e) => setG({ ...g, reihenfolge: Number(e.target.value) })} />

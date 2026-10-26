@@ -25,7 +25,7 @@ const zeilen = (s: string) =>
 
 /**
  * Landingpage für den Freund. Innerhalb der ersten Bildschirmhöhe muss klar sein:
- * Was bekomme ich, von wem, was kostet es (nichts), werde ich angerufen (nein).
+ * Was bekomme ich, von wem, was kostet es (nichts – geschenkt), werde ich angerufen (nein).
  */
 export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenUrl, orte, terminExtern }: Props) {
   const { teilung, geschenk: g, berater } = seite;
@@ -47,24 +47,25 @@ export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenU
         <section aria-labelledby="titel" className="karte anim-hoch relative mt-6 overflow-hidden px-6 pb-7 pt-8 text-center">
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-marke-hell to-transparent" />
           <GeschenkBox icon={g.icon} />
-          {/* Ein ganzer Satz: „Mia schenkt dir einen kostenlosen PKV-Beitragscheck“ */}
+          {/* Ein ganzer Satz: „Mia schenkt dir einen persönlichen PKV-Beitragscheck“ */}
           <h1 id="titel" className="relative">
             <span className="block text-xl font-medium text-tinte/80">{ueberschrift}</span>
             <span className="mt-1 block text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{empfehler ? imSatz(g) : g.titel}</span>
           </h1>
-          {g.kurz && <p className="relative mx-auto mt-3 max-w-md text-lg leading-snug text-tinte/80">{g.kurz}</p>}
           <ul className="relative mt-5 flex flex-wrap justify-center gap-2 text-sm font-semibold">
-            <li className="rounded-full bg-marke-hell px-3 py-1.5 text-marke-dunkel">{t['freund.kosten']}</li>
+            <li className="rounded-full bg-marke-hell px-3 py-1.5 text-marke-dunkel">{g.wert ? fuelle(t['freund.wert'], { wert: g.wert }) : t['freund.kosten']}</li>
             {g.dauer && (
               <li className="inline-flex items-center gap-1 rounded-full bg-marke-hell px-3 py-1.5 text-marke-dunkel">
                 <Clock size={14} aria-hidden /> {g.dauer}
               </li>
             )}
           </ul>
-          <p className="relative mx-auto mt-5 flex max-w-md items-start justify-center gap-2 text-left text-base font-medium">
+          <p className="relative mx-auto mt-4 flex max-w-md items-start justify-center gap-2 text-left text-base font-medium">
             <ShieldCheck className="mt-0.5 shrink-0 text-marke" size={20} aria-hidden />
             <span>{t['freund.versprechen']}</span>
           </p>
+          {g.kurz && <p className="relative mx-auto mt-4 max-w-md text-lg leading-snug text-tinte/80">{g.kurz}</p>}
+          {g.wert ? <p className="relative mx-auto mt-2 max-w-sm text-xs leading-snug text-tinte/60">{t['freund.wert.hinweis']}</p> : null}
         </section>
 
         {g.bild_id && (

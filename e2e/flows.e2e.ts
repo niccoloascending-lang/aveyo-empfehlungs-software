@@ -87,7 +87,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   const nachricht = await p.locator('textarea').inputValue();
   const wa = await p.getByRole('link', { name: 'WhatsApp' }).getAttribute('href');
   assert.match(wa!, /^https:\/\/wa\.me\/\?text=/);
-  assert.match(nachricht, /einen kostenlosen Versicherungs-Check-up/, 'Geschenk steht grammatisch korrekt im Satz');
+  assert.match(nachricht, /einen persönlichen Versicherungs-Check-up/, 'Geschenk steht grammatisch korrekt im Satz');
   await p.getByRole('button', { name: /kopieren/i }).first().click();
   await p.getByText('Danke! Dein Geschenk ist unterwegs.').waitFor();
   await p.getByText('Noch 2 von 3 Geschenken übrig.').waitFor();
@@ -100,7 +100,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   const f = await ctx.newPage();
   await f.goto(link);
   // 5-Sekunden-Test: Wer, was, Kosten, keine Anrufe – alles im ersten Bildschirm
-  for (const text of ['Lisa schenkt dir', 'einen kostenlosen Versicherungs-Check-up', 'Kosten: 0 €', 'Niemand ruft dich an']) {
+  for (const text of ['Lisa schenkt dir', 'einen persönlichen Versicherungs-Check-up', 'Wert 299 € · für dich geschenkt', 'Niemand ruft dich an']) {
     const box = await f.getByText(text).first().boundingBox();
     assert.ok(box && box.y + box.height <= 844, `${text} sichtbar ohne Scrollen`);
   }
@@ -128,7 +128,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   // Wirkung beim Empfehler: Name nur dank Einwilligung
   await p.goto(links.Lisa);
   await p.getByText('Dein Geschenk wurde gerade eingelöst').waitFor();
-  await p.getByText('Erika hat „Kostenloser Versicherungs-Check-up“ genutzt').waitFor();
+  await p.getByText('Erika hat „Versicherungs-Check-up“ genutzt').waitFor();
   await p.getByText('Schon 37 Kunden', { exact: false }).waitFor(); // Lisa zählt jetzt mit
   await p.getByRole('img', { name: '1 Bäume' }).waitFor();
   await ctx.close();

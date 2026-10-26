@@ -11,7 +11,7 @@ test('Du/Sie und Überschreibungen aus dem Admin', () => {
   assert.equal(text('freund.ueberschrift', 'du', {}, { empfehler: 'Lisa' }), 'Lisa schenkt dir');
   assert.equal(text('freund.ueberschrift', 'sie', {}, { empfehler: 'Lisa' }), 'Lisa schenkt Ihnen');
   // Text ohne Sie-Form: Du-Form gilt auch für Sie
-  assert.equal(rohtext('freund.kosten', 'sie'), 'Kosten: 0 €');
+  assert.equal(rohtext('freund.kosten', 'sie'), 'Für dich geschenkt');
   const o = { 'freund.kosten': { du: 'Kostet nichts' } };
   assert.equal(rohtext('freund.kosten', 'du', o), 'Kostet nichts');
   assert.equal(rohtext('freund.kosten', 'sie', o), 'Kostet nichts');
