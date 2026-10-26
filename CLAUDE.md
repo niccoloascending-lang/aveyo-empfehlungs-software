@@ -8,7 +8,7 @@ Ausführlich: `README.md`.
 2. **E-Mails an Freunde nur nach eigener Eingabe + Double-Opt-in** (`anfragen.ts`). Bestätigen nur per POST (Knopf), nicht per GET.
 3. **Empfehler sehen nur Zahlen;** Namen nur mit Einwilligung `empfehler_info` (nicht vorausgewählt, `aktivAngehakt` prüft streng auf `true`).
 4. **Keine Texte für Kunden/Freunde hart codieren:** neuer Text → Schlüssel in `src/lib/texte.ts` (Du/Sie, ggf. `rechtlich: true`), Abruf über `texte([...])`/`t()`.
-5. **Keine Geldprämien**, keine Renditeversprechen, keine Superlative (Test in `tests/texte.test.ts`).
+5. **Keine Geldprämien an Freunde**, kein Bargeld; Dankeschön an Empfehler nur über den A/B-Test (Spende A / Gutschein B, `zusagen.ts`). Keine Renditeversprechen, keine Superlative (Test in `tests/texte.test.ts`).
 6. Tracking ohne Cookies und ohne IP; Link-Vorschau-Bots zählen nicht (`istVorschauBot`).
 7. Schema nur abwärtskompatibel (`CREATE TABLE IF NOT EXISTS`, `addColumnIfMissing`).
 8. Logik in reine Dateien (nur relative Importe mit `.ts`-Endung, keine `@/`-Importe in `src/lib`) + Test. Vor jedem Push: `npx tsc --noEmit`, `npm test`, `npm run build`, möglichst `npm run test:e2e`.

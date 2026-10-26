@@ -247,6 +247,22 @@ export function initSchema(d: DatabaseSync) {
     CREATE UNIQUE INDEX IF NOT EXISTS zusagen_praemie ON zusagen(anfrage_id) WHERE art = 'praemie';
   `);
 
+  // Testimonial-Videos echter Kunden (nur mit schriftlicher Einwilligung)
+  d.exec(`
+    CREATE TABLE IF NOT EXISTS testimonials (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      name         TEXT NOT NULL,              -- Anzeige, z. B. „Sarah, selbstständig“
+      zitat        TEXT,                       -- ein Satz unter dem Video
+      video_id     INTEGER NOT NULL,
+      poster_id    INTEGER,                    -- optionales Vorschaubild
+      themen       TEXT NOT NULL DEFAULT '',   -- passt zu Geschenken mit diesen Themen; leer = allgemein
+      einwilligung TEXT NOT NULL,              -- Datum der schriftlichen Einwilligung
+      aktiv        INTEGER NOT NULL DEFAULT 1,
+      reihenfolge  INTEGER NOT NULL DEFAULT 0,
+      erstellt     TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+  `);
+
   // Ergänzungen (abwärtskompatibel)
   addColumnIfMissing(d, 'berater', 'kalender_id', 'TEXT'); // Google-Kalender-ID (meist die E-Mail-Adresse)
   addColumnIfMissing(d, 'anfragen', 'berater_id', 'INTEGER'); // zuständiger Berater (Kalender)

@@ -35,7 +35,7 @@ npm run dev         # http://localhost:3200
 
 ## Anstöße zum Teilen (warum es diesmal funktionieren soll)
 
-Bewusst ohne Geldprämien, Punkte oder Ranglisten – das hat bei Tellscale den Kunden zum Vertriebler gemacht. Stattdessen:
+Bewusst ohne Punkte oder Ranglisten – das hat bei Tellscale den Kunden zum Vertriebler gemacht. Ein Dankeschön gibt es nur im A/B-Test (siehe unten). Stattdessen:
 
 | Anstoß | Wo | Einstellbar |
 |---|---|---|
@@ -45,7 +45,9 @@ Bewusst ohne Geldprämien, Punkte oder Ranglisten – das hat bei Tellscale den 
 | **Persönlicher Erfolgs-Satz** („Ich spare jetzt 840 € im Jahr“) als erster Vorschlag – nur echte Zahlen | Schritt 2 | Kunde → Erfolg als Satz-Vorschlag |
 | **Im Termin teilen**: großer QR-Code zum Kunden-Link, der Kunde scannt und teilt sofort | Admin → Kunde | – |
 | **Erinnern**: Liste „geöffnet, aber nichts geteilt“ / „nie geöffnet“ mit fertigem Text, höchstens alle 60 Tage | Admin → Erinnern | Einstellungen (Tage), Texte |
-| **Sichtbare Wirkung**: ein Baum je eingelöstem Geschenk („Dein Wäldchen“), Gesamtzahl aller Kunden | Empfehler-Bereich, Übersicht | Einstellungen (⚖️ nur, wenn wirklich gepflanzt wird) |
+| **Wert statt „kostenlos“**: „Wert 299 € · für dich geschenkt“ – die Beratung kostet ohne Abschluss tatsächlich 299 € | Freund-Seite, Vorschaubild | Admin → Geschenke (Feld „Wert“), Texte |
+| **Kundenvideos**: bis zu 2 kurze Videos echter Kunden mit Vorschaubild, passend zum Thema des Geschenks | Freund-Seite vor „Einlösen“ | Admin → Kundenvideos |
+| **A/B-Test Dankeschön**: Gruppe A „Dein Geschenk tut doppelt Gutes“ (Kunde wählt Zweck: Bäume, SOS-Kinderdorf, Ärzte ohne Grenzen, Caritas; Spende je Einlösung), Gruppe B 50 €-Amazon-Gutschein je Freund, der zu einem Gespräch kommt | Empfehler-Bereich, Übersicht (Vergleich), Admin → Dankeschön (offene Zusagen) | Einstellungen (Anteil B, Beträge, Gutscheinbild), Texte |
 | **Soziale Bestätigung** „Schon 36 Kunden haben ein Geschenk weitergegeben“ – echter Startwert aus Tellscale + Kunden, die hier teilen | Empfehler-Bereich | Einstellungen (Startwert), Texte |
 
 Der wichtigste Hebel bleibt der Moment, in dem ihr fragt: am Ende eines guten Termins, direkt mit dem QR-Code.
@@ -223,6 +225,14 @@ Header: `X-Geschenk-Zeit` (Unix-Sekunden) und `X-Geschenk-Signatur: sha256=<HMAC
 - **Pflichtangaben** (Impressum, Datenschutz, Erstinformation, Registernummer) in der Fußzeile jeder öffentlichen Seite; Inhalte im Admin unter „Texte → Rechtliches“.
 - **Keine erfundenen Bewertungen:** Bewertungen erscheinen nur als Link, wenn ein echter Link eingetragen ist.
 
+## Kundenvideos (Testimonials)
+
+- **Wo liegen die Videos?** Auf dem eigenen Server (Hetzner), hochgeladen im Admin unter „Kundenvideos“. Nicht Google Drive: Drive-Links zeigen Google-Oberfläche, laden langsam, brechen bei Freigabeänderungen und übertragen Daten der Freunde an Google.
+- **Format:** MP4 (H.264), 720p, Hochformat, 30–60 Sekunden, idealerweise 5–15 MB (max. 300 MB). iPhone-Videos (MOV) gehen auch, sind aber groß – vorher z. B. mit HandBrake („Fast 720p30“) verkleinern.
+- **Vorschau:** Ohne eigenes Bild zeigt der Browser ein Standbild aus der ersten Sekunde; besser ist ein eigenes Vorschaubild (JPG). Geladen wird erst beim Abspielen, Safari/iPhone springen dank Range-Auslieferung (206) sofort.
+- **Einwilligung:** Ohne Datum der schriftlichen Einwilligung des Kunden lässt sich kein Video speichern. Videos lassen sich jederzeit deaktivieren oder löschen.
+- **Passend zum Geschenk:** Themen am Video (z. B. `pkv`) werden mit den Themen des Geschenks abgeglichen; passende Videos zuerst, Videos ohne Themen passen überall.
+
 ## Rechtlich zu prüfende Texte
 
 Im Admin unter „Texte“ mit ⚖️ markiert. Offener Platzhalter: Hosting-Anbieter in „Datenschutz bei dieser Seite“ (sobald der Server steht).
@@ -245,6 +255,8 @@ Im Admin unter „Texte“ mit ⚖️ markiert. Offener Platzhalter: Hosting-Anb
 | `belohnung.spende.titel` | Dankeschön | Spende: Titel |
 | `belohnung.spende.text` | Dankeschön | Spende: Text |
 | `belohnung.spende.zwecke` | Dankeschön | Spendenzwecke (mit | trennen) |
+| `kunde.gutes.*`, `kunde.praemie.*` | Empfehler | A/B-Test: Spende bzw. 50 €-Amazon-Gutschein (Provisionsabgabe/Zuwendungsverbot nach § 48b VAG prüfen; Gutschein an Empfehler, nicht an Freunde) |
+| `freund.wert.hinweis` | Freund | Hinweis zum Wert 299 € |
 | `belohnung.erlebnis.titel` | Dankeschön | Erlebnis: Titel |
 | `belohnung.erlebnis.text` | Dankeschön | Erlebnis: Text |
 | `belohnung.doppelt.titel` | Dankeschön | Doppeltes Geschenk: Titel |

@@ -15,6 +15,7 @@ type Props = {
   bewertungenUrl: string;
   orte: ('online' | 'hamburg')[];
   terminExtern: string | null;
+  testimonials: { id: number; name: string; zitat: string | null; video: number; poster: number | null }[];
 };
 
 const zeilen = (s: string) =>
@@ -27,7 +28,7 @@ const zeilen = (s: string) =>
  * Landingpage für den Freund. Innerhalb der ersten Bildschirmhöhe muss klar sein:
  * Was bekomme ich, von wem, was kostet es (nichts – geschenkt), werde ich angerufen (nein).
  */
-export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenUrl, orte, terminExtern }: Props) {
+export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenUrl, orte, terminExtern, testimonials }: Props) {
   const { teilung, geschenk: g, berater } = seite;
   const empfehler = teilung.von_name?.trim() || '';
   const ueberschrift = empfehler ? fuelle(t['freund.ueberschrift'], { empfehler }) : `${t['freund.ueberschrift.anonym']}:`;
@@ -107,6 +108,34 @@ export default function FreundAnsicht({ seite, t, vorschau = false, bewertungenU
                 </li>
               ))}
             </ol>
+          </section>
+        )}
+
+        {testimonials.length > 0 && (
+          <section className="mt-8" aria-labelledby="stimmen">
+            <h2 id="stimmen" className="text-xl font-bold">
+              {t['freund.testimonials.titel']}
+            </h2>
+            <div className={`mt-3 grid gap-4 ${testimonials.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+              {testimonials.map((v) => (
+                <figure key={v.id}>
+                  {/* Vorschau sofort sichtbar (Standbild bzw. eigenes Bild), geladen wird erst beim Abspielen */}
+                  <video
+                    src={`/api/datei/${v.video}#t=0.5`}
+                    poster={v.poster ? `/api/datei/${v.poster}` : undefined}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className={`w-full rounded-2xl bg-tinte object-cover shadow-karte ${testimonials.length > 1 ? 'aspect-[9/16]' : 'max-h-[70vh]'}`}
+                    aria-label={v.name}
+                  />
+                  <figcaption className="mt-2 text-sm">
+                    {v.zitat && <span className="block font-medium">„{v.zitat}“</span>}
+                    <span className="text-tinte/70">– {v.name}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </section>
         )}
 

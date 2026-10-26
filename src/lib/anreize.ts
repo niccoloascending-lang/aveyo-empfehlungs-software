@@ -127,3 +127,21 @@ export function zweckeLesen(text: string): Zweck[] {
 /** Gewählter Zweck, falls (noch) gültig, sonst der erste. */
 export const zweckOderStandard = (gewaehlt: string | null | undefined, zwecke: Zweck[]) =>
   zwecke.find((z) => z.name === gewaehlt)?.name ?? zwecke[0]?.name ?? '';
+
+// ---------- Testimonials ----------
+
+export type Testimonial = { id: number; themen: string; aktiv: number; reihenfolge: number };
+
+/** Für ein Geschenk: zuerst Testimonials mit gemeinsamem Thema, dann allgemeine (ohne Themen); fremde Themen nur als Lückenfüller. */
+export function testimonialsFuer<T extends Testimonial>(alle: T[], geschenkThemen: string, max = 2): T[] {
+  const g = new Set(liste(geschenkThemen));
+  const rang = (t: T) => {
+    const th = liste(t.themen);
+    if (th.some((x) => g.has(x))) return 0;
+    return th.length ? 2 : 1;
+  };
+  return alle
+    .filter((t) => t.aktiv)
+    .sort((a, b) => rang(a) - rang(b) || a.reihenfolge - b.reihenfolge || a.id - b.id)
+    .slice(0, max);
+}

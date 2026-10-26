@@ -83,3 +83,13 @@ test('Spendenzwecke mit Symbol lesen', () => {
   assert.equal(zweckOderStandard('Caritas', z), 'Caritas');
   assert.equal(zweckOderStandard('gibt es nicht', z), 'Bäume in Deutschland pflanzen');
 });
+
+import { testimonialsFuer } from '../src/lib/anreize.ts';
+
+test('Testimonials: passendes Thema zuerst, dann allgemein, max. 2, nur aktive', () => {
+  const t = (id: number, themen: string, aktiv = 1) => ({ id, themen, aktiv, reihenfolge: id });
+  const alle = [t(1, 'immobilien'), t(2, ''), t(3, 'pkv'), t(4, 'pkv', 0), t(5, '')];
+  assert.deepEqual(testimonialsFuer(alle, 'pkv').map((x) => x.id), [3, 2]);
+  assert.deepEqual(testimonialsFuer(alle, '').map((x) => x.id), [2, 5]);
+  assert.deepEqual(testimonialsFuer([t(1, 'immobilien')], 'pkv').map((x) => x.id), [1]);
+});

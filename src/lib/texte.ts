@@ -197,6 +197,7 @@ export const TEXTE = {
   'freund.nutzen.titel': { bereich: 'Freund', beschreibung: 'Überschrift Nutzen', du: 'Was du bekommst', sie: 'Was Sie bekommen' },
   'freund.ablauf.titel': { bereich: 'Freund', beschreibung: 'Überschrift Ablauf', du: 'So läuft es ab' },
   'freund.dauer': { bereich: 'Freund', beschreibung: 'Label Dauer', du: 'Dauer' },
+  'freund.testimonials.titel': { bereich: 'Freund', beschreibung: 'Überschrift Kundenvideos', du: 'Das sagen Kunden' },
   'freund.berater.titel': { bereich: 'Freund', beschreibung: 'Überschrift Beratervorstellung', du: 'Wer dahintersteckt' },
   'freund.einloesen.titel': { bereich: 'Freund', beschreibung: 'Überschrift Einlösen', du: 'Geschenk einlösen' },
   'freund.termin.ort': { bereich: 'Freund', beschreibung: 'Frage nach dem Ort', du: 'Wo passt es dir?', sie: 'Wo passt es Ihnen?' },

@@ -37,6 +37,7 @@ const ENV = {
 let server: ChildProcess;
 let browser: any;
 const links: Record<string, string> = {};
+let freundLink = '';
 
 const postausgang = () =>
   fs.existsSync(path.join(DATA, 'postausgang'))
@@ -98,6 +99,7 @@ test('Flow 1+2: Empfehler teilt in unter 30 s, Freund bucht Termin mit Double-Op
   assert.equal(await p.locator('input[type=email], input[type=tel]').count(), 0);
 
   const link = nachricht.match(/http\S+\/g\/\w+/)![0];
+  freundLink = link;
   const f = await ctx.newPage();
   await f.goto(link);
   // 5-Sekunden-Test: Wer, was, Kosten, keine Anrufe – alles im ersten Bildschirm
@@ -185,6 +187,26 @@ test('Flow 3: Berater-Login mit 2FA, Anfrage sehen, Status setzen', async () => 
   await a.getByRole('button', { name: /Jetzt im Termin teilen/ }).click();
   await a.getByText('scann mal kurz', { exact: false }).waitFor();
   assert.equal((await a.request.get(`${B}/api/admin/kunden/3/qr`)).headers()['content-type'], 'image/svg+xml');
+  // Kundenvideo hochladen, freigeben, auf der Freundesseite als Vorschau sehen
+  const up = await a.request.post(`${B}/api/admin/upload`, {
+    multipart: { datei: { name: 'test.mp4', mimeType: 'video/mp4', buffer: Buffer.alloc(4096, 1) } },
+  });
+  const videoId = (await up.json()).id;
+  assert.ok(videoId);
+  const ohne = await a.request.post(`${B}/api/admin/testimonials`, { data: { name: 'Sarah, Testkundin', video_id: videoId, aktiv: true } });
+  assert.equal(ohne.status(), 400, 'ohne Einwilligungsdatum nicht speicherbar');
+  const tm = await a.request.post(`${B}/api/admin/testimonials`, {
+    data: { name: 'Sarah, Testkundin', zitat: 'Hat sich gelohnt.', video_id: videoId, einwilligung: '2026-01-15', aktiv: true },
+  });
+  assert.equal(tm.status(), 200);
+  const teil = await a.request.get(`${B}/api/datei/${videoId}`, { headers: { Range: 'bytes=0-99' } });
+  assert.equal(teil.status(), 206);
+  assert.equal((await teil.body()).length, 100);
+  const freund = await browser.newPage();
+  await freund.goto(freundLink);
+  await freund.getByRole('heading', { name: 'Das sagen Kunden' }).waitFor();
+  assert.equal(await freund.locator('video').getAttribute('preload'), 'metadata');
+  await freund.close();
   await a.goto(`${B}/admin/anfragen`);
   await a.waitForTimeout(300);
   await a.reload();

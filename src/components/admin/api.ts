@@ -49,3 +49,23 @@ export async function kopiere(text: string) {
     return false;
   }
 }
+
+/** Upload mit Fortschritt (für große Videos). */
+export function hochladenMitFortschritt(f: File, fortschritt: (prozent: number) => void): Promise<{ id?: number; error?: string }> {
+  return new Promise((ok) => {
+    const fd = new FormData();
+    fd.append('datei', f);
+    const x = new XMLHttpRequest();
+    x.open('POST', '/api/admin/upload');
+    x.upload.onprogress = (e) => e.lengthComputable && fortschritt(Math.round((e.loaded / e.total) * 100));
+    x.onload = () => {
+      try {
+        ok(JSON.parse(x.responseText));
+      } catch {
+        ok({ error: `Upload fehlgeschlagen (${x.status})` });
+      }
+    };
+    x.onerror = () => ok({ error: 'Upload fehlgeschlagen (Verbindung).' });
+    x.send(fd);
+  });
+}
