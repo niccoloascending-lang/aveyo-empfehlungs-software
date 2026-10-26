@@ -1,0 +1,23 @@
+[Unit]
+Description=AVEYO Geschenk-Empfehlung
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=geschenk
+Group=geschenk
+WorkingDirectory=/opt/geschenk/aktuell
+# Nur lokal erreichbar – nach außen nur über Caddy (HTTPS)
+ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3200
+Environment=NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
+Restart=always
+RestartSec=3
+# Härtung
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/geschenk /opt/geschenk/releases
+
+[Install]
+WantedBy=multi-user.target

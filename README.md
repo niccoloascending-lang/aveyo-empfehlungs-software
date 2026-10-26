@@ -85,7 +85,7 @@ Der wichtigste Hebel bleibt der Moment, in dem ihr fragt: am Ende eines guten Te
 - **Spendenzwecke:** Einen Baum in Deutschland pflanzen · SOS-Kinderdorf e.V. · Ärzte ohne Grenzen.
 
 ### Noch offen
-1. „Datenschutz bei dieser Seite“: Hosting-Anbieter eintragen, sobald der Server steht (Platzhalter), und juristisch prüfen lassen.
+1. „Datenschutz bei dieser Seite“ (Hosting: Hetzner Online GmbH eingetragen) juristisch prüfen lassen.
 
 ## Server: Hetzner oder Büro?
 
@@ -131,42 +131,17 @@ npm run seed         # Beispieldaten (idempotent)
 npm run admin:add -- "Name" mail@aveyo.de "passwort-mit-12-zeichen"   # Zugang anlegen / Passwort + 2FA zurücksetzen
 ```
 
-## Deployment (Vorschlag: Hetzner Cloud CX22, Ubuntu 24.04, Standort Deutschland)
+## Deployment (Hetzner Cloud, Ubuntu 24.04, Standort Deutschland)
 
-1. Server anlegen, AVV mit Hetzner abschließen (im Kundenkonto). DNS: `geschenk.aveyo.de` → Server-IP.
-2. Node.js 22 installieren (`curl -fsSL https://deb.nodesource.com/setup_22.x | sudo bash - && sudo apt install -y nodejs`) und Caddy (`sudo apt install caddy`).
-3. Code holen und bauen:
-   ```bash
-   git clone https://github.com/niccoloascending-lang/aveyo-empfehlungs-software.git /opt/geschenk && cd /opt/geschenk
-   npm ci && cp .env.example .env.local   # ausfüllen: SESSION_SECRET, GESCHENK_BASE_URL, GESCHENK_HTTPS=1, SMTP_*
-   npm test && npm run build
-   npm run admin:add -- "Adrian" adrian@aveyo.de "…"
-   ```
-4. Dienst `/etc/systemd/system/geschenk.service`:
-   ```ini
-   [Unit]
-   Description=AVEYO Geschenk-Empfehlung
-   After=network.target
-   [Service]
-   WorkingDirectory=/opt/geschenk
-   ExecStart=/usr/bin/npm start
-   Restart=always
-   User=www-data
-   Environment=NODE_ENV=production
-   [Install]
-   WantedBy=multi-user.target
-   ```
-   `sudo chown -R www-data /opt/geschenk/data && sudo systemctl enable --now geschenk`
-5. Caddy `/etc/caddy/Caddyfile`:
-   ```
-   geschenk.aveyo.de {
-     reverse_proxy localhost:3200
-     header Strict-Transport-Security "max-age=31536000"
-   }
-   ```
-   Port 3200 per Firewall nur lokal erreichbar lassen (`ufw allow 80,443/tcp`).
-6. **Backup:** `data/` täglich sichern (z. B. `sqlite3 data/geschenk.db ".backup /backup/geschenk-$(date +%F).db"` per Cron + Hetzner-Snapshots).
-7. **Update:** `git pull && npm ci && npm test && npm run build && sudo systemctl restart geschenk`.
+Schritt für Schritt: **[`deploy/ANLEITUNG.md`](deploy/ANLEITUNG.md)**. Kurzfassung:
+
+- Einmalig `deploy/einrichten.sh` (als root): Firewall, SSH nur mit Schlüssel, automatische Sicherheitsupdates, Node.js 22, Caddy (HTTPS automatisch,
+  keine Zugriffsprotokolle), Benutzer `geschenk`, Einstellungen in `/etc/geschenk/geschenk.env` (SESSION_SECRET wird erzeugt und nie überschrieben),
+  Daten in `/var/lib/geschenk`, Sicherung täglich 03:15 nach `/var/backups/geschenk`, Grunddaten mit `npm run seed -- --produktiv` (ohne Demo-Daten).
+- `geschenk-update`: baut jede Version in `/opt/geschenk/releases/<zeit>-<commit>` (npm ci → Tests → Build), sichert, schaltet `/opt/geschenk/aktuell` um
+  und prüft, ob die App antwortet – sonst automatisch zurück. `geschenk-update --zurueck` schaltet auf die vorige Version.
+- `geschenk-admin "Name" mail@aveyo.de`: Zugang anlegen oder Passwort + 2FA zurücksetzen.
+- Dienst: `deploy/geschenk.service` (nur `127.0.0.1:3200`, gehärtet), Webserver: `deploy/Caddyfile`.
 
 ## E-Mail einrichten (Google Workspace, kontakt@aveyo.de)
 
@@ -182,8 +157,8 @@ SPF/DKIM für aveyo.de sind bei Google Workspace normalerweise schon eingerichte
 ## Google-Kalender einrichten
 
 1. Google Cloud Console (mit dem Workspace-Konto): Projekt anlegen → **Google Calendar API** aktivieren → **Dienstkonto** anlegen → Schlüssel (JSON) erzeugen.
-2. JSON auf den Server legen, z. B. `/opt/aveyo/geheim/google-dienstkonto.json` (nur für den Dienst lesbar, **nie ins Repository**), und in `.env.local`
-   `GOOGLE_SERVICE_ACCOUNT_FILE=/opt/aveyo/geheim/google-dienstkonto.json` setzen.
+2. JSON auf den Server legen, z. B. `/etc/geschenk/google-dienstkonto.json` (nur für den Dienst lesbar, **nie ins Repository**), und in `.env.local`
+   `GOOGLE_SERVICE_ACCOUNT_FILE=/etc/geschenk/google-dienstkonto.json` setzen.
 3. Jeder Berater: Google Kalender → Einstellungen seines Kalenders → „Für bestimmte Personen freigeben“ → E-Mail des Dienstkontos (steht im Admin) mit
    **„Änderungen an Terminen vornehmen“**. Falls die Freigabe für externe Konten gesperrt ist: Google Admin → Apps → Kalender → Freigabeeinstellungen anpassen.
 4. Im Admin unter Einstellungen → Mein Profil die Kalender-ID eintragen (meist die eigene E-Mail) und **„Kalender testen“** drücken.
@@ -236,7 +211,7 @@ Header: `X-Geschenk-Zeit` (Unix-Sekunden) und `X-Geschenk-Signatur: sha256=<HMAC
 
 ## Rechtlich zu prüfende Texte
 
-Im Admin unter „Texte“ mit ⚖️ markiert. Offener Platzhalter: Hosting-Anbieter in „Datenschutz bei dieser Seite“ (sobald der Server steht).
+Im Admin unter „Texte“ mit ⚖️ markiert. Hosting in „Datenschutz bei dieser Seite“: Hetzner Online GmbH (AVV abschließen).
 
 | Schlüssel | Bereich | Inhalt |
 |---|---|---|
