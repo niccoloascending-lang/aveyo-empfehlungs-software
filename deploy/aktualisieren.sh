@@ -56,6 +56,19 @@ if ! cmp -s "$QUELLE/deploy/geschenk.service" /etc/systemd/system/geschenk.servi
   install -m 644 "$QUELLE/deploy/geschenk.service" /etc/systemd/system/geschenk.service
   systemctl daemon-reload
 fi
+# Webserver-Einstellung aus dem Repository übernehmen (nur wenn geändert und gültig)
+DOMAIN=$(sed -n 's#^GESCHENK_BASE_URL=https\?://##p' /etc/geschenk/geschenk.env)
+if [ -n "$DOMAIN" ]; then
+  sed "s#__DOMAIN__#$DOMAIN#g" "$QUELLE/deploy/Caddyfile" > /etc/caddy/Caddyfile.neu
+  if cmp -s /etc/caddy/Caddyfile.neu /etc/caddy/Caddyfile; then
+    rm -f /etc/caddy/Caddyfile.neu
+  elif caddy validate --config /etc/caddy/Caddyfile.neu --adapter caddyfile >/dev/null 2>&1; then
+    mv /etc/caddy/Caddyfile.neu /etc/caddy/Caddyfile
+    systemctl reload caddy && echo "== Webserver-Einstellung aktualisiert"
+  else
+    echo "!! Neue Webserver-Einstellung ungültig – die bisherige bleibt (/etc/caddy/Caddyfile.neu prüfen)."
+  fi
+fi
 
 STAND=$(git -C "$QUELLE" rev-parse --short HEAD)
 if [ -n "$ALT" ] && [ "$(basename "$ALT" | sed 's/.*-//')" = "$STAND" ]; then

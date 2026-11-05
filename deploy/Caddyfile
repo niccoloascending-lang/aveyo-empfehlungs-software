@@ -1,5 +1,16 @@
-# Wird von einrichten.sh nach /etc/caddy/Caddyfile geschrieben (__DOMAIN__ ersetzt).
-# Keine Zugriffsprotokolle (keine IP-Adressen gespeichert). HTTPS-Zertifikat holt Caddy automatisch.
+# Wird von einrichten.sh und geschenk-update nach /etc/caddy/Caddyfile geschrieben (__DOMAIN__ ersetzt).
+# HTTPS-Zertifikat holt Caddy automatisch.
+#
+# Datenschutz: keine Zugriffsprotokolle und keine IP-Adressen im Protokoll.
+# Ohne „log“-Anweisung schreibt Caddy keine Zugriffsprotokolle. Meldungen, die Anfragen samt IP enthalten
+# (abgebrochene Verbindungen, Fehler beim Weiterleiten, TLS-Fehler), werden hier ausgeschlossen.
+# Zertifikats-Meldungen (tls.*) bleiben, damit Probleme mit HTTPS sichtbar sind.
+{
+	log default {
+		exclude http.handlers.reverse_proxy http.log.error http.stdlib
+	}
+}
+
 __DOMAIN__ {
 	encode zstd gzip
 	reverse_proxy 127.0.0.1:3200
