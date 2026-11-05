@@ -4,10 +4,21 @@ import Fusszeile from '@/components/Fusszeile';
 import EmpfehlerApp from '@/components/EmpfehlerApp';
 import { kundeAusToken } from '@/lib/kunden';
 import { empfehlerDaten } from '@/lib/empfehler';
-import { texte } from '@/lib/einstellungen';
+import { einstellungen, texte } from '@/lib/einstellungen';
 
 export const dynamic = 'force-dynamic';
-export const metadata: Metadata = { title: 'Mein Geschenke-Bereich', robots: { index: false, follow: false }, referrer: 'no-referrer' };
+// Neutral (für Du und Sie) und ohne Kundendaten: Link-Vorschauen werden von WhatsApp & Co. abgerufen.
+export function generateMetadata(): Metadata {
+  const t = texte(['og.kunde.']);
+  const titel = t['og.kunde.oben'];
+  return {
+    title: titel,
+    description: t['og.kunde.beschreibung'],
+    openGraph: { title: titel, description: t['og.kunde.beschreibung'], siteName: einstellungen().theme.firmenname, type: 'website' },
+    robots: { index: false, follow: false },
+    referrer: 'no-referrer',
+  };
+}
 
 export default function Empfehler({ params }: { params: { token: string } }) {
   const kunde = kundeAusToken(params.token);

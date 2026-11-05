@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Shell from '@/components/admin/Shell';
 import { anfrage, hochladen, useDaten } from '@/components/admin/api';
+import { verkleinereFoto } from '@/components/admin/verkleinern';
 import { Feld, KopierKnopf, Meldung } from '@/components/admin/ui';
 
 const TAGE = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
@@ -62,7 +63,7 @@ export default function Einstellungen() {
             <div className="flex items-center gap-3">
               {p.foto_id && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={`/api/datei/${p.foto_id}`} alt="" className="h-12 w-12 rounded-full object-cover" />
+                <img src={`/api/datei/${p.foto_id}`} alt="" className="h-12 w-12 rounded-full object-cover" style={{ objectPosition: '50% 22%' }} />
               )}
               <input
                 type="file"
@@ -70,7 +71,7 @@ export default function Einstellungen() {
                 onChange={async (x) => {
                   const f = x.target.files?.[0];
                   if (!f) return;
-                  const r = await hochladen(f);
+                  const r = await hochladen(await verkleinereFoto(f, 900));
                   if (!r.id) return zeige(r);
                   // sofort speichern – sonst ist das Foto nur in der Vorschau
                   const neu = { ...p, foto_id: r.id };

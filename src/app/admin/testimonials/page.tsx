@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import Shell from '@/components/admin/Shell';
 import { anfrage, hochladen, hochladenMitFortschritt, useDaten } from '@/components/admin/api';
+import { verkleinereFoto } from '@/components/admin/verkleinern';
 import { Feld, Meldung, Themen, THEMEN_LABEL } from '@/components/admin/ui';
 
 type T = { id?: number; name: string; zitat: string | null; video_id: number | null; poster_id: number | null; themen: string; einwilligung: string; aktiv: number; reihenfolge: number };
@@ -86,7 +87,7 @@ export default function Testimonials() {
                 onChange={async (e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
-                  const r = await hochladen(f);
+                  const r = await hochladen(await verkleinereFoto(f, 1280));
                   if (r.id) setX({ ...x, poster_id: r.id });
                   else setFehler(r.error ?? 'Upload fehlgeschlagen');
                 }}

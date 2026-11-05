@@ -16,6 +16,18 @@ export function istTokenFormat(t: unknown): t is string {
   return typeof t === 'string' && /^[A-Za-z0-9_-]{43}$/.test(t);
 }
 
+/**
+ * Magic-Link für Kunden, kurz genug für WhatsApp: 16 Zeichen Base62 ≈ 95 Bit Zufall. Selbst mit Milliarden
+ * Versuchen pro Sekunde nicht in Jahrtausenden zu erraten. Ältere Links mit 43 Zeichen bleiben gültig.
+ */
+export function neuesKundenToken(): string {
+  return neuerCode(16);
+}
+
+export function istKundenTokenFormat(t: unknown): t is string {
+  return typeof t === 'string' && (/^[0-9A-Za-z]{16}$/.test(t) || istTokenFormat(t));
+}
+
 const BASE62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 /** Kurzer, öffentlicher Code für Freund-Links (/g/<code>). 10 Zeichen ≈ 59 Bit, gleichverteilt (Rejection Sampling). */

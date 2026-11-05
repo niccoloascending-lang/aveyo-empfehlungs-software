@@ -187,6 +187,34 @@ test('Flow 3: Berater-Login mit 2FA, Anfrage sehen, Status setzen', async () => 
   await a.getByRole('button', { name: /Jetzt im Termin teilen/ }).click();
   await a.getByText('scann mal kurz', { exact: false }).waitFor();
   assert.equal((await a.request.get(`${B}/api/admin/kunden/3/qr`)).headers()['content-type'], 'image/svg+xml');
+  // Beraterfoto: Ein großes Hochformat-Foto wird schon im Browser verkleinert (scharf, wenig Datenvolumen)
+  const grossesFoto = await a.evaluate(async () => {
+    const c = document.createElement('canvas');
+    c.width = 2400;
+    c.height = 3600;
+    const ctx = c.getContext('2d')!;
+    for (let y = 0; y < 3600; y += 40) {
+      ctx.fillStyle = `hsl(${y % 360}, 60%, 50%)`;
+      ctx.fillRect(0, y, 2400, 40);
+    }
+    const blob: Blob = await new Promise((ok) => c.toBlob((b) => ok(b!), 'image/jpeg', 0.95));
+    return Array.from(new Uint8Array(await blob.arrayBuffer()));
+  });
+  await a.goto(`${B}/admin/einstellungen`);
+  const fotoAntwort = a.waitForResponse((r) => r.url().endsWith('/api/admin/upload'));
+  await a.getByLabel('Foto').setInputFiles({ name: 'portrait.jpg', mimeType: 'image/jpeg', buffer: Buffer.from(grossesFoto) });
+  const fotoId = (await (await fotoAntwort).json()).id;
+  assert.ok(fotoId, 'Foto hochgeladen');
+  await a.getByText('Foto gespeichert.').waitFor();
+  const foto = await a.evaluate(async (id) => {
+    const b = await (await fetch(`/api/datei/${id}`)).blob();
+    const bild = await createImageBitmap(b);
+    return { breite: bild.width, hoehe: bild.height, groesse: b.size, typ: b.type };
+  }, fotoId);
+  assert.deepEqual([foto.breite, foto.hoehe], [600, 900], 'längste Kante 900 px, Seitenverhältnis bleibt');
+  assert.equal(foto.typ, 'image/jpeg');
+  assert.ok(foto.groesse < grossesFoto.length, `kleiner als das Original (${foto.groesse} statt ${grossesFoto.length} Byte)`);
+
   // Kundenvideo hochladen, freigeben, auf der Freundesseite als Vorschau sehen
   const up = await a.request.post(`${B}/api/admin/upload`, {
     multipart: { datei: { name: 'test.mp4', mimeType: 'video/mp4', buffer: Buffer.alloc(4096, 1) } },
