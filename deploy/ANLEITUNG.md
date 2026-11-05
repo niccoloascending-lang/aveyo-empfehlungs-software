@@ -181,3 +181,6 @@ Timo erzeugt Schritt 1 auf seinem PC und schickt dir die `.pub`-Zeile. Auf dem S
 - Die App läuft als eigener Benutzer `geschenk` mit eingeschränkten Rechten. Die Einstellungsdatei ist nur für root und die App lesbar.
 - HTTPS-Zertifikat (Let's Encrypt) über Caddy, verlängert sich selbst.
 - Keine Zugriffsprotokolle mit IP-Adressen (passend zum Datenschutztext).
+
+Automatische Scanner (z. B. „l9scan“, „zgrab“) klopfen jede neue Website im Internet ab. Das ist normal und harmlos:
+Offen sind nur die Seiten der App, und Admin-Bereiche brauchen Passwort + 2FA.
