@@ -342,6 +342,14 @@ export const TEXTE = {
   'og.von': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat: Absender', du: 'Ein Geschenk von {empfehler}' },
   'og.anonym': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat ohne Namen', du: 'Ein Geschenk für dich', sie: 'Ein Geschenk für Sie' },
   'og.zeile': { bereich: 'Freund', beschreibung: 'Vorschaubild im Chat: Unterzeile', du: 'Geschenkt · Niemand ruft dich an · Du entscheidest', sie: 'Geschenkt · Niemand ruft Sie an · Sie entscheiden', rechtlich: true },
+  'og.kunde.oben': { bereich: 'Empfehler', beschreibung: 'Vorschaubild Kunden-Link: oben', du: 'Persönlicher Geschenke-Bereich' },
+  'og.kunde.titel': { bereich: 'Empfehler', beschreibung: 'Vorschaubild Kunden-Link: Titel', du: 'Freunden etwas Gutes schenken' },
+  'og.kunde.zeile': { bereich: 'Empfehler', beschreibung: 'Vorschaubild Kunden-Link: Unterzeile', du: 'Ohne Verkaufsgespräch · in 30 Sekunden geteilt' },
+  'og.kunde.beschreibung': {
+    bereich: 'Empfehler',
+    beschreibung: 'Link-Vorschau Kunden-Link: Beschreibung unter dem Titel',
+    du: 'Etwas verschenken, das Freunden wirklich hilft – ganz ohne Verkaufsgespräch.',
+  },
   'freund.drucken': { bereich: 'Freund', beschreibung: 'Button auf der Download-Inhaltsseite', du: 'Drucken / als PDF speichern' },
   'doi.fehler': { bereich: 'Bestätigung', beschreibung: 'Link abgelaufen/ungültig', du: 'Dieser Bestätigungslink ist abgelaufen oder ungültig.' },
 

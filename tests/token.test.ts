@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  neuesToken, hashToken, istTokenFormat, neuerCode, istCodeFormat, linkGueltig, signiere, pruefeSignatur,
+  neuesToken, hashToken, istTokenFormat, neuesKundenToken, istKundenTokenFormat, neuerCode, istCodeFormat, linkGueltig, signiere, pruefeSignatur,
   hashPasswort, pruefePasswort, passwortProblem,
 } from '../src/lib/token.ts';
 import { verschluesseln, entschluesseln } from '../src/lib/geheim.ts';
@@ -15,6 +15,18 @@ test('Magic-Link-Token: lang, URL-sicher, eindeutig', () => {
   assert.equal(istTokenFormat('kurz'), false);
   assert.equal(istTokenFormat(a + '!'), false);
   assert.equal(istTokenFormat(undefined), false);
+});
+
+test('Kunden-Link: kurz (16 Zeichen, nur Buchstaben/Ziffern), alte lange Links gelten weiter', () => {
+  const k = neuesKundenToken();
+  assert.match(k, /^[0-9A-Za-z]{16}$/);
+  assert.notEqual(k, neuesKundenToken());
+  assert.ok(istKundenTokenFormat(k));
+  assert.ok(istKundenTokenFormat(neuesToken()), 'alter 43-Zeichen-Link');
+  assert.equal(istKundenTokenFormat('kurz'), false);
+  assert.equal(istKundenTokenFormat(k.slice(0, 15) + '-'), false);
+  assert.equal(istKundenTokenFormat(k + 'x'), false);
+  assert.equal(istKundenTokenFormat(undefined), false);
 });
 
 test('Token wird nur gehasht gespeichert', () => {

@@ -11,7 +11,8 @@ export function Avatar({ name, fotoId, groesse = 64, breit = false }: { name: st
   const s = { width: breit && fotoId ? Math.round(groesse * 1.33) : groesse, height: groesse };
   const form = breit && fotoId ? 'rounded-3xl' : 'rounded-full';
   return fotoId ? (
-    <img src={`/api/datei/${fotoId}`} alt={name} style={s} className={`shrink-0 ${form} object-cover shadow-karte ring-4 ring-white`} />
+    // Ausschnitt etwas oberhalb der Mitte: Bei Porträts bleibt so das Gesicht im Bild statt der Brust
+    <img src={`/api/datei/${fotoId}`} alt={name} style={{ ...s, objectPosition: '50% 22%' }} className={`shrink-0 ${form} object-cover shadow-karte ring-4 ring-white`} />
   ) : (
     <span style={s} aria-hidden className="grid shrink-0 place-items-center rounded-full bg-marke-hell text-lg font-bold text-marke-dunkel ring-4 ring-white">
       {init}

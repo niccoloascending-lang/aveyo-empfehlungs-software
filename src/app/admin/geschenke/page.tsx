@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import Shell from '@/components/admin/Shell';
 import { anfrage, hochladen, useDaten } from '@/components/admin/api';
+import { verkleinereFoto } from '@/components/admin/verkleinern';
 import { Feld, Meldung, Themen, THEMEN_LABEL } from '@/components/admin/ui';
 
 type G = {
@@ -46,7 +47,9 @@ export default function Geschenke() {
 
   const upload = async (feld: 'bild_id' | 'datei_id', f?: File) => {
     if (!f || !g) return;
-    const r = await hochladen(f);
+    // Titelbild: Fotos verkleinern (PNG-Grafiken und Download-Dateien bleiben unverändert)
+    const datei = feld === 'bild_id' && /^image\/(jpeg|webp)$/.test(f.type) ? await verkleinereFoto(f, 1600) : f;
+    const r = await hochladen(datei);
     if (r.error) return setFehler(r.error);
     setG({ ...g, [feld]: r.id! });
   };

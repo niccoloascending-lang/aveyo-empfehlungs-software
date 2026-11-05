@@ -1,6 +1,6 @@
 // Kunden (Empfehler) und ihre Magic-Links.
 import { all, one, run, insertRow, transaktion } from './db.ts';
-import { neuesToken, hashToken, istTokenFormat, linkGueltig } from './token.ts';
+import { neuesKundenToken, hashToken, istKundenTokenFormat, linkGueltig } from './token.ts';
 import { verschluesseln, entschluesseln } from './geheim.ts';
 import { einstellungen, basisUrl } from './einstellungen.ts';
 import { kundenLink } from './teilen.ts';
@@ -56,7 +56,7 @@ export function kundeAnlegen(k: KundeNeu): number {
 
 /** Neuen Magic-Link erzeugen. Ein alter Link wird dadurch sofort ungültig. */
 export function neuerLink(kundeId: number): string {
-  const token = neuesToken();
+  const token = neuesKundenToken();
   run(
     "UPDATE kunden SET token_hash = ?, token_enc = ?, token_erstellt = datetime('now'), token_widerrufen = NULL, geaendert = datetime('now') WHERE id = ?",
     hashToken(token),
@@ -84,7 +84,7 @@ export function linkFuer(kundeId: number): string | null {
 
 /** Kunde zum Magic-Link. null bei falschem, widerrufenem oder abgelaufenem Link. */
 export function kundeAusToken(token: unknown): Kunde | null {
-  if (!istTokenFormat(token)) return null;
+  if (!istKundenTokenFormat(token)) return null;
   const k = one<Kunde & { token_widerrufen: string | null }>('SELECT * FROM kunden WHERE token_hash = ?', hashToken(token));
   if (!k || !k.token_erstellt) return null;
   if (!linkGueltig({ erstellt: k.token_erstellt, widerrufen: k.token_widerrufen }, einstellungen().linkGueltigTage)) return null;
