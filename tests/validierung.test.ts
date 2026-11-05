@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { istEmail, sauber, telefon, themenLesen, geschenkeFuer, istVorschauBot } from '../src/lib/validierung.ts';
+import { istEmail, sauber, telefon, themenLesen, geschenkeFuer, istVorschauBot, kalenderId } from '../src/lib/validierung.ts';
 import { kundenAusCsv, parseCsv } from '../src/lib/csv.ts';
 
 test('E-Mail und Telefon', () => {
@@ -51,4 +51,14 @@ test('CSV-Kundenimport mit Fehlern je Zeile', () => {
   assert.deepEqual(r.kunden[0], { vorname: 'Lisa', nachname: 'Muster', anrede: 'frau', ansprache: 'sie', email: 'lisa@example.org', handy: '+49 171 111', themen: 'pkv,vorsorge', extern_id: 'K-1' });
   assert.deepEqual(r.fehler.map((f) => f.zeile), [3, 4, 5, 6]);
   assert.equal(kundenAusCsv('Name;Telefon\nA;1').fehler[0].zeile, 1);
+});
+
+test('Kalender-ID: E-Mail direkt oder aus kopiertem Google-Kalender-Link', () => {
+  assert.equal(kalenderId('adrian@example.org'), 'adrian@example.org');
+  assert.equal(kalenderId(''), '');
+  assert.equal(kalenderId('https://calendar.google.com/calendar/embed?src=adrian%40example.org&ctz=Europe%2FBerlin'), 'adrian@example.org');
+  assert.equal(kalenderId('https://calendar.google.com/calendar/ical/adrian%40example.org/public/basic.ics'), 'adrian@example.org');
+  assert.equal(kalenderId('abc123@group.calendar.google.com'), 'abc123@group.calendar.google.com');
+  assert.equal(kalenderId('https://calendar.google.com/calendar/u/0/r'), null);
+  assert.equal(kalenderId('mein kalender'), null);
 });
