@@ -13,6 +13,26 @@ export function mehrzeilig(s: unknown, max = 5000): string {
   return s.replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').slice(0, max);
 }
 
+/**
+ * Google-Kalender-ID aus der Eingabe. Erlaubt ist die ID selbst (meist die E-Mail) oder ein kopierter Link aus den
+ * Google-Kalender-Einstellungen („Öffentliche URL“ …/embed?src=…, „iCal-Adresse“ …/ical/<id>/…). Unbrauchbar → null.
+ */
+export function kalenderId(x: unknown): string | null {
+  const s = sauber(x, 1000);
+  if (!s) return '';
+  if (!/^https?:\/\//i.test(s)) return /\s/.test(s) ? null : s.slice(0, 200);
+  try {
+    const u = new URL(s);
+    const src = u.searchParams.get('src');
+    if (src) return sauber(src, 200) || null;
+    const ical = /\/calendar\/ical\/([^/]+)\//.exec(u.pathname);
+    if (ical) return sauber(decodeURIComponent(ical[1]), 200) || null;
+  } catch {
+    // kein gültiger Link
+  }
+  return null;
+}
+
 /** Telefon: nur Ziffern, +, Leerzeichen, /, -, (). Leer erlaubt. */
 export function telefon(s: unknown): string | null {
   const t = sauber(s, 40);

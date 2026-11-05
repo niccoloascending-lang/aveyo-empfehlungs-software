@@ -215,6 +215,14 @@ test('Flow 3: Berater-Login mit 2FA, Anfrage sehen, Status setzen', async () => 
   const fremd = await browser.newContext();
   const r = await fremd.request.get(`${B}/api/admin/anfragen`);
   assert.equal(r.status(), 401);
+  // Weiterleitung zur Anmeldung immer auf die öffentliche Adresse (GESCHENK_BASE_URL), auch hinter dem Webserver:
+  // Caddy meldet „https“, die App selbst läuft intern – früher landete man dann auf https://localhost:…
+  const umweg = await fremd.request.get(`${B}/admin`, {
+    maxRedirects: 0,
+    headers: { Host: 'geschenk.example.org', 'X-Forwarded-Host': 'geschenk.example.org', 'X-Forwarded-Proto': 'https' },
+  });
+  assert.equal(umweg.status(), 307);
+  assert.equal(umweg.headers()['location'], `${B}/admin/login`);
   await fremd.close();
   await ctx.close();
 });

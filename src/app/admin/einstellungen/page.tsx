@@ -81,10 +81,10 @@ export default function Einstellungen() {
             </div>
           </Feld>
           <Feld label="Begrüßungsvideo (optional, https-Link)">
-            <input className="a-input" value={p.video_url ?? ''} onChange={(x) => setP({ ...p, video_url: x.target.value })} />
+            <input className="a-input" type="url" autoComplete="off" placeholder="https://…" value={p.video_url ?? ''} onChange={(x) => setP({ ...p, video_url: x.target.value })} />
           </Feld>
           <Feld label="Externes Buchungstool (optional, Cal.com/Calendly-Link)" hinweis="Wird nur genutzt, wenn unten „Terminbuchung: extern“ gewählt ist.">
-            <input className="a-input" value={p.termin_url ?? ''} onChange={(x) => setP({ ...p, termin_url: x.target.value })} />
+            <input className="a-input" type="url" autoComplete="off" placeholder="https://…" value={p.termin_url ?? ''} onChange={(x) => setP({ ...p, termin_url: x.target.value })} />
           </Feld>
           <Feld
             label="Google-Kalender (Kalender-ID, meist deine E-Mail)"
@@ -94,7 +94,7 @@ export default function Einstellungen() {
                 : 'Noch kein Google-Dienstkonto auf dem Server eingerichtet (siehe README → Google-Kalender).'
             }
           >
-            <input className="a-input" placeholder="adrian@aveyo.de" value={p.kalender_id ?? ''} onChange={(x) => setP({ ...p, kalender_id: x.target.value })} />
+            <input className="a-input" autoComplete="off" placeholder="adrian@aveyo.de" value={p.kalender_id ?? ''} onChange={(x) => setP({ ...p, kalender_id: x.target.value })} />
           </Feld>
           <div className="flex flex-wrap gap-2">
             <button className="a-btn" onClick={async () => zeige(await anfrage('/api/admin/profil', 'PUT', p))}>

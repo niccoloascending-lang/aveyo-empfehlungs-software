@@ -1,6 +1,6 @@
 import { admin, json, fehler, body } from '@/lib/admin';
 import { one, run, protokolliere } from '@/lib/db';
-import { mehrzeilig, sauber } from '@/lib/validierung';
+import { kalenderId, mehrzeilig, sauber } from '@/lib/validierung';
 import { hashPasswort, passwortProblem, pruefePasswort } from '@/lib/token';
 
 export const dynamic = 'force-dynamic';
@@ -26,7 +26,10 @@ export const PUT = admin(async (req, b) => {
   }
   const video = url(d.video_url);
   const termin = url(d.termin_url);
-  if (video === null || termin === null) return fehler('Links müssen mit https:// beginnen.');
+  if (video === null) return fehler('Begrüßungsvideo: bitte einen Link mit https:// eintragen oder das Feld leer lassen.');
+  if (termin === null) return fehler('Buchungstool: bitte einen Link mit https:// eintragen oder das Feld leer lassen.');
+  const kalender = kalenderId(d.kalender_id);
+  if (kalender === null) return fehler('Google-Kalender: bitte die Kalender-ID eintragen (meist deine E-Mail-Adresse).');
   const name = sauber(d.name, 80);
   if (!name) return fehler('Name fehlt.');
   run(
@@ -35,7 +38,7 @@ export const PUT = admin(async (req, b) => {
     mehrzeilig(d.vorstellung, 1000) || null,
     video || null,
     termin || null,
-    sauber(d.kalender_id, 200) || null,
+    kalender || null,
     Number(d.foto_id) > 0 ? Number(d.foto_id) : null,
     b.id,
   );

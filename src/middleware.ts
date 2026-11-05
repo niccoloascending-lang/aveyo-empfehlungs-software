@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { anmeldeUrl } from './lib/weiterleitung.ts';
 
 // Nur der Admin-Bereich ist geschützt. Kunden (Magic-Link /k/…) und Freunde (/g/…) brauchen keinen Login.
 // Edge-Runtime: Signatur der Sitzung per Web Crypto prüfen (kein DB-Zugriff).
@@ -26,7 +27,7 @@ export async function middleware(req: NextRequest) {
   if (OFFEN.includes(pathname)) return NextResponse.next();
   if (await gueltig(req.cookies.get('gs_session')?.value)) return NextResponse.next();
   if (pathname.startsWith('/api/')) return NextResponse.json({ error: 'Nicht angemeldet' }, { status: 401 });
-  return NextResponse.redirect(new URL('/admin/login', req.url));
+  return NextResponse.redirect(anmeldeUrl(process.env.GESCHENK_BASE_URL, req.url));
 }
 
 export const config = { matcher: ['/admin/:path*', '/api/admin/:path*'] };
